@@ -54,10 +54,15 @@ local conf = {
 local ngx_server_url = ngx.var.scheme.."://"..ngx.var.server_name
 local request_path   = ngx.var.uri
 local request_args   = ngx.req.get_uri_args()
-local httpc          = http.new()
 
 
 ---------- Functions ----------
+
+--- Returns a partially applied function.
+local function partial(func, ...)
+  local args = ...
+  return function(...) return func(args, ...) end
+end
 
 --- Rewrites nginx variable if defined, otherwise do nothing.
 local function rewrite_var(name, value)
@@ -86,12 +91,14 @@ end
 
 --- Sends an HTTP request and returns respond if has status 200.
 -- This function just wraps resty.http#request_uri for simpler error handling.
+--
+-- @param resty.http#http an instance of resty http client.
 -- @param #string uri
--- @param #map params see resty.http#request.
+-- @param #map params
 -- @return #map a response, or nil if an error occured or server didn't return
 --         status 200.
-local function request_uri(uri, params)
-  local res, err = httpc:request_uri(uri, params)
+local function request_uri(http_client, uri, params)
+  local res, err = http_client:request_uri(uri, params)
 
   if res and res.status == 200 then
     return res
@@ -102,11 +109,12 @@ local function request_uri(uri, params)
 end
 
 ---
+-- @param request_f the function to perform a request, see #request_uri.
 -- @param #string grant_type "authorization_code", or "client_credentials".
 -- @param #string auth_code the authorization code obtained from the
 --        authorization server (only for grant_type authorization_code).
 -- @return #map token
-local function request_token(grant_type, auth_code)
+local function request_token(request_f, grant_type, auth_code)
 
   local credentials = conf.client_id..":"..conf.client_secret
   local body = { grant_type = grant_type }
@@ -116,7 +124,7 @@ local function request_token(grant_type, auth_code)
     body['redirect_uri'] = ngx_server_url..conf.redirect_path
   end
 
-  local res = request_uri(conf.token_url, {
+  local res = request_f(conf.token_url, {
     method = 'POST',
     body = ngx.encode_args(body),
     headers = {
@@ -132,11 +140,12 @@ local function request_token(grant_type, auth_code)
 end
 
 --- Requests info about user that authorized the given access token.
+-- @param request_f the function to perform a request, see #request_uri.
 -- @param #string access_token
 -- @return #map
-local function request_userinfo(access_token)
+local function request_userinfo(request_f, access_token)
 
-  local res = request_uri(conf.userinfo_url.."?token="..access_token, {
+  local res = request_f(conf.userinfo_url.."?token="..access_token, {
     headers = {
       ['Accept'] = "application/json",
       ['Authorization'] = "Bearer "..access_token,
@@ -195,12 +204,14 @@ local function do_handle_callback()
   elseif auth_code then
     if debug then ngx.log(ngx.DEBUG, "requesting token for auth code: "..auth_code) end
 
-    local token = request_token('authorization_code', auth_code)
+    local request_f = partial(request_uri, http.new())
+
+    local token = request_token(request_f, 'authorization_code', auth_code)
     if not token then
       return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
 
-    local userinfo = request_userinfo(token.access_token)
+    local userinfo = request_userinfo(request_f, token.access_token)
     if not userinfo then
       return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
