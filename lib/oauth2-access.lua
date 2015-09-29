@@ -31,9 +31,9 @@ end
 
 ---------- Variables ----------
 
-local COOKIE_TOKEN_NAME    = 'oauth_access_token'
-local COOKIE_NICKNAME_NAME = 'oauth_nickname'
-local COOKIE_EMAIL_NAME    = 'oauth_email'
+local COOKIE_ACCESS_TOKEN = 'oauth_access_token'
+local COOKIE_NICKNAME     = 'oauth_nickname'
+local COOKIE_EMAIL        = 'oauth_email'
 
 local debug    = ngx.var.oauth_debug or false
 local oaas_url = ngx.var.oauth_server_url
@@ -171,9 +171,9 @@ local function build_cookies(token, userinfo)
     ['Max-Age'] = token.expires_in
   }
   return {
-    format_cookie(COOKIE_TOKEN_NAME,    token.access_token, args),
-    format_cookie(COOKIE_NICKNAME_NAME, userinfo.nickname,  args),
-    format_cookie(COOKIE_EMAIL_NAME,    userinfo.email,     args)
+    format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, args),
+    format_cookie(COOKIE_NICKNAME,     userinfo.nickname,  args),
+    format_cookie(COOKIE_EMAIL,        userinfo.email,     args)
   }
 end
 
@@ -229,11 +229,11 @@ end
 
 ---------- Main ----------
 
-local access_token = get_cookie(COOKIE_TOKEN_NAME)
+local access_token = get_cookie(COOKIE_ACCESS_TOKEN)
 
 -- Cookie with access token exists.
 if access_token then
-  local user_id = get_cookie(COOKIE_NICKNAME_NAME)
+  local user_id = get_cookie(COOKIE_NICKNAME)
 
   ngx.log(ngx.INFO, "found access token for user: "..user_id)
 
