@@ -204,7 +204,7 @@ local function do_handle_callback()
   local auth_code = request_args.code
 
   if request_args.error then
-    ngx.log(ngx.ERR, request_path..': received '..request_args.error)
+    ngx.log(ngx.WARN, request_path..': received '..request_args.error)
     ngx.exit(ngx.HTTP_UNAUTHORIZED)
 
   elseif auth_code then
