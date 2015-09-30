@@ -48,7 +48,6 @@ local conf = {
   client_id          = default(ngx.var.oauth_client_id, nil), --required
   client_secret      = default(ngx.var.oauth_client_secret, nil), --required
   scope              = default(ngx.var.oauth_scope, nil),
-  grant_type         = default(ngx.var.oauth_grant_type, 'authorization_code'),
   redirect_path      = default(ngx.var.oauth_redirect_path, '/_oauth/callback'),
   authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url..'/oauth/authorize'),
   token_url          = default(ngx.var.oauth_token_url, oaas_url..'/oauth/token'),
