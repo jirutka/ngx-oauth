@@ -48,17 +48,17 @@ local conf = {
   client_id          = default(ngx.var.oauth_client_id, nil), --required
   client_secret      = default(ngx.var.oauth_client_secret, nil), --required
   scope              = default(ngx.var.oauth_scope, nil),
-  grant_type         = default(ngx.var.oauth_grant_type, "authorization_code"),
-  redirect_path      = default(ngx.var.oauth_redirect_path, "/_oauth/callback"),
-  authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url.."/oauth/authorize"),
-  token_url          = default(ngx.var.oauth_token_url, oaas_url.."/oauth/token"),
-  userinfo_url       = default(ngx.var.oauth_userinfo_url, oaas_url.."/api/v1/tokeninfo"),
+  grant_type         = default(ngx.var.oauth_grant_type, 'authorization_code'),
+  redirect_path      = default(ngx.var.oauth_redirect_path, '/_oauth/callback'),
+  authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url..'/oauth/authorize'),
+  token_url          = default(ngx.var.oauth_token_url, oaas_url..'/oauth/token'),
+  userinfo_url       = default(ngx.var.oauth_userinfo_url, oaas_url..'/api/v1/tokeninfo'),
   success_path       = default(ngx.var.oauth_success_path, nil),
-  cookie_path        = default(ngx.var.oauth_cookie_path, "/"),
+  cookie_path        = default(ngx.var.oauth_cookie_path, '/'),
   set_header         = default(ngx.var.oauth_set_header, false)
 }
 
-local ngx_server_url = ngx.var.scheme.."://"..ngx.var.server_name
+local ngx_server_url = ngx.var.scheme..'://'..ngx.var.server_name
 local request_path   = ngx.var.uri
 local request_args   = ngx.req.get_uri_args()
 
@@ -89,11 +89,11 @@ end
 -- @param #map attrs a map of additional attributes.
 -- @return #string a cookie.
 local function format_cookie(name, value, attrs)
-  local t = { name.."="..ngx.escape_uri(value) }
+  local t = { name..'='..ngx.escape_uri(value) }
   for k, v in pairs(attrs) do
-    t[#t+1] = k.."="..v
+    t[#t+1] = k..'='..v
   end
-  return table.concat(t, ";")
+  return table.concat(t, ';')
 end
 
 --- Sends an HTTP request and returns respond if has status 200.
@@ -110,8 +110,8 @@ local function request_uri(http_client, uri, params)
   if res and res.status == 200 then
     return res
   else
-    local msg = err or res.status..": "..res.body
-    ngx.log(ngx.ERR, "request to "..uri.." has failed with: "..msg)
+    local msg = err or res.status..': '..res.body
+    ngx.log(ngx.ERR, 'request to '..uri..' has failed with: '..msg)
   end
 end
 
@@ -123,7 +123,7 @@ end
 -- @return #map token
 local function request_token(request_f, grant_type, auth_code)
 
-  local credentials = conf.client_id..":"..conf.client_secret
+  local credentials = conf.client_id..':'..conf.client_secret
   local body = { grant_type = grant_type }
 
   if grant_type == 'authorization_code' then
@@ -135,13 +135,13 @@ local function request_token(request_f, grant_type, auth_code)
     method = 'POST',
     body = ngx.encode_args(body),
     headers = {
-      ['Accept'] = "application/json",
-      ['Authorization'] = "Basic "..ngx.encode_base64(credentials),
-      ['Content-Type'] = "application/x-www-form-urlencoded"
+      ['Accept'] = 'application/json',
+      ['Authorization'] = 'Basic '..ngx.encode_base64(credentials),
+      ['Content-Type'] = 'application/x-www-form-urlencoded'
     }
   })
   if res then
-    if debug then ngx.log(ngx.DEBUG, "received token: "..res.body) end
+    if debug then ngx.log(ngx.DEBUG, 'received token: '..res.body) end
     return jsonmod.decode(res.body)
   end
 end
@@ -152,10 +152,10 @@ end
 -- @return #map
 local function request_userinfo(request_f, access_token)
 
-  local res = request_f(conf.userinfo_url.."?token="..access_token, {
+  local res = request_f(conf.userinfo_url..'?token='..access_token, {
     headers = {
-      ['Accept'] = "application/json",
-      ['Authorization'] = "Bearer "..access_token,
+      ['Accept'] = 'application/json',
+      ['Authorization'] = 'Bearer '..access_token,
     }
   })
   if res then
@@ -204,11 +204,11 @@ local function do_handle_callback()
   local auth_code = request_args.code
 
   if request_args.error then
-    ngx.log(ngx.ERR, request_path..": received "..request_args.error)
+    ngx.log(ngx.ERR, request_path..': received '..request_args.error)
     ngx.exit(ngx.HTTP_UNAUTHORIZED)
 
   elseif auth_code then
-    if debug then ngx.log(ngx.DEBUG, "requesting token for auth code: "..auth_code) end
+    if debug then ngx.log(ngx.DEBUG, 'requesting token for auth code: '..auth_code) end
 
     local request_f = partial(request_uri, http.new())
 
@@ -229,7 +229,7 @@ local function do_handle_callback()
       success_uri = ngx_server_url..conf.success_path
     end
 
-    ngx.log(ngx.INFO, "authorized user "..userinfo.nickname..", redirecting to "..success_uri)
+    ngx.log(ngx.INFO, 'authorized user '..userinfo.nickname..', redirecting to '..success_uri)
     ngx.redirect(success_uri)
 
   else
@@ -242,7 +242,7 @@ end
 
 -- Exit with HTTP 500 when required variables are not set.
 if not conf.client_id or not conf.client_secret then
-  ngx.log(ngx.ERR, "variables $oauth_client_id and $oauth_client_secret must be set!")
+  ngx.log(ngx.ERR, 'variables $oauth_client_id and $oauth_client_secret must be set!')
   return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
@@ -252,13 +252,13 @@ local access_token = get_cookie(COOKIE_ACCESS_TOKEN)
 if access_token then
   local user_id = get_cookie(COOKIE_NICKNAME)
 
-  ngx.log(ngx.INFO, "found access token for user: "..user_id)
+  ngx.log(ngx.INFO, 'found access token for user: '..user_id)
 
   rewrite_var('oauth_access_token', access_token)
   rewrite_var('oauth_user_id', user_id)
 
   if conf.set_header then
-    ngx.req.set_header('Authorization', "Bearer "..access_token)
+    ngx.req.set_header('Authorization', 'Bearer '..access_token)
   end
 
 -- Response from the authorization server.
@@ -267,6 +267,6 @@ elseif request_path == conf.redirect_path then
 
 -- No cookie with access token found, redirecting to the authorization server.
 else
-  ngx.log(ngx.INFO, "redirecting to "..conf.authorization_url)
+  ngx.log(ngx.INFO, 'redirecting to '..conf.authorization_url)
   do_redirect_authorization()
 end
