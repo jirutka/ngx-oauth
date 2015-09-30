@@ -115,20 +115,9 @@ local function request_uri(http_client, uri, params)
 end
 
 ---
--- @param request_f the function to perform a request, see #request_uri.
--- @param #string grant_type "authorization_code", or "client_credentials".
--- @param #string auth_code the authorization code obtained from the
---        authorization server (only for grant_type authorization_code).
--- @return #map token
-local function request_token(request_f, grant_type, auth_code)
-
+-- @see #request_token_using_code, #request_token_using_refresh
+local function request_token(request_f, body)
   local credentials = conf.client_id..':'..conf.client_secret
-  local body = { grant_type = grant_type }
-
-  if grant_type == 'authorization_code' then
-    body['code'] = auth_code
-    body['redirect_uri'] = ngx_server_url..conf.redirect_path
-  end
 
   local res = request_f(conf.token_url, {
     method = 'POST',
@@ -143,6 +132,30 @@ local function request_token(request_f, grant_type, auth_code)
     if debug then ngx.log(ngx.DEBUG, 'received token: '..res.body) end
     return jsonmod.decode(res.body)
   end
+end
+
+--- Obtains access token using authorization code (grant client_credentials).
+-- @param request_f the function to perform a request, see #request_uri.
+-- @param #string auth_code the authorization code obtained from the
+--        authorization server.
+-- @return #map a parsed response body.
+local function request_token_using_code(request_f, auth_code)
+  return request_token(request_f, {
+    grant_type = 'authorization_code',
+    code = auth_code,
+    redirect_uri = ngx_server_url..conf.redirect_path
+  })
+end
+
+--- Obtains access token using refresh token (grant refresh_token).
+-- @param request_f the function to perform a request, see #request_uri.
+-- @param #string refresh_token
+-- @return #map a parsed response body.
+local function request_token_using_refresh(request_f, refresh_token)
+  return request_token(request_f, {
+    grant_type = 'refresh_token',
+    refresh_token = refresh_token
+  })
 end
 
 --- Requests info about user that authorized the given access token.
@@ -211,7 +224,7 @@ local function do_handle_callback()
 
     local request_f = partial(request_uri, http.new())
 
-    local token = request_token(request_f, 'authorization_code', auth_code)
+    local token = request_token_using_code(request_f, auth_code)
     if not token then
       return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
