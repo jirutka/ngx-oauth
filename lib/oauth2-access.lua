@@ -28,6 +28,12 @@ if not has_cjson then
   jsonmod = require('json')
 end
 
+--- Returns the value if not nil or empty, otherwise returns the default_value.
+local function default(value, default_value)
+  if value == nil or value == '' then return default_value end
+  return value
+end
+
 
 ---------- Variables ----------
 
@@ -35,20 +41,20 @@ local COOKIE_ACCESS_TOKEN = 'oauth_access_token'
 local COOKIE_NICKNAME     = 'oauth_nickname'
 local COOKIE_EMAIL        = 'oauth_email'
 
-local debug    = ngx.var.oauth_debug or false
+local debug    = default(ngx.var.oauth_debug, false)
 local oaas_url = ngx.var.oauth_server_url
 
 local conf = {
-  client_id          = ngx.var.oauth_client_id,
-  client_secret      = ngx.var.oauth_client_secret,
-  scope              = ngx.var.oauth_scope,
-  grant_type         = ngx.var.oauth_grant_type        or "authorization_code",
-  redirect_path      = ngx.var.oauth_redirect_path     or "/_oauth/callback",
-  authorization_url  = ngx.var.oauth_authorization_url or oaas_url.."/oauth/authorize",
-  token_url          = ngx.var.oauth_token_url         or oaas_url.."/oauth/token",
-  userinfo_url       = ngx.var.oauth_userinfo_url      or oaas_url.."/api/v1/tokeninfo",
-  cookie_path        = ngx.var.oauth_cookie_path       or "/",
-  set_header         = ngx.var.oauth_set_header        or ngx.var.oauth_set_header == nil
+  client_id          = default(ngx.var.oauth_client_id, nil), --required
+  client_secret      = default(ngx.var.oauth_client_secret, nil), --required
+  scope              = default(ngx.var.oauth_scope, nil),
+  grant_type         = default(ngx.var.oauth_grant_type, "authorization_code"),
+  redirect_path      = default(ngx.var.oauth_redirect_path, "/_oauth/callback"),
+  authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url.."/oauth/authorize"),
+  token_url          = default(ngx.var.oauth_token_url, oaas_url.."/oauth/token"),
+  userinfo_url       = default(ngx.var.oauth_userinfo_url, oaas_url.."/api/v1/tokeninfo"),
+  cookie_path        = default(ngx.var.oauth_cookie_path, "/"),
+  set_header         = default(ngx.var.oauth_set_header, false)
 }
 
 local ngx_server_url = ngx.var.scheme.."://"..ngx.var.server_name
@@ -230,7 +236,7 @@ end
 ---------- Main ----------
 
 -- Exit with HTTP 500 when required variables are not set.
-if conf.client_id == '' or conf.client_secret == '' then
+if not conf.client_id or not conf.client_secret then
   ngx.log(ngx.ERR, "variables $oauth_client_id and $oauth_client_secret must be set!")
   return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
