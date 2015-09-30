@@ -229,6 +229,12 @@ end
 
 ---------- Main ----------
 
+-- Exit with HTTP 500 when required variables are not set.
+if conf.client_id == '' or conf.client_secret == '' then
+  ngx.log(ngx.ERR, "variables $oauth_client_id and $oauth_client_secret must be set!")
+  return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+end
+
 local access_token = get_cookie(COOKIE_ACCESS_TOKEN)
 
 -- Cookie with access token exists.
