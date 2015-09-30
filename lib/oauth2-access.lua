@@ -53,6 +53,7 @@ local conf = {
   authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url.."/oauth/authorize"),
   token_url          = default(ngx.var.oauth_token_url, oaas_url.."/oauth/token"),
   userinfo_url       = default(ngx.var.oauth_userinfo_url, oaas_url.."/api/v1/tokeninfo"),
+  success_path       = default(ngx.var.oauth_success_path, nil),
   cookie_path        = default(ngx.var.oauth_cookie_path, "/"),
   set_header         = default(ngx.var.oauth_set_header, false)
 }
@@ -201,7 +202,6 @@ end
 local function do_handle_callback()
 
   local auth_code = request_args.code
-  local intended_uri = request_args.state
 
   if request_args.error then
     ngx.log(ngx.ERR, request_path..": received "..request_args.error)
@@ -222,10 +222,15 @@ local function do_handle_callback()
       return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
 
-    ngx.log(ngx.INFO, "authorized user "..userinfo.nickname..", redirecting to "..intended_uri)
-
     ngx.header['Set-Cookie'] = build_cookies(token, userinfo)
-    ngx.redirect(intended_uri)
+
+    local success_uri = request_args.state
+    if conf.success_path then
+      success_uri = ngx_server_url..conf.success_path
+    end
+
+    ngx.log(ngx.INFO, "authorized user "..userinfo.nickname..", redirecting to "..success_uri)
+    ngx.redirect(success_uri)
 
   else
     ngx.exit(ngx.HTTP_BAD_REQUEST)
