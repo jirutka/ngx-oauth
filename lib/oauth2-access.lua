@@ -71,7 +71,7 @@ local function partial(func, ...)
 end
 
 --- Rewrites nginx variable if defined, otherwise do nothing.
-local function rewrite_var(name, value)
+local function rewrite_ngx_var(name, value)
   if ngx.var[name] ~= nil then
     ngx.var[name] = value
   end
@@ -267,8 +267,8 @@ if access_token then
 
   ngx.log(ngx.INFO, 'found access token for user: '..user_id)
 
-  rewrite_var('oauth_access_token', access_token)
-  rewrite_var('oauth_user_id', user_id)
+  rewrite_ngx_var('oauth_access_token', access_token)
+  rewrite_ngx_var('oauth_user_id', user_id)
 
   if conf.set_header then
     ngx.req.set_header('Authorization', 'Bearer '..access_token)
