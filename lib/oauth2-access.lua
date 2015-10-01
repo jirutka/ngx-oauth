@@ -51,7 +51,7 @@ local conf = {
   redirect_path      = default(ngx.var.oauth_redirect_path, '/_oauth/callback'),
   authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url..'/oauth/authorize'),
   token_url          = default(ngx.var.oauth_token_url, oaas_url..'/oauth/token'),
-  userinfo_url       = default(ngx.var.oauth_userinfo_url, oaas_url..'/api/v1/tokeninfo'),
+  check_token_url    = default(ngx.var.oauth_check_token_url, oaas_url..'/oauth/check_token'),
   success_path       = default(ngx.var.oauth_success_path, nil),
   cookie_path        = default(ngx.var.oauth_cookie_path, '/'),
   set_header         = default(ngx.var.oauth_set_header, false)
@@ -167,20 +167,15 @@ end
 --- Requests info about user that authorized the given access token.
 -- @param request_f the function to perform a request, see #request_uri.
 -- @param #string access_token
--- @return #map
+-- @return #map a table with keys "nickname" and "email".
 local function request_userinfo(request_f, access_token)
-
-  local res = request_f(conf.userinfo_url..'?token='..access_token, {
-    headers = {
-      ['Accept'] = 'application/json',
-      ['Authorization'] = 'Bearer '..access_token,
-    }
+  local json = post_form(request_f, conf.check_token_url, {
+    token = access_token
   })
-  if res then
-    local json = jsonmod.decode(res.body)
+  if json then
     return {
-      nickname = json.user_id,
-      email    = json.user_email
+      nickname = json.user_name,
+      email    = json.email
     }
   end
 end
