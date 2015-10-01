@@ -114,14 +114,20 @@ local function request_uri(http_client, uri, params)
   end
 end
 
----
--- @see #request_token_using_code, #request_token_using_refresh
-local function request_token(request_f, body)
+--- Sends an HTTP POST request with URL-encoded data, authenticated with the
+-- client credentials using HTTP Basic and returns response body parsed
+-- as JSON.
+--
+-- @param request_f the function to perform a request, see #request_uri.
+-- @param #string uri
+-- @param #map data
+-- @return #map a parsed response body, or nil if respond is not HTTP 200.
+local function post_form(request_f, uri, data)
   local credentials = conf.client_id..':'..conf.client_secret
 
-  local res = request_f(conf.token_url, {
+  local res = request_f(uri, {
     method = 'POST',
-    body = ngx.encode_args(body),
+    body = ngx.encode_args(data),
     headers = {
       ['Accept'] = 'application/json',
       ['Authorization'] = 'Basic '..ngx.encode_base64(credentials),
@@ -129,7 +135,7 @@ local function request_token(request_f, body)
     }
   })
   if res then
-    if debug then ngx.log(ngx.DEBUG, 'received token: '..res.body) end
+    if debug then ngx.log(ngx.DEBUG, 'received response: '..res.body) end
     return jsonmod.decode(res.body)
   end
 end
@@ -140,7 +146,7 @@ end
 --        authorization server.
 -- @return #map a parsed response body.
 local function request_token_using_code(request_f, auth_code)
-  return request_token(request_f, {
+  return post_form(request_f, conf.token_url, {
     grant_type = 'authorization_code',
     code = auth_code,
     redirect_uri = ngx_server_url..conf.redirect_path
@@ -152,7 +158,7 @@ end
 -- @param #string refresh_token
 -- @return #map a parsed response body.
 local function request_token_using_refresh(request_f, refresh_token)
-  return request_token(request_f, {
+  return post_form(request_f, conf.token_url, {
     grant_type = 'refresh_token',
     refresh_token = refresh_token
   })
