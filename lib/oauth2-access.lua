@@ -65,6 +65,14 @@ local ngx_server_url = ngx.var.scheme..'://'..ngx.var.server_name
 local request_path   = ngx.var.uri
 local request_args   = ngx.req.get_uri_args()
 
+-- Map of default cookie attributes.
+local cookie_attrs = {
+  version     = 1,
+  path        = conf.cookie_path,
+  ['Max-Age'] = conf.max_age,
+  secure      = true
+}
+
 
 ---------- Functions ----------
 
@@ -206,24 +214,28 @@ local function request_userinfo(request_f, access_token)
 end
 
 ---
--- @param #map token
--- @param #map userinfo
--- @return #list a list of cookies.
-local function build_cookies(token, userinfo)
-  local args = {
-    version     = 1,
-    path        = conf.cookie_path,
-    ['Max-Age'] = conf.max_age,
-    secure      = true
-  }
-  return {
-    format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, tmerge(args, {
-      ['Max-Age'] = math.min(token.expires_in, conf.max_age)
-    })),
-    format_cookie(COOKIE_REFRESH_TOKEN, encrypt(token.refresh_token), args),
-    format_cookie(COOKIE_NICKNAME, userinfo.nickname, args),
-    format_cookie(COOKIE_EMAIL, userinfo.email, args)
-  }
+-- @param #map token table with `access_token` and `expires_in` keys.
+-- @return #string an access token cookie.
+local function create_access_token_cookie(token)
+  return format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, tmerge(cookie_attrs, {
+    ['Max-Age'] = math.min(token.expires_in, conf.max_age)
+  }))
+end
+
+---
+-- @param #map token table with `refresh_token` key.
+-- @return #string a refresh token cookie.
+local function create_refresh_token_cookie(token)
+  return format_cookie(COOKIE_REFRESH_TOKEN, encrypt(token.refresh_token), cookie_attrs)
+end
+
+---
+-- @param #map userinfo table with `nickname` and `email` keys.
+-- @return #string a nickname cookie.
+-- @return #string an email cookie.
+local function create_userinfo_cookies(userinfo)
+  return format_cookie(COOKIE_NICKNAME, userinfo.nickname, cookie_attrs),
+         format_cookie(COOKIE_EMAIL, userinfo.email, cookie_attrs)
 end
 
 --- Issue a redirect to the authorization endpoint.
@@ -264,7 +276,14 @@ local function do_handle_callback()
       return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
 
-    ngx.header['Set-Cookie'] = build_cookies(token, userinfo)
+    local cookies = {
+      create_access_token_cookie(token),
+      create_userinfo_cookies(userinfo)
+    }
+    if token.refresh_token then
+      table.insert(cookies, create_refresh_token_cookie(token))
+    end
+    ngx.header['Set-Cookie'] = cookies
 
     local success_uri = request_args.state
     if conf.success_path then
