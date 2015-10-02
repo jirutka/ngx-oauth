@@ -21,6 +21,7 @@
 -- THE SOFTWARE.
 
 local http = require('resty.http')
+local openssl = require('openssl')
 
 -- Allow either cjson, or th-LuaJSON.
 local has_cjson, jsonmod = pcall(require, 'cjson')
@@ -37,9 +38,10 @@ end
 
 ---------- Variables ----------
 
-local COOKIE_ACCESS_TOKEN = 'oauth_access_token'
-local COOKIE_NICKNAME     = 'oauth_nickname'
-local COOKIE_EMAIL        = 'oauth_email'
+local COOKIE_ACCESS_TOKEN  = 'oauth_access_token'
+local COOKIE_REFRESH_TOKEN = 'oauth_refresh_token'
+local COOKIE_NICKNAME      = 'oauth_nickname'
+local COOKIE_EMAIL         = 'oauth_email'
 
 local debug    = default(ngx.var.oauth_debug, false)
 local oaas_url = ngx.var.oauth_server_url
@@ -55,6 +57,7 @@ local conf = {
   success_path       = default(ngx.var.oauth_success_path, nil),
   cookie_path        = default(ngx.var.oauth_cookie_path, '/'),
   max_age            = default(ngx.var.oauth_max_age, 2592000), -- 30 days
+  crypto_alg         = default(ngx.var.oauth_crypto_alg, 'aes-256-cbc'),
   set_header         = default(ngx.var.oauth_set_header, false)
 }
 
@@ -69,6 +72,15 @@ local request_args   = ngx.req.get_uri_args()
 local function partial(func, ...)
   local args = ...
   return function(...) return func(args, ...) end
+end
+
+--- Returns a new table containing the contents of tables t1 and t2.
+-- Entries with duplicate keys are overwritten with the values from t2.
+local function tmerge(t1, t2)
+  local t3 = {}
+  for k, v in pairs(t1) do t3[k] = v end
+  for k, v in pairs(t2) do t3[k] = v end
+  return t3
 end
 
 --- Rewrites nginx variable if defined, otherwise do nothing.
@@ -94,6 +106,18 @@ local function format_cookie(name, value, attrs)
     t[#t+1] = (v == true) and k or k..'='..v
   end
   return table.concat(t, ';')
+end
+
+--- Encrypts the given value with client_secret.
+local function encrypt(value)
+  return openssl.hex(
+      openssl.cipher.encrypt(conf.crypto_alg, value, conf.client_secret))
+end
+
+--- Decryptes the given value with client_secret.
+local function decrypt(value)
+  return openssl.cipher.decrypt(
+      conf.crypto_alg, openssl.hex(value, false), conf.client_secret)
 end
 
 --- Sends an HTTP request and returns respond if has status 200.
@@ -187,15 +211,18 @@ end
 -- @return #list a list of cookies.
 local function build_cookies(token, userinfo)
   local args = {
-    version = 1,
-    path = conf.cookie_path,
-    ['Max-Age'] = math.min(token.expires_in, conf.max_age),
-    secure = true
+    version     = 1,
+    path        = conf.cookie_path,
+    ['Max-Age'] = conf.max_age,
+    secure      = true
   }
   return {
-    format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, args),
-    format_cookie(COOKIE_NICKNAME,     userinfo.nickname,  args),
-    format_cookie(COOKIE_EMAIL,        userinfo.email,     args)
+    format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, tmerge(args, {
+      ['Max-Age'] = math.min(token.expires_in, conf.max_age)
+    })),
+    format_cookie(COOKIE_REFRESH_TOKEN, encrypt(token.refresh_token), args),
+    format_cookie(COOKIE_NICKNAME, userinfo.nickname, args),
+    format_cookie(COOKIE_EMAIL, userinfo.email, args)
   }
 end
 
