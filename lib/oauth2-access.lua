@@ -90,7 +90,7 @@ end
 local function format_cookie(name, value, attrs)
   local t = { name..'='..ngx.escape_uri(value) }
   for k, v in pairs(attrs) do
-    t[#t+1] = k..'='..v
+    t[#t+1] = (v == true) and k or k..'='..v
   end
   return table.concat(t, ';')
 end
@@ -188,7 +188,8 @@ local function build_cookies(token, userinfo)
   local args = {
     version = 1,
     path = conf.cookie_path,
-    ['Max-Age'] = token.expires_in
+    ['Max-Age'] = token.expires_in,
+    secure = true
   }
   return {
     format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, args),
