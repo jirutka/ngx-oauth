@@ -54,6 +54,7 @@ local conf = {
   check_token_url    = default(ngx.var.oauth_check_token_url, oaas_url..'/oauth/check_token'),
   success_path       = default(ngx.var.oauth_success_path, nil),
   cookie_path        = default(ngx.var.oauth_cookie_path, '/'),
+  max_age            = default(ngx.var.oauth_max_age, 2592000), -- 30 days
   set_header         = default(ngx.var.oauth_set_header, false)
 }
 
@@ -188,7 +189,7 @@ local function build_cookies(token, userinfo)
   local args = {
     version = 1,
     path = conf.cookie_path,
-    ['Max-Age'] = token.expires_in,
+    ['Max-Age'] = math.min(token.expires_in, conf.max_age),
     secure = true
   }
   return {
