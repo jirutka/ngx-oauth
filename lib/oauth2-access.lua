@@ -134,8 +134,8 @@ local function request_uri(http_client, uri, params)
   if res and res.status == 200 then
     return res
   else
-    local msg = err or res.status..': '..res.body
-    ngx.log(ngx.ERR, 'request to '..uri..' has failed with: '..msg)
+    ngx.log(ngx.ERR, ("request to %s has failed with: %s"):format(
+                      uri, err or res.status..': '..res.body))
   end
 end
 
@@ -250,7 +250,7 @@ local function do_handle_callback()
   local auth_code = request_args.code
 
   if request_args.error then
-    ngx.log(ngx.WARN, request_path..': received '..request_args.error)
+    ngx.log(ngx.WARN, ("%s: received %s"):format(request_path, request_args.error))
     ngx.exit(ngx.HTTP_UNAUTHORIZED)
 
   elseif auth_code then
@@ -282,7 +282,8 @@ local function do_handle_callback()
       success_uri = ngx_server_url..conf.success_path
     end
 
-    ngx.log(ngx.INFO, 'authorized user '..userinfo.nickname..', redirecting to '..success_uri)
+    ngx.log(ngx.INFO, ("authorized user %s, redirecting to %s"):format(
+                       userinfo.nickname, success_uri))
     ngx.redirect(success_uri)
 
   else
