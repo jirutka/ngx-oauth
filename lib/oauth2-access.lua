@@ -20,13 +20,13 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-local http = require('resty.http')
-local openssl = require('openssl')
+local http = require 'resty.http'
+local openssl = require 'openssl'
 
 -- Allow either cjson, or th-LuaJSON.
 local has_cjson, jsonmod = pcall(require, 'cjson')
 if not has_cjson then
-  jsonmod = require('json')
+  jsonmod = require 'json'
 end
 
 --- Returns the value if not nil or empty, otherwise returns the default_value.
@@ -47,8 +47,8 @@ local debug    = default(ngx.var.oauth_debug, false)
 local oaas_url = ngx.var.oauth_server_url
 
 local conf = {
-  client_id          = default(ngx.var.oauth_client_id, nil), --required
-  client_secret      = default(ngx.var.oauth_client_secret, nil), --required
+  client_id          = default(ngx.var.oauth_client_id, nil), -- required
+  client_secret      = default(ngx.var.oauth_client_secret, nil), -- required
   scope              = default(ngx.var.oauth_scope, nil),
   redirect_path      = default(ngx.var.oauth_redirect_path, '/_oauth/callback'),
   authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url..'/oauth/authorize'),
