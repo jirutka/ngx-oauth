@@ -298,6 +298,21 @@ local function do_handle_callback()
   end
 end
 
+--- Obtains a new access token using the given refresh token, sets it to
+-- a cookie and exits with HTTP 204 (No Content).
+-- @param #string refresh_token encrypted refresh token.
+local function do_refresh_token(refresh_token)
+  local request_f = partial(request_uri, http.new())
+
+  local token = request_token_using_refresh(request_f, decrypt(refresh_token))
+  if not token then
+    return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+  end
+
+  ngx.header['Set-Cookie'] = create_access_token_cookie(token)
+  ngx.exit(204)
+end
+
 
 ---------- Main ----------
 
@@ -308,11 +323,15 @@ if not conf.client_id or not conf.client_secret then
 end
 
 local access_token = get_cookie(COOKIE_ACCESS_TOKEN)
+local refresh_token = get_cookie(COOKIE_REFRESH_TOKEN)
+local user_id = get_cookie(COOKIE_NICKNAME)
+
+-- Got response from the authorization server.
+if request_path == conf.redirect_path then
+  do_handle_callback()
 
 -- Cookie with access token exists.
-if access_token then
-  local user_id = get_cookie(COOKIE_NICKNAME)
-
+elseif access_token then
   ngx.log(ngx.INFO, 'found access token for user: '..user_id)
 
   rewrite_ngx_var('oauth_access_token', access_token)
@@ -322,9 +341,10 @@ if access_token then
     ngx.req.set_header('Authorization', 'Bearer '..access_token)
   end
 
--- Response from the authorization server.
-elseif request_path == conf.redirect_path then
-  do_handle_callback()
+-- Cookie with refresh token exists, obtain a new access token.
+elseif refresh_token then
+  ngx.log(ngx.INFO, 'refreshing token for user: '..user_id)
+  do_refresh_token(refresh_token)
 
 -- No cookie with access token found, redirecting to the authorization server.
 else
