@@ -57,8 +57,7 @@ local conf = {
   success_path       = default(ngx.var.oauth_success_path, nil),
   cookie_path        = default(ngx.var.oauth_cookie_path, '/'),
   max_age            = default(ngx.var.oauth_max_age, 2592000), -- 30 days
-  crypto_alg         = default(ngx.var.oauth_crypto_alg, 'aes-256-cbc'),
-  set_header         = default(ngx.var.oauth_set_header, false)
+  crypto_alg         = default(ngx.var.oauth_crypto_alg, 'aes-256-cbc')
 }
 
 local ngx_server_url = ngx.var.scheme..'://'..ngx.var.server_name
@@ -89,13 +88,6 @@ local function tmerge(t1, t2)
   for k, v in pairs(t1) do t3[k] = v end
   for k, v in pairs(t2) do t3[k] = v end
   return t3
-end
-
---- Rewrites nginx variable if defined, otherwise do nothing.
-local function rewrite_ngx_var(name, value)
-  if ngx.var[name] ~= nil then
-    ngx.var[name] = value
-  end
 end
 
 --- Returns value of the specified cookie, or nil of doesn't exist.
@@ -332,14 +324,7 @@ if request_path == conf.redirect_path then
 
 -- Cookie with access token exists.
 elseif access_token then
-  ngx.log(ngx.INFO, 'found access token for user: '..user_id)
-
-  rewrite_ngx_var('oauth_access_token', access_token)
-  rewrite_ngx_var('oauth_user_id', user_id)
-
-  if conf.set_header then
-    ngx.req.set_header('Authorization', 'Bearer '..access_token)
-  end
+  ngx.redirect(ngx_server_url..(conf.success_path or '/'))
 
 -- Cookie with refresh token exists, obtain a new access token.
 elseif refresh_token then
