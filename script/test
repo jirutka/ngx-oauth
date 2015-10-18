@@ -6,5 +6,8 @@ cd "$(dirname "$0")/.."
 
 script/bootstrap
 
-echo '==> Running linter...'
+echo -e '\n==> Running tests...'
+busted --shuffle --verbose
+
+echo -e '\n==> Running linter...'
 luacheck src/*
