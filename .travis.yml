@@ -1,0 +1,11 @@
+sudo: false
+env:
+  - LUA_VERSION='luajit-2.0'
+  - LUA_VERSION='lua-5.1'
+  - LUA_VERSION='lua-5.2'
+  - LUA_VERSION='lua-5.3'
+install:
+  - script/bootstrap
+  - source .envrc
+script:
+  - script/test
