@@ -1,4 +1,5 @@
 busted
+ldoc
 lua-cjson
 luacheck
 moonscript
