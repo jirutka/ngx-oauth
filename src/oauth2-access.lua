@@ -29,8 +29,9 @@ if not has_cjson then
   jsonmod = require 'json'
 end
 
+local config = require 'ngx-oauth.config'
+
 local util = require 'ngx-oauth.util'
-local default = util.default
 local merge = util.merge
 local partial = util.partial
 local get_cookie = util.get_cookie
@@ -44,23 +45,14 @@ local COOKIE_REFRESH_TOKEN = 'oauth_refresh_token'
 local COOKIE_NICKNAME      = 'oauth_nickname'
 local COOKIE_EMAIL         = 'oauth_email'
 
-local debug    = default(ngx.var.oauth_debug, false)
-local oaas_url = ngx.var.oauth_server_url
+-- Exit with HTTP 500 when required variables are not set or invalid.
+local ok, conf = pcall(config.load)
+if not ok then
+  ngx.log(ngx.ERR, conf)
+  return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+end
 
-local conf = {
-  client_id          = default(ngx.var.oauth_client_id, nil), -- required
-  client_secret      = default(ngx.var.oauth_client_secret, nil), -- required
-  scope              = default(ngx.var.oauth_scope, nil),
-  redirect_path      = default(ngx.var.oauth_redirect_path, '/_oauth/callback'),
-  authorization_url  = default(ngx.var.oauth_authorization_url, oaas_url..'/oauth/authorize'),
-  token_url          = default(ngx.var.oauth_token_url, oaas_url..'/oauth/token'),
-  check_token_url    = default(ngx.var.oauth_check_token_url, oaas_url..'/oauth/check_token'),
-  success_path       = default(ngx.var.oauth_success_path, nil),
-  cookie_path        = default(ngx.var.oauth_cookie_path, '/'),
-  max_age            = default(ngx.var.oauth_max_age, 2592000), -- 30 days
-  crypto_alg         = default(ngx.var.oauth_crypto_alg, 'aes-256-cbc')
-}
-
+local debug          = conf.debug
 local ngx_server_url = ngx.var.scheme..'://'..ngx.var.server_name
 local request_path   = ngx.var.uri
 local request_args   = ngx.req.get_uri_args()
@@ -276,12 +268,6 @@ end
 
 
 ---------- Main ----------
-
--- Exit with HTTP 500 when required variables are not set.
-if not conf.client_id or not conf.client_secret then
-  ngx.log(ngx.ERR, 'variables $oauth_client_id and $oauth_client_secret must be set!')
-  return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
-end
 
 local access_token = get_cookie(COOKIE_ACCESS_TOKEN)
 local refresh_token = get_cookie(COOKIE_REFRESH_TOKEN)

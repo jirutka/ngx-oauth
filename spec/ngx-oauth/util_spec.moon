@@ -34,6 +34,27 @@ describe 'merge', ->
     assert.same tab2_orig, tab2
 
 
+describe 'not_blank', ->
+
+  it 'returns false for nil', ->
+    assert.is_false util.not_blank(nil)
+
+  it 'returns false for empty string', ->
+    assert.is_false util.not_blank('')
+
+  it 'returns false for string with whitespaces only', ->
+    for value in *{'  ', '\t\t', '\t'} do
+      assert.is_false util.not_blank(value)
+
+  it 'returns true for string with any non-whitespace char', ->
+    for value in *{'foo', ' foo ', '\tfoo'} do
+      assert.is_true util.not_blank(value)
+
+  it 'returns true for other types than nil and string', ->
+    for value in *{42, true, false, {}, util.not_blank}
+      assert.is_true util.not_blank(value)
+
+
 describe 'partial', ->
   func1 = util.partial(string.find, 'yada yada')
   func2 = util.partial(string.gsub, 'yada yada', 'y')

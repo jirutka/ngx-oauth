@@ -21,6 +21,13 @@ function M.merge (tab1, tab2)
   return tab3
 end
 
+--- Returns true if the `value` is *not* nil, empty string and contains at
+-- least one character other than space and tab. If the `value` is not nil and
+-- string, then it's converted to string.
+function M.not_blank (value)
+  return value ~= nil and value ~= '' and tostring(value):find('^%s*$') == nil
+end
+
 --- Partial application.
 -- Takes a function `func` and arguments, and returns a function *func2*.
 -- When applied, *func2* returns the result of applying `func` to the arguments
