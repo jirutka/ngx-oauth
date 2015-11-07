@@ -29,11 +29,12 @@ if not has_cjson then
   jsonmod = require 'json'
 end
 
---- Returns the value if not nil or empty, otherwise returns the default_value.
-local function default(value, default_value)
-  if value == nil or value == '' then return default_value end
-  return value
-end
+local util = require 'ngx-oauth.util'
+local default = util.default
+local merge = util.merge
+local partial = util.partial
+local get_cookie = util.get_cookie
+local format_cookie = util.format_cookie
 
 
 ---------- Variables ----------
@@ -74,39 +75,6 @@ local cookie_attrs = {
 
 
 ---------- Functions ----------
-
---- Returns a partially applied function.
-local function partial(func, ...)
-  local args = ...
-  return function(...) return func(args, ...) end
-end
-
---- Returns a new table containing the contents of tables t1 and t2.
--- Entries with duplicate keys are overwritten with the values from t2.
-local function tmerge(t1, t2)
-  local t3 = {}
-  for k, v in pairs(t1) do t3[k] = v end
-  for k, v in pairs(t2) do t3[k] = v end
-  return t3
-end
-
---- Returns value of the specified cookie, or nil of doesn't exist.
-local function get_cookie(name)
-  return ngx.var['cookie_'..name]
-end
-
---- Formats HTTP cookie from the given arguments.
--- @param #string name
--- @param #string value
--- @param #map attrs a map of additional attributes.
--- @return #string a cookie.
-local function format_cookie(name, value, attrs)
-  local t = { name..'='..ngx.escape_uri(value) }
-  for k, v in pairs(attrs) do
-    t[#t+1] = (v == true) and k or k..'='..v
-  end
-  return table.concat(t, ';')
-end
 
 --- Encrypts the given value with client_secret.
 local function encrypt(value)
@@ -209,7 +177,7 @@ end
 -- @param #map token table with `access_token` and `expires_in` keys.
 -- @return #string an access token cookie.
 local function create_access_token_cookie(token)
-  return format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, tmerge(cookie_attrs, {
+  return format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, merge(cookie_attrs, {
     ['Max-Age'] = math.min(token.expires_in, conf.max_age)
   }))
 end
