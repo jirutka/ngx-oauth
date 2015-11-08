@@ -1,8 +1,8 @@
 ---------
 -- This module is responsible for configuration loading and validating.
 
-local util = require 'ngx-oauth/util'
-local not_blank = util.not_blank
+local util = require 'ngx-oauth.util'
+local is_blank = util.is_blank
 
 local M = {}
 
@@ -35,23 +35,30 @@ end
 --- Loads settings from nginx variables and ensure that all required
 -- variables are set.
 --
--- @treturn {[string]=any,...}
--- @raise An error message when some required variable is not set.
+-- @treturn {[string]=any,...} Settings
+-- @treturn nil|{string, ...} Validation messages, or `nil` if no validation
+--   error was found.
 function M.load ()
+  local errors = {}
   local conf = load_from_ngx()
-  local oaas_url = conf.server_url
+  local server_url = not is_blank(conf.server_url) and conf.server_url
 
-  assert(not_blank(conf.client_id), 'Variable $oauth_client_id is not set.')
-  assert(not_blank(conf.client_secret), 'Variable $oauth_client_secret is not set.')
+  if is_blank(conf.client_id) then
+    table.insert(errors, 'Variable $oauth_client_id is not set.')
+  end
+  if is_blank(conf.client_secret) then
+    table.insert(errors, 'Variable $oauth_client_secret is not set.')
+  end
 
   for _, key in ipairs {'authorization_url', 'token_url', 'check_token_url'} do
-    if conf[key]:find('${server_url}', 1, true) then
-      assert(not_blank(oaas_url), 'Neither variable $oauth_'..key..' nor $oauth_server_url is set.')
-      conf[key] = conf[key]:gsub('${server_url}', oaas_url)
+    if not server_url and conf[key]:find('${server_url}', 1, true) then
+      table.insert(errors, 'Neither variable $oauth_'..key..' nor $oauth_server_url is set.')
+    elseif server_url then
+      conf[key] = conf[key]:gsub('${server_url}', server_url)
     end
   end
 
-  return conf
+  return conf, #errors ~= 0 and errors
 end
 
 return M

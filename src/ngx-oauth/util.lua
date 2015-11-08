@@ -12,6 +12,13 @@ function M.default (value, default_value)
   return value
 end
 
+--- Returns true if the `value` is nil, empty string or contains at least one
+-- character other than space and tab. If the `value` is not nil and
+-- string, then it's converted to string.
+function M.is_blank (value)
+  return value == nil or value == '' or tostring(value):find('^%s*$') ~= nil
+end
+
 --- Returns a new table containing the contents of tables `tab1` and `tab2`.
 -- Entries with duplicate keys are overwritten with the values from `tab2`.
 function M.merge (tab1, tab2)
@@ -19,13 +26,6 @@ function M.merge (tab1, tab2)
   for k, v in pairs(tab1) do tab3[k] = v end
   for k, v in pairs(tab2) do tab3[k] = v end
   return tab3
-end
-
---- Returns true if the `value` is *not* nil, empty string and contains at
--- least one character other than space and tab. If the `value` is not nil and
--- string, then it's converted to string.
-function M.not_blank (value)
-  return value ~= nil and value ~= '' and tostring(value):find('^%s*$') == nil
 end
 
 --- Partial application.

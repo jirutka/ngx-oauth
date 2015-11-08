@@ -13,6 +13,27 @@ describe 'default', ->
       assert.same 'hi', util.default('hi', 42)
 
 
+describe 'is_blank', ->
+
+  it 'returns true for nil', ->
+    assert.is_true util.is_blank(nil)
+
+  it 'returns true for empty string', ->
+    assert.is_true util.is_blank('')
+
+  it 'returns true for string with whitespaces only', ->
+    for value in *{'  ', '\t\t', '\t'} do
+      assert.is_true util.is_blank(value)
+
+  it 'returns false for string with any non-whitespace char', ->
+    for value in *{'foo', ' foo ', '\tfoo'} do
+      assert.is_false util.is_blank(value)
+
+  it 'returns false for other types than nil and string', ->
+    for value in *{42, true, false, {}, util.is_blank}
+      assert.is_false util.is_blank(value)
+
+
 describe 'merge', ->
 
   tab1 = {a: 1, b: 2}
@@ -32,27 +53,6 @@ describe 'merge', ->
     util.merge(tab1, tab2)
     assert.same tab1_orig, tab1
     assert.same tab2_orig, tab2
-
-
-describe 'not_blank', ->
-
-  it 'returns false for nil', ->
-    assert.is_false util.not_blank(nil)
-
-  it 'returns false for empty string', ->
-    assert.is_false util.not_blank('')
-
-  it 'returns false for string with whitespaces only', ->
-    for value in *{'  ', '\t\t', '\t'} do
-      assert.is_false util.not_blank(value)
-
-  it 'returns true for string with any non-whitespace char', ->
-    for value in *{'foo', ' foo ', '\tfoo'} do
-      assert.is_true util.not_blank(value)
-
-  it 'returns true for other types than nil and string', ->
-    for value in *{42, true, false, {}, util.not_blank}
-      assert.is_true util.not_blank(value)
 
 
 describe 'partial', ->

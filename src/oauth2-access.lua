@@ -46,9 +46,9 @@ local COOKIE_NICKNAME      = 'oauth_nickname'
 local COOKIE_EMAIL         = 'oauth_email'
 
 -- Exit with HTTP 500 when required variables are not set or invalid.
-local ok, conf = pcall(config.load)
-if not ok then
-  ngx.log(ngx.ERR, conf)
+local conf, errs = config.load()
+if errs then
+  ngx.log(ngx.ERR, unpack(errs))
   return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
 end
 
