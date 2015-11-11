@@ -1,5 +1,7 @@
+basexx
 busted
 ldoc
 lua-cjson
 luacheck
+luaossl
 moonscript

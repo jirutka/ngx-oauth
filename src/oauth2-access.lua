@@ -21,7 +21,6 @@
 -- THE SOFTWARE.
 
 local http = require 'resty.http'
-local openssl = require 'openssl'
 
 -- Allow either cjson, or th-LuaJSON.
 local has_cjson, jsonmod = pcall(require, 'cjson')
@@ -30,6 +29,7 @@ if not has_cjson then
 end
 
 local config = require 'ngx-oauth.config'
+local crypto = require 'ngx-oauth.crypto'
 
 local util = require 'ngx-oauth.util'
 local merge = util.merge
@@ -70,14 +70,12 @@ local cookie_attrs = {
 
 --- Encrypts the given value with client_secret.
 local function encrypt(value)
-  return openssl.hex(
-      openssl.cipher.encrypt('aes-'..conf.aes_bits..'-cbc', value, conf.client_secret))
+  return crypto.encrypt(conf.aes_bits, conf.client_secret, value)
 end
 
 --- Decryptes the given value with client_secret.
 local function decrypt(value)
-  return openssl.cipher.decrypt(
-      'aes-'..conf.aes_bits..'-cbc', openssl.hex(value, false), conf.client_secret)
+  return crypto.decrypt(conf.aes_bits, conf.client_secret, value)
 end
 
 --- Sends an HTTP request and returns respond if has status 200.
