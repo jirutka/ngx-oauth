@@ -59,10 +59,10 @@ local request_args   = ngx.req.get_uri_args()
 
 -- Map of default cookie attributes.
 local cookie_attrs = {
-  version     = 1,
-  path        = conf.cookie_path,
-  ['Max-Age'] = conf.max_age,
-  secure      = true
+  version = 1,
+  path    = conf.cookie_path,
+  max_age = conf.max_age,
+  secure  = true
 }
 
 
@@ -168,7 +168,7 @@ end
 -- @return #string an access token cookie.
 local function create_access_token_cookie(token)
   return format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, merge(cookie_attrs, {
-    ['Max-Age'] = math.min(token.expires_in, conf.max_age)
+    max_age = math.min(token.expires_in, conf.max_age)
   }))
 end
 

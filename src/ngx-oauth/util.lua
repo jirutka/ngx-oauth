@@ -60,11 +60,13 @@ end
 --
 -- @tparam string name
 -- @tparam string value
--- @tparam {[string]=string, ...} attrs The cookie's attributes.
+-- @tparam {[string]=string,...} attrs The cookie's attributes. Underscores in
+--   the attribute name are implicitly replaced with dashes.
 -- @treturn string A cookie string.
 function M.format_cookie (name, value, attrs)
   local t = { name..'='..ngx.escape_uri(value) }
   for k, v in pairs(attrs) do
+    k = k:gsub('_', '-')
     table.insert(t, v == true and k or k..'='..v)
   end
   return table.concat(t, ';')

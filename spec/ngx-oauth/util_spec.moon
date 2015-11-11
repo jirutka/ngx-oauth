@@ -97,7 +97,7 @@ describe 'format_cookie', ->
       escape_uri: (value) -> string.gsub(value, ' ', '+')
 
   it 'returns correctly formated cookie with attributes', ->
-    actual = util.format_cookie('foo', 'meh', {version: 1, path: '/'})
+    actual = util.format_cookie('foo', 'meh', version: 1, path: '/')
     assert.is_true 'foo=meh;version=1;path=/' == actual or 'foo=meh;path=/;version=1' == actual
 
   it 'escapes cookie value using ngx.escape_uri', ->
@@ -105,4 +105,7 @@ describe 'format_cookie', ->
     assert.stub(_G.ngx.escape_uri).called_with 'chunky bacon'
 
   it "omits attribute's value if it's true", ->
-    assert.same 'foo=bar;secure', util.format_cookie('foo', 'bar', {secure: true})
+    assert.same 'foo=bar;secure', util.format_cookie('foo', 'bar', secure: true)
+
+  it 'replaces underscore in attribute name with a dash', ->
+    assert.same 'foo=bar;max-age=60', util.format_cookie('foo', 'bar', max_age: 60)
