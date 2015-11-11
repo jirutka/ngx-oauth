@@ -71,13 +71,13 @@ local cookie_attrs = {
 --- Encrypts the given value with client_secret.
 local function encrypt(value)
   return openssl.hex(
-      openssl.cipher.encrypt(conf.crypto_alg, value, conf.client_secret))
+      openssl.cipher.encrypt('aes-'..conf.aes_bits..'-cbc', value, conf.client_secret))
 end
 
 --- Decryptes the given value with client_secret.
 local function decrypt(value)
   return openssl.cipher.decrypt(
-      conf.crypto_alg, openssl.hex(value, false), conf.client_secret)
+      'aes-'..conf.aes_bits..'-cbc', openssl.hex(value, false), conf.client_secret)
 end
 
 --- Sends an HTTP request and returns respond if has status 200.

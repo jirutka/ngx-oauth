@@ -18,7 +18,7 @@ local defaults = {
   success_path      = '',
   cookie_path       = '/',
   max_age           = 2592000, -- 30 days
-  crypto_alg        = 'aes-256-cbc',
+  aes_bits          = 256,
   debug             = false
 }
 

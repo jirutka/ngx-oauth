@@ -25,7 +25,7 @@ describe 'load', ->
       success_path: '/app/home'
       cookie_path: '/app'
       max_age: 600
-      crypto_alg: 'aes-128'
+      aes_bits: 128
       debug: true
     }, required_vars
 
@@ -47,7 +47,7 @@ describe 'load', ->
       success_path: ''
       cookie_path: '/'
       max_age: 2592000
-      crypto_alg: 'aes-256-cbc'
+      aes_bits: 256
       debug: false
     }, required_vars
 
