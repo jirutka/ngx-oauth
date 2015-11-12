@@ -38,6 +38,40 @@ function M.is_blank (value)
   return value == nil or value == '' or tostring(value):find('^%s*$') ~= nil
 end
 
+--- Returns a new table with the results of running `func(value, key)` once
+-- for every key-value pair in the `tab`. Tables are iterated using @{pairs},
+-- so this function is intended for tables that represent *associative arrays*.
+--
+-- @tparam function func The function that accepts at least one argument and
+--   returns a value.
+-- @tparam table tab The table to map over.
+-- @treturn table A new table.
+-- @see imap
+function M.map (func, tab)
+  local result = {}
+  for key, val in pairs(tab) do
+    result[key] = func(val, key)
+  end
+  return result
+end
+
+--- Returns a new table with the results of running `func(value, index)` once
+-- for every item in the `tab`. Tables are iterated using @{ipairs}, so this
+-- function is intended for tables that represent *indexed arrays*.
+--
+-- @tparam function func The function that accepts at least one argument and
+--   returns a value.
+-- @tparam table tab The table to map over.
+-- @treturn table A new table.
+-- @see map
+function M.imap (func, tab)
+  local result = {}
+  for i, val in ipairs(tab) do
+    table.insert(result, func(val, i))
+  end
+  return result
+end
+
 --- Returns a new table containing the contents of all the given tables.
 -- Tables are iterated using @{pairs}, so this function is intended for tables
 -- that represent *associative arrays*. Entries with duplicate keys are

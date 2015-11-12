@@ -51,6 +51,40 @@ describe 'is_blank', ->
       assert.is_false util.is_blank(value)
 
 
+describe 'map', ->
+
+  context 'with 1-argument func', ->
+    it 'applies the func over each key-value pair, calls it with value', ->
+      assert.same {a: 2, b: 4}, util.map ((v) -> v * 2), {a: 1, b: 2}
+
+  context 'with 2-arguments func', ->
+    it 'applies the func over each key-value pair, calls it with value and key', ->
+      assert.same {a: 'a1', b: 'b2'}, util.map ((v, k) -> k..v), {a: 1, b: 2}
+
+  it 'does not modify given table', ->
+    tab = {a: 1, b: 2, c: 3}
+    tab_orig = copy(tab)
+    util.map ((v) -> v *2), tab
+    assert.same tab_orig, tab
+
+
+describe 'imap', ->
+
+  context 'with 1-argument func', ->
+    it 'applies the func over each item, calls it with value', ->
+      assert.same {4, 8, 12}, util.imap(((v) -> v * 2), {2, 4, 6})
+
+  context 'with 2-arguments func', ->
+    it 'applies the func over each item, calls it with value and index', ->
+      assert.same {'a1', 'b2', 'c3'}, util.imap ((v, i) -> v..i), {'a', 'b', 'c'}
+
+  it 'does not modify given table', ->
+    tab = {1, 2, 3}
+    tab_orig = copy(tab)
+    util.map ((v) -> v *2), tab
+    assert.same tab_orig, tab
+
+
 describe 'merge', ->
 
   tab1 = {a: 1, b: 2}

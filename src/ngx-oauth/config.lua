@@ -2,7 +2,10 @@
 -- This module is responsible for configuration loading and validating.
 
 local util = require 'ngx-oauth.util'
+
 local is_blank = util.is_blank
+local map      = util.map
+local par      = util.partial
 
 local M = {}
 
@@ -22,15 +25,9 @@ local defaults = {
   debug             = false
 }
 
-local function load_from_ngx ()
-  local conf = {}
-
-  for key, default_value in pairs(defaults) do
-    conf[key] = util.default(ngx.var['oauth_'..key], default_value)
-  end
-
-  return conf
-end
+local load_from_ngx = par(map, function(default_value, key)
+    return util.default(ngx.var['oauth_'..key], default_value)
+  end, defaults)
 
 --- Loads settings from nginx variables and ensure that all required
 -- variables are set.
