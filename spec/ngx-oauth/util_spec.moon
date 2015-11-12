@@ -127,6 +127,40 @@ describe 'partial', ->
       assert.same 'Yada yada', func2('Y', 1)
 
 
+describe 'pipe', ->
+  swap = (x, y) -> y, x
+  swapi = (x, y) -> -y, x
+
+  context '2 functions', ->
+    it 'composes functions from left to right', ->
+      assert.same 3, util.pipe(math.abs, math.sqrt)(-9)
+      assert.same 3, util.pipe({ math.abs, math.sqrt })(-9)
+
+    context '1st returns 2 values', ->
+
+      context 'and 2nd has arity 2', ->
+        it 'passes both return values to 2nd function', ->
+          assert.same 8, util.pipe(swap, math.pow)(3, 2)
+
+      context 'and 2nd has arity 1', ->
+        it 'ignores second return value', ->
+          assert.same 3, util.pipe(swap, math.abs)(5, -3)
+
+    context 'both has arity 2 and returns 2 values', ->
+      it 'passes and returns both return values', ->
+        x, y = util.pipe(swap, swapi)(3, 2)
+        assert.same {-3, 2}, {x, y}
+
+    context '1st returns 1 value and 2nd has arity 2', ->
+      it 'throws error', ->
+        assert.has_error -> util.pipe(math.abs, math.pow)(3)
+
+  context '3 functions', ->
+    it 'composes functions from left to right', ->
+      assert.same 3, util.pipe(math.abs, math.floor, math.sqrt)(-9.4)
+      assert.same 3, util.pipe({ math.abs, math.floor, math.sqrt })(-9.4)
+
+
 describe 'get_cookie', ->
   setup ->
     _G.ngx = {

@@ -112,6 +112,30 @@ function M.partial (func, ...)
   end
 end
 
+--- Performs left-to-right function composition.
+--
+-- @tparam {function,...} ... The functions to compose; as multiple arguments,
+--   or in a single table.
+-- @treturn function A composition of the given functions.
+function M.pipe (...)
+  local funcs = {...}
+
+  if #funcs == 1 and type(funcs[1]) == 'table' then
+    funcs = funcs[1]
+  end
+
+  local function pipe_inner (i, ...)
+    if i == #funcs then
+      return funcs[i](...)
+    end
+    return pipe_inner(i + 1, funcs[i](...))
+  end
+
+  return function(...)
+    return pipe_inner(1, ...)
+  end
+end
+
 --- Returns value of the specified request's cookie.
 --
 -- @tparam string name The name of the cookie to get.
