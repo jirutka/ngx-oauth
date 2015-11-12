@@ -3,6 +3,25 @@
 
 local M = {}
 
+--- Returns a new table with items concatenated from the given tables.
+-- Tables are iterated using @{ipairs}, so this function is intended for tables
+-- that represent *indexed arrays*.
+--
+-- @tparam {table,...} ... The tables to concatenate.
+-- @treturn table A new table.
+-- @see merge
+function M.concat (...)
+  local result = {}
+
+  for _, tab in ipairs {...} do
+    for _, val in ipairs(tab) do
+      table.insert(result, val)
+    end
+  end
+
+  return result
+end
+
 --- Returns the `value` if not nil or empty, otherwise returns the
 -- `default_value`.
 function M.default (value, default_value)

@@ -13,6 +13,23 @@ describe 'default', ->
       assert.same 'hi', util.default('hi', 42)
 
 
+describe 'concat', ->
+  tab1 = {2, 6, 8}
+  tab2 = {1, 7}
+  tab3 = {3, 8}
+
+  it 'returns concatenation of the given tables', ->
+    assert.same {2, 6, 8, 1, 7, 3, 8}, util.concat(tab1, tab2, tab3)
+
+  it 'does not modify given tables', ->
+    tab1_orig = copy(tab1)
+    tab2_orig = copy(tab2)
+
+    util.concat(tab1, tab2)
+    assert.same tab1_orig, tab1
+    assert.same tab2_orig, tab2
+
+
 describe 'is_blank', ->
 
   it 'returns true for nil', ->
