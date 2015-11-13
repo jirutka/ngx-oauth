@@ -29,21 +29,13 @@ if not has_cjson then
 end
 
 local config = require 'ngx-oauth.config'
-local crypto = require 'ngx-oauth.crypto'
+local Cookies = require 'ngx-oauth.cookies'
 
 local util = require 'ngx-oauth.util'
-local merge = util.merge
 local partial = util.partial
-local get_cookie = util.get_cookie
-local format_cookie = util.format_cookie
 
 
 ---------- Variables ----------
-
-local COOKIE_ACCESS_TOKEN  = 'oauth_access_token'
-local COOKIE_REFRESH_TOKEN = 'oauth_refresh_token'
-local COOKIE_NICKNAME      = 'oauth_nickname'
-local COOKIE_EMAIL         = 'oauth_email'
 
 -- Exit with HTTP 500 when required variables are not set or invalid.
 local conf, errs = config.load()
@@ -57,26 +49,10 @@ local ngx_server_url = ngx.var.scheme..'://'..ngx.var.server_name
 local request_path   = ngx.var.uri
 local request_args   = ngx.req.get_uri_args()
 
--- Map of default cookie attributes.
-local cookie_attrs = {
-  version = 1,
-  path    = conf.cookie_path,
-  max_age = conf.max_age,
-  secure  = true
-}
+local cookies = Cookies(conf)
 
 
 ---------- Functions ----------
-
---- Encrypts the given value with client_secret.
-local function encrypt(value)
-  return crypto.encrypt(conf.aes_bits, conf.client_secret, value)
-end
-
---- Decryptes the given value with client_secret.
-local function decrypt(value)
-  return crypto.decrypt(conf.aes_bits, conf.client_secret, value)
-end
 
 --- Sends an HTTP request and returns respond if has status 200.
 -- This function just wraps resty.http#request_uri for simpler error handling.
@@ -163,31 +139,6 @@ local function request_userinfo(request_f, access_token)
   end
 end
 
----
--- @param #map token table with `access_token` and `expires_in` keys.
--- @return #string an access token cookie.
-local function create_access_token_cookie(token)
-  return format_cookie(COOKIE_ACCESS_TOKEN, token.access_token, merge(cookie_attrs, {
-    max_age = math.min(token.expires_in, conf.max_age)
-  }))
-end
-
----
--- @param #map token table with `refresh_token` key.
--- @return #string a refresh token cookie.
-local function create_refresh_token_cookie(token)
-  return format_cookie(COOKIE_REFRESH_TOKEN, encrypt(token.refresh_token), cookie_attrs)
-end
-
----
--- @param #map userinfo table with `nickname` and `email` keys.
--- @return #string a nickname cookie.
--- @return #string an email cookie.
-local function create_userinfo_cookies(userinfo)
-  return format_cookie(COOKIE_NICKNAME, userinfo.nickname, cookie_attrs),
-         format_cookie(COOKIE_EMAIL, userinfo.email, cookie_attrs)
-end
-
 --- Issue a redirect to the authorization endpoint.
 -- Note: Calling this method terminates processing of the current request.
 local function do_redirect_authorization()
@@ -226,14 +177,8 @@ local function do_handle_callback()
       return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
     end
 
-    local cookies = {
-      create_access_token_cookie(token),
-      create_userinfo_cookies(userinfo)
-    }
-    if token.refresh_token then
-      table.insert(cookies, create_refresh_token_cookie(token))
-    end
-    ngx.header['Set-Cookie'] = cookies
+    cookies.add_token(token)
+    cookies.add_userinfo(userinfo)
 
     local success_uri = request_args.state
     if conf.success_path then
@@ -255,34 +200,31 @@ end
 local function do_refresh_token(refresh_token)
   local request_f = partial(request_uri, http.new())
 
-  local token = request_token_using_refresh(request_f, decrypt(refresh_token))
+  local token = request_token_using_refresh(request_f, refresh_token)
   if not token then
     return ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
   end
 
-  ngx.header['Set-Cookie'] = create_access_token_cookie(token)
+  cookies.add_token(token)
+
   ngx.exit(204)
 end
 
 
 ---------- Main ----------
 
-local access_token = get_cookie(COOKIE_ACCESS_TOKEN)
-local refresh_token = get_cookie(COOKIE_REFRESH_TOKEN)
-local user_id = get_cookie(COOKIE_NICKNAME)
-
 -- Got response from the authorization server.
 if request_path == conf.redirect_path then
   do_handle_callback()
 
 -- Cookie with access token exists.
-elseif access_token then
+elseif cookies.get_access_token() then
   ngx.redirect(ngx_server_url..(conf.success_path or '/'))
 
 -- Cookie with refresh token exists, obtain a new access token.
-elseif refresh_token then
-  ngx.log(ngx.INFO, 'refreshing token for user: '..user_id)
-  do_refresh_token(refresh_token)
+elseif cookies.get_refresh_token() then
+  ngx.log(ngx.INFO, 'refreshing token for user: '..cookies.get_username())
+  do_refresh_token(cookies.get_refresh_token())
 
 -- No cookie with access token found, redirecting to the authorization server.
 else
