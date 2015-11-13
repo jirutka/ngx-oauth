@@ -161,6 +161,38 @@ describe 'pipe', ->
       assert.same 3, util.pipe({ math.abs, math.floor, math.sqrt })(-9.4)
 
 
+describe 'add_response_cookies', ->
+  before_each ->
+    _G.ngx = { header: {} }
+
+  set_resp_cookie = (value) ->
+    _G.ngx.header['Set-Cookie'] = value
+
+  context 'when Set-Cookie is nil', ->
+    it 'sets ngx.header[Set-Cookie] to the given cookies', ->
+      new_cookies = {'first=1;path=/', 'second=2;path=/'}
+      util.add_response_cookies(new_cookies)
+      assert.same new_cookies, _G.ngx.header['Set-Cookie']
+
+  context 'when Set-Cookie is string', ->
+    old_cookie = 'first=1;path=/'
+    new_cookies = {'second=2;path=/', 'third=3;path=/'}
+
+    it 'converts ngx.header[Set-Cookie] to table and appends the given cookies', ->
+      set_resp_cookie old_cookie
+      util.add_response_cookies(new_cookies)
+      assert.same util.concat({old_cookie}, new_cookies), _G.ngx.header['Set-Cookie']
+
+  context 'when Set-Cookie is table', ->
+    old_cookies = {'first=1;path=/', 'second=2;path=/'}
+    new_cookies = {'third=3;path=/'}
+
+    it 'appends given cookies to ngx.header[Set-Cookie]', ->
+      set_resp_cookie old_cookies
+      util.add_response_cookies(new_cookies)
+      assert.same util.concat(old_cookies, new_cookies), _G.ngx.header['Set-Cookie']
+
+
 describe 'get_cookie', ->
   setup ->
     _G.ngx = {
