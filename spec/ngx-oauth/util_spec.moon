@@ -210,12 +210,13 @@ describe 'get_cookie', ->
 
 describe 'format_cookie', ->
   setup ->
+    _G.pairs = sorted_pairs
     _G.ngx = mock
       escape_uri: (value) -> string.gsub(value, ' ', '+')
 
   it 'returns correctly formated cookie with attributes', ->
     actual = util.format_cookie('foo', 'meh', version: 1, path: '/')
-    assert.is_true 'foo=meh;version=1;path=/' == actual or 'foo=meh;path=/;version=1' == actual
+    assert.same 'foo=meh;path=/;version=1', actual
 
   it 'escapes cookie value using ngx.escape_uri', ->
     assert.same 'foo=chunky+bacon', util.format_cookie('foo', 'chunky bacon', {})

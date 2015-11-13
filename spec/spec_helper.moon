@@ -1,6 +1,8 @@
 luassert = require 'luassert'
 say = require 'say'
 
+-- Assertions
+
 contains = (state, args) ->
   {expected, table} = args
   for value in *table do
@@ -13,3 +15,20 @@ say\set 'assertion.contains.negative', 'Expected item %s to not be in:\n%s'
 
 luassert\register 'assertion', 'contains', contains,
   'assertion.contains.positive', 'assertion.contains.negative'
+
+-- Helpers
+
+orig_pairs = pairs
+
+export sorted_pairs = (tab) ->
+  keys = [ k for k, _ in orig_pairs tab ]
+
+  table.sort keys, (a, b) ->
+    return a < b if type(a) == type(b)
+    tostring(a) < tostring(b)
+
+  i = 0
+  return ->
+    i += 1
+    key = keys[i]
+    key, tab[key] if key
