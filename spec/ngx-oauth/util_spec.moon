@@ -30,6 +30,13 @@ describe 'concat', ->
     assert.same tab2_orig, tab2
 
 
+describe 'id', ->
+
+  it 'returns given value', ->
+    value = 42
+    assert.equal value, util.id(value)
+
+
 describe 'is_blank', ->
 
   it 'returns true for nil', ->

@@ -31,6 +31,11 @@ function M.default (value, default_value)
   return value
 end
 
+--- Returns the given value. That's it, this is an identity function.
+function M.id (value)
+  return value
+end
+
 --- Returns true if the `value` is nil, empty string or contains at least one
 -- character other than space and tab. If the `value` is not nil and
 -- string, then it's converted to string.
