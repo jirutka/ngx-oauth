@@ -57,9 +57,7 @@ describe 'request', ->
 
       it 'returns Right with response', ->
         resp = client.request(params.method, params.headers, url, params.body)
-
-        assert.truthy is_right(resp)
-        assert.same response, resp.value
+        assert.equal Right(response), resp
 
     context 'when http.request_uri failed', ->
       before_each ->
@@ -69,9 +67,7 @@ describe 'request', ->
 
       it 'returns Left with error message', ->
         resp = client.request('POST', {}, url, 'body')
-
-        assert.truthy is_left(resp)
-        assert.same 'request failed!', resp.value
+        assert.equal Left('request failed!'), resp
 
   context 'when http.new failed', ->
     resp = nil
@@ -84,8 +80,7 @@ describe 'request', ->
       assert.stub(http_stub.request_uri).was_not_called!
 
     it 'returns Left with error message', ->
-      assert.truthy is_left(resp)
-      assert.same 'new failed!', resp.value
+      assert.equal Left('new failed!'), resp
 
 
 -- Shared contexts for request_json and derived functions.
@@ -103,9 +98,7 @@ contexts_json_response = (exec_request) ->
     it 'returns Left with error message', ->
       response.status = 404
       body = exec_request!
-
-      assert.same 'HTTP 404: { "msg": "hi!" }', body.value
-      assert.truthy is_left(body)
+      assert.equal Left('HTTP 404: { "msg": "hi!" }'), body
 
   context 'when failed to parse JSON', ->
 

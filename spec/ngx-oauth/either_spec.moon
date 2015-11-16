@@ -2,6 +2,23 @@ require 'moon.all'
 import Left, Right, either, encase, encase2 from require 'ngx-oauth.either'
 
 
+shared_either = (ttype) ->
+  other = ttype == Right and Left or Right
+
+  describe 'metatable.__eq', ->
+    context 'same Either types with same value', ->
+      it 'returns true', -> assert.is_true ttype(42) == ttype(42)
+
+    context 'same Either types with different value', ->
+      it 'returns false', -> assert.is_false ttype(42) == ttype(66)
+
+    context 'different Either types with same value', ->
+      it 'returns false', -> assert.is_false ttype(42) == other(42)
+
+    context 'Either with non-Either', ->
+      it 'returns false', -> assert.is_false ttype(66) == 66
+
+
 describe 'Left', ->
   left = Left(66)
 
@@ -9,6 +26,8 @@ describe 'Left', ->
     describe func_name, ->
       it 'returns self', ->
         assert.equal left, left[func_name](Right(42))
+
+  shared_either Left
 
 
 describe 'Right', ->
@@ -21,8 +40,7 @@ describe 'Right', ->
       it "returns Right which value is result of applying this Right's value to given Right's value", ->
         given = Right(42)
         result = fright.ap(given)
-        assert.same Right, result._type
-        assert.same 84, result.value
+        assert.equal Right(84), result
 
     context 'given Left', ->
       it 'returns given Left', ->
@@ -40,12 +58,13 @@ describe 'Right', ->
   describe 'map', ->
     it "returns Right which value is result of applying given function to this Right's value", ->
       result = right.map((x) -> x * 2)
-      assert.same Right, result._type
-      assert.same 84, result.value
+      assert.equal Right(84), result
 
   describe 'chain', ->
     it "returns result of applying given function to this Right's value", ->
       assert.same 84, right.chain((x) -> x * 2)
+
+  shared_either Right
 
 
 describe 'either', ->
@@ -89,8 +108,7 @@ describe 'encase', ->
   context 'when given func has not raised error', ->
     it "nested function returns Right with the func's return value", ->
       result = encase(-> 'hai!')()
-      assert.same Right, result._type
-      assert.same 'hai!', result.value
+      assert.equal Right('hai!'), result
 
   context 'when given func has raised error', ->
     it 'nested function returns Left with an error message', ->
@@ -108,13 +126,11 @@ describe 'encase2', ->
 
     it "nested function returns Right with the func's 1st result value", ->
       result = encase2(func)()
-      assert.same Right, result._type
-      assert.same 'OK!', result.value
+      assert.equal Right('OK!'), result
 
   context 'when func returns nil and a value', ->
     func = -> nil, 'FAIL!'
 
     it "nested function returns Left with the func's 2nd result value", ->
       result = encase2(func)()
-      assert.same Left, result._type
-      assert.same 'FAIL!', result.value
+      assert.equal Left('FAIL!'), result

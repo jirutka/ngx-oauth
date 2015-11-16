@@ -14,6 +14,11 @@ local function istype (ttype, value)
   return type(value) == 'table' and value._type == ttype
 end
 
+local either_meta = {
+  __eq = function(a, b)
+    return a._type == b._type and a.value == b.value
+  end
+}
 
 --- Returns a `Left` with the given `value`.
 -- @param value The value of any type to wrap.
@@ -39,7 +44,7 @@ local function Left (value)
   -- @treturn Left self
   self.chain = function() return self end
 
-  return self
+  return setmetatable(self, either_meta)
 end
 
 --- Returns a `Right` with the given `value`.
@@ -86,7 +91,7 @@ local function Right (value)
     return func(value)
   end
 
-  return self
+  return setmetatable(self, either_meta)
 end
 
 --- Returns the result of applying the `on_left` function to the Left's value,
