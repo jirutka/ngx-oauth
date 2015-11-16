@@ -10,7 +10,8 @@
 --
 -- @alias self
 
-local util = require 'ngx-oauth/util'
+local util  = require 'ngx-oauth/util'
+local nginx = require 'ngx-oauth/nginx'
 
 local min  = math.min
 local imap = util.imap
@@ -44,7 +45,7 @@ return function (conf, crypto)
   local decrypt = par(crypto.decrypt, conf.aes_bits, conf.client_secret)
 
   local function create_cookie (name, value, max_age)
-    return util.format_cookie(name, value, {
+    return nginx.format_cookie(name, value, {
       version = 1, secure = true, path = conf.cookie_path, max_age = max_age
     })
   end
@@ -65,7 +66,7 @@ return function (conf, crypto)
       table.insert(cookies,
         create_cookie(COOKIE_REFRESH_TOKEN, encrypt(token.refresh_token), conf.max_age))
     end
-    util.add_response_cookies(cookies)
+    nginx.add_response_cookies(cookies)
   end
 
   --- Writes userinfo cookies, i.e. username and email, to the *response's*
@@ -73,7 +74,7 @@ return function (conf, crypto)
   --
   -- @tparam {username=string,email=string} userinfo
   self.add_userinfo = function(userinfo)
-    util.add_response_cookies {
+    nginx.add_response_cookies {
       create_cookie(COOKIE_USERNAME, userinfo.username, conf.max_age),
       create_cookie(COOKIE_EMAIL, userinfo.email, conf.max_age)
     }
@@ -85,20 +86,20 @@ return function (conf, crypto)
   -- @function clear_all
   self.clear_all = pipe {
     par(imap, clear_cookie, ALL_COOKIES),
-    util.add_response_cookies
+    nginx.add_response_cookies
   }
 
   --- Reads an access token from the *request's* cookies.
   --
   -- @function get_access_token
   -- @treturn string|nil An access token, or `nil` if not set.
-  self.get_access_token = par(util.get_cookie, COOKIE_ACCESS_TOKEN)
+  self.get_access_token = par(nginx.get_cookie, COOKIE_ACCESS_TOKEN)
 
   --- Reads a refresh token from the *request's* cookies.
   -- @treturn string|nil A decrypted refresh token, or `nil` if not set.
   self.get_refresh_token = function()
     if not refresh_token then
-      local value = util.get_cookie(COOKIE_REFRESH_TOKEN)
+      local value = nginx.get_cookie(COOKIE_REFRESH_TOKEN)
       if value then refresh_token = decrypt(value) end
     end
     return refresh_token
@@ -108,7 +109,7 @@ return function (conf, crypto)
   --
   -- @function get_username
   -- @treturn string|nil An username, or `nil` if not set.
-  self.get_username = par(util.get_cookie, COOKIE_USERNAME)
+  self.get_username = par(nginx.get_cookie, COOKIE_USERNAME)
 
   return self
 end
