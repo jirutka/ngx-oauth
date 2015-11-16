@@ -10,24 +10,29 @@
 -- specification from the Fantasy Land Specification, except the `of` method.
 -- Instead of `Left.of(a)` and `Right.of(a)`, use `Left(a)` and `Right(a)`.
 
-local function istype (ttype, value)
-  return type(value) == 'table' and value._type == ttype
-end
+local util = require 'ngx-oauth.util'
+local mtype = util.mtype
 
-local either_meta = {
-  __eq = function(a, b)
-    return a._type == b._type and a.value == b.value
-  end
-}
+
+local function Either (ttype, value)
+  return setmetatable({
+    value = value
+  }, {
+    __eq = function(a, b)
+      return mtype(a) == mtype(b) and a.value == b.value
+    end,
+    __tostring = function(a)
+      return ttype..'('..a.value..')'
+    end,
+    __type = ttype
+  })
+end
 
 --- Returns a `Left` with the given `value`.
 -- @param value The value of any type to wrap.
 -- @treturn Left
 local function Left (value)
-  local self = {
-    _type  = Left,
-    value = value,
-  }
+  local self = Either('Left', value)
 
   --- Returns self.
   -- @function Left.ap
@@ -44,17 +49,14 @@ local function Left (value)
   -- @treturn Left self
   self.chain = function() return self end
 
-  return setmetatable(self, either_meta)
+  return self
 end
 
 --- Returns a `Right` with the given `value`.
 -- @param value The value of any type to wrap.
 -- @treturn Right
 local function Right (value)
-  local self = {
-    _type = Right,
-    value = value
-  }
+  local self = Either('Right', value)
 
   --- Returns a `Right` whose value is the result of applying self's value to
   -- the given Right's value, if it's `Right`; otherwise returns the given `Left`.
@@ -65,9 +67,9 @@ local function Right (value)
   -- @raise Error if self's value is not a function or if _either_ is not
   --   `Left`, nor `Right`.
   self.ap = function(either)
-    assert(type(value) == 'function',
+    assert(mtype(value) == 'function',
       'Could not apply this value to given Either; this value is not a function')
-    assert(istype(Right, either) or istype(Left, either),
+    assert(mtype(either) == 'Right' or mtype(either) == 'Left',
       'Expected Left or Right')
     return either.map(value)
   end
@@ -91,7 +93,7 @@ local function Right (value)
     return func(value)
   end
 
-  return setmetatable(self, either_meta)
+  return self
 end
 
 --- Returns the result of applying the `on_left` function to the Left's value,
@@ -103,10 +105,10 @@ end
 -- @tparam Left|Right teither
 -- @raise Error when `teither` is not `Left`, nor `Right`.
 local function either (on_left, on_right, teither)
-  if istype(Left, teither) then
+  if mtype(teither) == 'Left' then
     return on_left(teither.value)
 
-  elseif istype(Right, teither) then
+  elseif mtype(teither) == 'Right' then
     return on_right(teither.value)
 
   else

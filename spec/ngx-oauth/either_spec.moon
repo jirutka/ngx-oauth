@@ -1,4 +1,5 @@
 require 'moon.all'
+import mtype from require 'ngx-oauth.util'
 import Left, Right, either, encase, encase2 from require 'ngx-oauth.either'
 
 
@@ -26,6 +27,9 @@ describe 'Left', ->
     describe func_name, ->
       it 'returns self', ->
         assert.equal left, left[func_name](Right(42))
+
+  describe 'metatable.__type', ->
+    it 'is Left', -> getmetatable(left).__type
 
   shared_either Left
 
@@ -63,6 +67,9 @@ describe 'Right', ->
   describe 'chain', ->
     it "returns result of applying given function to this Right's value", ->
       assert.same 84, right.chain((x) -> x * 2)
+
+  describe 'metatable.__type', ->
+    it 'is Right', -> getmetatable(right).__type
 
   shared_either Right
 
@@ -113,7 +120,7 @@ describe 'encase', ->
   context 'when given func has raised error', ->
     it 'nested function returns Left with an error message', ->
       result = encase(table.insert)()
-      assert.same Left, result._type
+      assert.same 'Left', mtype(result)
       assert.match 'bad argument.*', result.value
 
 

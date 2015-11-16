@@ -97,6 +97,21 @@ function M.merge (...)
   return result
 end
 
+--- Returns type of the given value. If `value` has a metatable with key
+-- `__type`, then returns its value; otherwise returns Lua's raw type.
+--
+-- @param value
+-- @treturn string A type of the `value`.
+function M.mtype (value)
+  local meta = getmetatable(value)
+
+  if meta and meta.__type then
+    return meta.__type
+  else
+    return type(value)
+  end
+end
+
 --- Partial application.
 -- Takes a function `func` and arguments, and returns a function *func2*.
 -- When applied, *func2* returns the result of applying `func` to the arguments

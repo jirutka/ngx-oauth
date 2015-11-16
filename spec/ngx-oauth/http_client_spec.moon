@@ -1,16 +1,12 @@
 require 'moon.all'
 import _ from require 'luassert.match'
-import merge from require 'ngx-oauth.util'
+import merge, mtype from require 'ngx-oauth.util'
 import Left, Right from require 'ngx-oauth.either'
 
 HTTP_INST = '<fake-http-instance>'
 
 http_stub = {}
 url = 'https://example.org'
-
-is_right = (value) -> type(value) == 'table' and value._type == Right
-is_left  = (value) -> type(value) == 'table' and value._type == Left
-
 
 -- Trick Lua to require our fake table instead of resty.http module
 -- into http_client.
@@ -91,7 +87,7 @@ contexts_json_response = (exec_request) ->
       body = exec_request!
 
       assert.same { msg: 'hi!' }, body.value
-      assert.truthy is_right(body)
+      assert.same 'Right', mtype(body)
 
   context 'when response status is not 200', ->
 
@@ -107,7 +103,7 @@ contexts_json_response = (exec_request) ->
       body = exec_request!
 
       assert.matches 'Expected object key string.*', body.value
-      assert.truthy is_left(body)
+      assert.same 'Left', mtype(body)
 
 
 describe 'request_json', ->

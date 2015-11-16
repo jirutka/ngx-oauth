@@ -113,6 +113,20 @@ describe 'merge', ->
     assert.same tab2_orig, tab2
 
 
+describe 'mtype', ->
+
+  context 'given value with __type', ->
+    value = setmetatable({}, { __type: 'mytable' })
+
+    it "returns value of metatable's key __type", ->
+      assert.same 'mytable', util.mtype(value)
+
+  context 'given value without __type', ->
+    it 'returns raw type', ->
+      for value in *{nil, true, 1, 'foo', ->, coroutine.create(->)} do
+        assert.same type(value), util.mtype(value)
+
+
 describe 'partial', ->
   func1 = util.partial(string.find, 'yada yada')
   func2 = util.partial(string.gsub, 'yada yada', 'y')
