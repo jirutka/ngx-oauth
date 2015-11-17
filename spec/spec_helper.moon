@@ -32,3 +32,11 @@ export sorted_pairs = (tab) ->
     i += 1
     key = keys[i]
     key, tab[key] if key
+
+
+export url_encode = (tab) ->
+  encode_param = (str) ->
+    tostring(str)\gsub('\n', '\r\n')\gsub('([^%w_])', (c) ->
+      string.format('%%%02X', string.byte(c)))
+
+  table.concat([ encode_param(k)..'='..encode_param(v) for k, v in sorted_pairs(tab) ], '&')
