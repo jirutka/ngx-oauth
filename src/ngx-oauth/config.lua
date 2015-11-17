@@ -17,7 +17,7 @@ local defaults = {
   server_url        = '',  -- used only as a shorthand for setting these 3 below
   authorization_url = '${server_url}/authorize',
   token_url         = '${server_url}/token',
-  check_token_url   = "${server_url}/check_token",
+  userinfo_url      = "${server_url}/userinfo",
   success_path      = '',
   cookie_path       = '/',
   max_age           = 2592000, -- 30 days
@@ -47,7 +47,7 @@ function M.load ()
     table.insert(errors, 'Variable $oauth_client_secret is not set.')
   end
 
-  for _, key in ipairs {'authorization_url', 'token_url', 'check_token_url'} do
+  for _, key in ipairs {'authorization_url', 'token_url', 'userinfo_url'} do
     if not server_url and conf[key]:find('${server_url}', 1, true) then
       table.insert(errors, 'Neither variable $oauth_'..key..' nor $oauth_server_url is set.')
     elseif server_url then

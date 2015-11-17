@@ -10,7 +10,7 @@ describe 'load', ->
     client_secret: '123'
     authorization_url: 'http://oaas.org/authorize'
     token_url: 'http://oaas.org/token'
-    check_token_url: 'http://oaas.org/check_token'
+    userinfo_url: 'http://oaas.org/userinfo'
   }
 
   before_each ->
@@ -68,7 +68,7 @@ describe 'load', ->
     for key, default_value in pairs {
       token_url: 'token',
       authorization_url: 'authorize',
-      check_token_url: 'check_token'
+      userinfo_url: 'userinfo'
     } do
       context "and ngx.var.#{key} is not set", ->
         it "prefixes default #{key} with server_url", ->
@@ -77,7 +77,7 @@ describe 'load', ->
 
   context 'when ngx.var.oauth_server_url is not set', ->
 
-    for varname in *{'authorization_url', 'token_url', 'check_token_url'} do
+    for varname in *{'authorization_url', 'token_url', 'userinfo_url'} do
       context "and ngx.var.#{varname} is not set", ->
         it 'returns table with error message as 2nd value', ->
           _, errs = config.load()
