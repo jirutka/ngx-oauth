@@ -35,6 +35,41 @@ describe 'add_response_cookies', ->
       assert.same concat(old_cookies, new_cookies), _G.ngx.header['Set-Cookie']
 
 
+describe 'fail', ->
+  setup ->
+    _G.ngx = mock { ERR: 4, WARN: 5, HTTP_OK: 200, header: {}, log: ->, say: ->, exit: -> }
+
+  context 'given valid status', ->
+    before_each -> nginx.fail(503, 'Ay, %s!', 'caramba')
+
+    it 'sets ngx.status to given status and ngx.header.content_type to json', ->
+      assert.same 503, _G.ngx.status
+      assert.same 'application/json', _G.ngx.header.content_type
+
+    it 'calls ngx.say with JSON containing the given message', ->
+      assert.stub(_G.ngx.say).called_with '{"error":"Ay, caramba!"}'
+
+    -- This is a workaround to send response body; it will still send
+    -- the status set in ngx.status.
+    it 'calls ngx.exit with HTTP_OK', ->
+      assert.stub(_G.ngx.exit).called_with _G.ngx.HTTP_OK
+
+  context 'given status < 400 or >= 600', ->
+    it 'throws error', ->
+      for value in *{0, 200, 399, 600, nil, '400'} do
+        assert.has_error -> nginx.fail value, 'fail'
+
+  context 'given status >= 500', ->
+    it 'logs given message with prefix "[ngx-oauth] " on level ERR', ->
+      nginx.fail 500, 'Ay, caramba!'
+      assert.stub(_G.ngx.log).called_with _G.ngx.ERR, '[ngx-oauth] Ay, caramba!'
+
+  context 'given status < 500', ->
+    it 'logs given message with prefix "[ngx-oauth] " on level WARN', ->
+      nginx.fail 400, 'EXTERMINATE!'
+      assert.stub(_G.ngx.log).called_with _G.ngx.WARN, '[ngx-oauth] EXTERMINATE!'
+
+
 describe 'format_cookie', ->
   setup ->
     _G.pairs = sorted_pairs

@@ -1,2 +1,2 @@
 std = 'luajit'
-read_globals = { 'ngx' }
+globals = { 'ngx' }
