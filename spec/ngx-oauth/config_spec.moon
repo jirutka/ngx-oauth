@@ -81,13 +81,11 @@ describe 'load', ->
       context "and ngx.var.#{varname} is not set", ->
         it 'returns table with error message as 2nd value', ->
           _, errs = config.load()
-          assert.is_table errs
-          assert.contains "Neither variable $oauth_#{varname} nor $oauth_server_url is set.", errs
+          assert.matches "neither variable $oauth_#{varname} nor $oauth_server_url is set", errs
 
 
   for varname in *{'client_id', 'client_secret'} do
     context "when ngx.var.oauth_#{varname} is not set", ->
       it 'returns table with error message as 2nd value', ->
         _, errs = config.load()
-        assert.is_table errs
-        assert.contains "Variable $oauth_#{varname} is not set.", errs
+        assert.matches "variable $oauth_#{varname} is not set", errs

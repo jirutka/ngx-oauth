@@ -1,5 +1,5 @@
 ---------
--- This module is responsible for configuration loading and validating.
+-- Module for configuration loading.
 
 local util = require 'ngx-oauth.util'
 
@@ -33,7 +33,7 @@ local load_from_ngx = par(map, function(default_value, key)
 -- variables are set.
 --
 -- @treturn {[string]=any,...} Settings
--- @treturn nil|{string, ...} Validation messages, or `nil` if no validation
+-- @treturn nil|string Validation error, or `false` if no validation
 --   error was found.
 function M.load ()
   local errors = {}
@@ -41,21 +41,21 @@ function M.load ()
   local server_url = not is_blank(conf.server_url) and conf.server_url
 
   if is_blank(conf.client_id) then
-    table.insert(errors, 'Variable $oauth_client_id is not set.')
+    table.insert(errors, 'variable $oauth_client_id is not set')
   end
   if is_blank(conf.client_secret) then
-    table.insert(errors, 'Variable $oauth_client_secret is not set.')
+    table.insert(errors, 'variable $oauth_client_secret is not set')
   end
 
   for _, key in ipairs {'authorization_url', 'token_url', 'userinfo_url'} do
     if not server_url and conf[key]:find('${server_url}', 1, true) then
-      table.insert(errors, 'Neither variable $oauth_'..key..' nor $oauth_server_url is set.')
+      table.insert(errors, 'neither variable $oauth_'..key..' nor $oauth_server_url is set')
     elseif server_url then
       conf[key] = conf[key]:gsub('${server_url}', server_url)
     end
   end
 
-  return conf, #errors ~= 0 and errors
+  return conf, #errors ~= 0 and table.concat(errors, ', ')
 end
 
 return M
