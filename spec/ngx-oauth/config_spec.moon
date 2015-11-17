@@ -44,7 +44,7 @@ describe 'load', ->
       scope: ''
       server_url: ''
       redirect_path: '/_oauth/callback'
-      success_path: ''
+      success_path: '/'
       cookie_path: '/'
       max_age: 2592000
       aes_bits: 256
