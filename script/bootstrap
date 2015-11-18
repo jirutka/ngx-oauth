@@ -7,14 +7,14 @@
 #                    version is not available on PATH and USE_SYSTEM_LUA != 'yes', then it will be
 #                    installed, otherwise it fails.
 #                    If not set, then the script checks if lua-5.1, lua-5.2, or luajit-2 is
-#                    available. If not and USE_SYSTEM_LUA != 'yes', then lua-5.1 will be installed,
-#                    otherwise it fails.
+#                    available. If not and USE_SYSTEM_LUA != 'yes', then luajit-2.0 will be
+#                    installed, otherwise it fails.
 #
 #   USE_SYSTEM_LUA : Set to 'yes' if you want to use system provided lua. Default is to install
 #                    lua locally in .env directory.
 set -e
 
-DEFAULT_VERSION='lua-5.2'
+DEFAULT_VERSION='luajit-2.0'
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 VENV_DIR="$PROJECT_DIR/.env"
 HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py'
