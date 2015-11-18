@@ -1,0 +1,19 @@
+return {
+
+  -- filename to store stats collected
+  statsfile = '.tmp/luacov.stats.out',
+
+  -- filename to store report
+  reportfile = '.tmp/luacov.report.out',
+
+  -- Run reporter on completion? (won't work for ticks)
+  runreport = true,
+
+  -- Patterns for files to include when reporting
+  -- all will be included if nothing is listed
+  -- (exclude overrules include, do not include
+  -- the .lua extension, path separator is always '/')
+  include = {
+    '^%./src/.*'
+  }
+}

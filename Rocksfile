@@ -3,5 +3,7 @@ busted
 ldoc
 lua-cjson
 luacheck
+luacov
+luacov-coveralls
 luaossl
 moonscript
