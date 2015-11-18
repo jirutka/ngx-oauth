@@ -34,7 +34,7 @@ sorted_pairs = (tab) ->
     key, tab[key] if key
 
 
-url_encode = (tab) ->
+encode_args = (tab) ->
   encode_param = (str) ->
     tostring(str)\gsub('\n', '\r\n')\gsub('([^%w_])', (c) ->
       string.format('%%%02X', string.byte(c)))
@@ -44,5 +44,5 @@ url_encode = (tab) ->
 
 export spec_helper = {
   :sorted_pairs
-  :url_encode
+  :encode_args
 }
