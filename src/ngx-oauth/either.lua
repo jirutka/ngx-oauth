@@ -14,13 +14,17 @@ local util = require 'ngx-oauth.util'
 local mtype = util.mtype
 
 
+local function either_eq (op1, op2)
+  return mtype(op1) == mtype(op2) and op1.value == op2.value
+end
+
 local function Either (ttype, value)
   return setmetatable({
     value = value
   }, {
-    __eq = function(a, b)
-      return mtype(a) == mtype(b) and a.value == b.value
-    end,
+    -- __eq must be a non-anonymous function, to have the same identity for each
+    -- instance of Either, otherwise it doesn't work on Lua 5.1 and LuaJIT 2.0.
+    __eq = either_eq,
     __tostring = function(a)
       return ttype..'('..a.value..')'
     end,
