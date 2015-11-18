@@ -73,7 +73,7 @@ describe 'fail', ->
 
 describe 'format_cookie', ->
   setup ->
-    _G.pairs = sorted_pairs
+    _G.pairs = spec_helper.sorted_pairs
     _G.ngx = mock
       escape_uri: (value) -> string.gsub(value, ' ', '+')
 

@@ -20,7 +20,7 @@ luassert\register 'assertion', 'contains', contains,
 
 orig_pairs = pairs
 
-export sorted_pairs = (tab) ->
+sorted_pairs = (tab) ->
   keys = [ k for k, _ in orig_pairs tab ]
 
   table.sort keys, (a, b) ->
@@ -34,9 +34,15 @@ export sorted_pairs = (tab) ->
     key, tab[key] if key
 
 
-export url_encode = (tab) ->
+url_encode = (tab) ->
   encode_param = (str) ->
     tostring(str)\gsub('\n', '\r\n')\gsub('([^%w_])', (c) ->
       string.format('%%%02X', string.byte(c)))
 
   table.concat([ encode_param(k)..'='..encode_param(v) for k, v in sorted_pairs(tab) ], '&')
+
+
+export spec_helper = {
+  :sorted_pairs
+  :url_encode
+}

@@ -16,7 +16,7 @@ http_client_stub = { post_form_for_json: -> }
 
 
 setup ->
-  _G.ngx = { encode_args: url_encode, encode_base64: to_base64 }
+  _G.ngx = { encode_args: spec_helper.url_encode, encode_base64: to_base64 }
   -- Trick Lua to require our fake http_client instead of ngx-oauth.http_client module.
   package.loaded['ngx-oauth.http_client'] = http_client_stub
   export oauth = require 'ngx-oauth.oauth2'

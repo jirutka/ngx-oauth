@@ -19,7 +19,7 @@ describe '__call', ->
   cookie_attrs = "path=#{conf.cookie_path};secure;version=1"
 
   setup ->
-    _G.pairs = sorted_pairs
+    _G.pairs = spec_helper.sorted_pairs
     export crypto_stub = mock {
       encrypt: (bits, key, value) -> "<ENC[#{value}]>"
       decrypt: (bits, key, value) -> "<DEC[#{value}]>"
