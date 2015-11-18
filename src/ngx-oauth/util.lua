@@ -1,6 +1,9 @@
 ---------
 -- General utility functions.
 
+-- unpack is not global since Lua 5.3
+local unpack = table.unpack or unpack
+
 local M = {}
 
 --- Returns a new table with items concatenated from the given tables.
