@@ -1,3 +1,5 @@
+-- vim: set ft=lua:
+
 return {
   _all = {
     helper = 'spec/spec_helper'

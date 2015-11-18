@@ -1,3 +1,5 @@
+-- vim: set ft=lua:
+
 return {
 
   -- filename to store stats collected
