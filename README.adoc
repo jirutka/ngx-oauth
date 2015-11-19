@@ -1,0 +1,11 @@
+= ngx-oauth
+Jakub Jirutka <https://github.com/jirutka[@jirutka]>
+:gh-name: jirutka/ngx-oauth
+:gh-branch: master
+
+ifdef::env-github[]
+image:https://travis-ci.org/{gh-name}.svg?branch={gh-branch}["Build Status", link="https://travis-ci.org/{gh-name}"]
+image:https://coveralls.io/repos/{gh-name}/badge.svg?branch={gh-branch}&service=github["Coverage Status", link="https://coveralls.io/github/{gh-name}?branch={gh-branch}"]
+endif::env-github[]
+
+TBD
