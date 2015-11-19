@@ -91,9 +91,9 @@ function M.get_cookie (name)
 end
 
 --- Logs the given `message` on the specified logging `level` (e.g. `ngx.ERR`,
--- `ngx.INFO`), if the `level` is less or equal to the `treshold`.
+-- `ngx.INFO`), if the `level` is less or equal to the `threshold`.
 --
--- @tparam int treshold The logging level treshold (0-8).
+-- @tparam int threshold The logging level threshold (0-8).
 -- @tparam int level The logging level (0-8).
 -- @tparam string message
 -- @param ... Arguments for @{string.format} being applied to `message`.
