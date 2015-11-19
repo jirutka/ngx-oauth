@@ -28,7 +28,7 @@ end
 --- Returns the `value` if not nil or empty, otherwise returns the
 -- `default_value`.
 function M.default (value, default_value)
-  if value == nil or value == '' then
+  if M.is_empty(value) then
     return default_value
   end
   return value
@@ -42,8 +42,15 @@ end
 --- Returns true if the `value` is nil, empty string or contains at least one
 -- character other than space and tab. If the `value` is not nil and
 -- string, then it's converted to string.
+-- @treturn bool
 function M.is_blank (value)
-  return value == nil or value == '' or tostring(value):find('^%s*$') ~= nil
+  return M.is_empty(value) or tostring(value):find('^%s*$') ~= nil
+end
+
+--- Returns true if the `value` is nil or empty string.
+-- @treturn bool
+function M.is_empty (value)
+  return value == nil or value == ''
 end
 
 --- Returns a new table with the results of running `func(value, key)` once
@@ -157,6 +164,22 @@ function M.pipe (...)
   return function(...)
     return pipe_inner(1, ...)
   end
+end
+
+--- Returns the result of calling `when_false` with the `value` if `pred`
+-- function returns falsy for the `value`; otherwise returns the `value` as is.
+--
+-- @tparam function pred The predicate function.
+-- @tparam function when_false The function to invoke when the `pred` evaluates
+--   to a falsy value.
+-- @param value The value to test with the `pred` function and pass to the
+--   `when_false` if necessary.
+-- @return The `value`, or the result of applying `value` to `when_false`.
+function M.unless (pred, when_false, value)
+  if pred(value) then
+    return value
+  end
+  return when_false(value)
 end
 
 return M

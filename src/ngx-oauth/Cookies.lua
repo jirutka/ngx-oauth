@@ -13,10 +13,12 @@
 local util  = require 'ngx-oauth/util'
 local nginx = require 'ngx-oauth/nginx'
 
-local min  = math.min
-local imap = util.imap
-local par  = util.partial
-local pipe = util.pipe
+local min      = math.min
+local imap     = util.imap
+local is_empty = util.is_empty
+local par      = util.partial
+local pipe     = util.pipe
+local unless   = util.unless
 
 local COOKIE_ACCESS_TOKEN  = 'oauth_access_token'
 local COOKIE_REFRESH_TOKEN = 'oauth_refresh_token'
@@ -99,8 +101,7 @@ return function (conf, crypto)
   -- @treturn string|nil A decrypted refresh token, or `nil` if not set.
   self.get_refresh_token = function()
     if not refresh_token then
-      local value = nginx.get_cookie(COOKIE_REFRESH_TOKEN)
-      if value then refresh_token = decrypt(value) end
+      refresh_token = unless(is_empty, decrypt, nginx.get_cookie(COOKIE_REFRESH_TOKEN))
     end
     return refresh_token
   end

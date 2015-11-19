@@ -37,13 +37,21 @@ describe 'id', ->
     assert.equal value, util.id(value)
 
 
-describe 'is_blank', ->
+behaves_like_is_empty = (func) ->
 
   it 'returns true for nil', ->
-    assert.is_true util.is_blank(nil)
+    assert.is_true func(nil)
 
   it 'returns true for empty string', ->
-    assert.is_true util.is_blank('')
+    assert.is_true func('')
+
+  it 'returns false for other types than nil and string', ->
+    for value in *{42, true, false, {}, print}
+      assert.is_false func(value)
+
+
+describe 'is_blank', ->
+  behaves_like_is_empty util.is_blank
 
   it 'returns true for string with whitespaces only', ->
     for value in *{'  ', '\t\t', '\t'} do
@@ -53,9 +61,9 @@ describe 'is_blank', ->
     for value in *{'foo', ' foo ', '\tfoo'} do
       assert.is_false util.is_blank(value)
 
-  it 'returns false for other types than nil and string', ->
-    for value in *{42, true, false, {}, util.is_blank}
-      assert.is_false util.is_blank(value)
+
+describe 'is_empty', ->
+  behaves_like_is_empty util.is_empty
 
 
 describe 'map', ->
@@ -180,3 +188,18 @@ describe 'pipe', ->
     it 'composes functions from left to right', ->
       assert.same 3, util.pipe(math.abs, math.floor, math.sqrt)(-9.4)
       assert.same 3, util.pipe({ math.abs, math.floor, math.sqrt })(-9.4)
+
+
+describe 'unless', ->
+
+  context 'when pred evaluates to false', ->
+    it 'returns result of calling when_false(value)', ->
+      assert.same 6, util.unless(((x) -> x == 0), ((x) -> x * 2), 3)
+
+  context 'when pred evaluates to true', ->
+    it 'returns the value as is', ->
+      assert.same 3, util.unless(((x) -> x == 3), ((x) -> x * 2), 3)
+
+  context 'given value "false"', ->
+    it 'returns the value as is when pred evaluates to true', ->
+      assert.is_false util.unless((-> 'wrong!'), ((x) -> not x), false)
