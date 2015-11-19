@@ -42,11 +42,11 @@ function M.load ()
   local server_url = not is_blank(conf.server_url) and conf.server_url
 
   if is_blank(conf.client_id) then
-    table.insert(errors, 'variable $oauth_client_id is not set')
+    table.insert(errors, '$oauth_client_id is not set')
   end
 
   if is_blank(conf.client_secret) then
-    table.insert(errors, 'variable $oauth_client_secret is not set')
+    table.insert(errors, '$oauth_client_secret is not set')
   end
 
   if not contains(conf.aes_bits, {128, 192, 256}) then
@@ -60,13 +60,13 @@ function M.load ()
 
   for _, key in ipairs {'authorization_url', 'token_url', 'userinfo_url'} do
     if not server_url and conf[key]:find('${server_url}', 1, true) then
-      table.insert(errors, 'neither variable $oauth_'..key..' nor $oauth_server_url is set')
+      table.insert(errors, 'neither $oauth_'..key..' nor $oauth_server_url is set')
     elseif server_url then
       conf[key] = conf[key]:gsub('${server_url}', server_url)
     end
   end
 
-  return conf, #errors ~= 0 and table.concat(errors, ', ')
+  return conf, #errors ~= 0 and table.concat(errors, '; ')
 end
 
 return M
