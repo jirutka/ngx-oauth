@@ -94,13 +94,18 @@ describe 'format_cookie', ->
 
 describe 'get_cookie', ->
   setup ->
-    _G.ngx = {
-      var: { cookie_foo: 'meh.' }
+    _G.ngx = mock {
+      var: { cookie_plain: 'meh.', cookie_encod: '%2Fping%3F' }
+      unescape_uri: spec_helper.unescape_uri
     }
 
   context 'existing cookie', ->
     it 'returns cookie value from ngx.var', ->
-      assert.same 'meh.', nginx.get_cookie('foo')
+      assert.same 'meh.', nginx.get_cookie('plain')
+
+    it 'decodes uri-encoded cookie value using ngx.unescape_uri', ->
+      assert.same '/ping?', nginx.get_cookie('encod')
+      assert.spy(_G.ngx.unescape_uri).called_with '%2Fping%3F'
 
   context 'non-existing cookie', ->
     it 'returns nil', ->

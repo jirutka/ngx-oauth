@@ -2,13 +2,17 @@
 -- Utilities for nginx.
 
 local util = require 'ngx-oauth.util'
-local concat = util.concat
 
 -- Allow either cjson, or th-LuaJSON.
 local ok, json = pcall(require, 'cjson')
 if not ok then
   json = require 'json'
 end
+
+local concat   = util.concat
+local is_empty = util.is_empty
+local unless   = util.unless
+
 
 local LOG_PREFIX = '[ngx-oauth] '
 
@@ -78,12 +82,12 @@ function M.format_cookie (name, value, attrs)
   return table.concat(t, ';')
 end
 
---- Returns value of the specified request's cookie.
+--- Returns URI-decoded value of the specified request's cookie.
 --
 -- @tparam string name The name of the cookie to get.
 -- @treturn string|nil The cookie's value, or nil if doesn't exist.
 function M.get_cookie (name)
-  return ngx.var['cookie_'..name]
+  return unless(is_empty, ngx.unescape_uri, ngx.var['cookie_'..name])
 end
 
 --- Logs the given `message` on the specified logging `level` (e.g. `ngx.ERR`,

@@ -31,6 +31,7 @@ describe '__call', ->
       var: {}
       header: {}
       escape_uri: (value) -> value\gsub(' ', '+')
+      unescape_uri: spec_helper.unescape_uri
 
 
   describe 'add_token', ->

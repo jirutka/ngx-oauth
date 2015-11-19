@@ -42,7 +42,13 @@ encode_args = (tab) ->
   table.concat([ encode_param(k)..'='..encode_param(v) for k, v in sorted_pairs(tab) ], '&')
 
 
+unescape_uri = (str) ->
+  tostring(str)\gsub('+', ' ')\gsub('\r\n', '\n')\gsub('%%(%x%x)', (h) ->
+    string.char(tonumber(h, 16)))
+
+
 export spec_helper = {
-  :sorted_pairs
   :encode_args
+  :sorted_pairs
+  :unescape_uri
 }
