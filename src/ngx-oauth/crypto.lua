@@ -25,6 +25,8 @@ local M = {}
 --   or equal than `bits / 8`.
 -- @tparam string value The string to encrypt.
 -- @treturn string A pair of IV and encrypted string encoded in Base64.
+-- @raise If the specified key length (`bits`) is not supported or the `key`
+--   is too short.
 function M.encrypt (bits, key, value)
   local iv = rand.bytes(IV_BYTES)
 
@@ -38,9 +40,17 @@ end
 -- @tparam string key The secret key to use for decryption. It must be greater
 --   or equal than `bits / 8`.
 -- @tparam string value The pair of IV and encrypted string encoded in Base64.
--- @treturn string A decrypted string.
+-- @treturn string|nil A decrypted string, or nil if the `value` is malformed
+--   or cannot be decrypted with the given key.
+-- @raise If the specified key length (`bits`) is not supported or the `key`
+--   is too short.
 function M.decrypt (bits, key, value)
   value = ngx.decode_base64(value)
+
+  if not value or value:len() <= IV_BYTES then
+    return nil
+  end
+
   local iv = value:sub(1, IV_BYTES)
   local encrypted = value:sub(17)
 
