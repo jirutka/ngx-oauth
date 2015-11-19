@@ -25,6 +25,21 @@ function M.concat (...)
   return result
 end
 
+--- Returns true if the table `tab` contains the specified `item`; otherwise
+-- returns false.
+--
+-- @param item The item to search.
+-- @tparam table tab The table to test.
+-- @treturn bool Whether the `tab` contains the `item`.
+function M.contains (item, tab)
+  for _, val in pairs(tab) do
+    if val == item then
+      return true
+    end
+  end
+  return false
+end
+
 --- Returns the `value` if not nil or empty, otherwise returns the
 -- `default_value`.
 function M.default (value, default_value)

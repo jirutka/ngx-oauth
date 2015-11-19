@@ -11,7 +11,9 @@
 -- Instead of `Left.of(a)` and `Right.of(a)`, use `Left(a)` and `Right(a)`.
 
 local util = require 'ngx-oauth.util'
-local mtype = util.mtype
+
+local contains = util.contains
+local mtype    = util.mtype
 
 
 local function either_eq (op1, op2)
@@ -73,8 +75,8 @@ local function Right (value)
   self.ap = function(either)
     assert(mtype(value) == 'function',
       'Could not apply this value to given Either; this value is not a function')
-    assert(mtype(either) == 'Right' or mtype(either) == 'Left',
-      'Expected Left or Right')
+    assert(contains(mtype(either), {'Right', 'Left'}), 'Expected Left or Right')
+
     return either.map(value)
   end
 

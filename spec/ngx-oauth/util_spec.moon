@@ -30,6 +30,27 @@ describe 'concat', ->
     assert.same tab2_orig, tab2
 
 
+describe 'contains', ->
+
+  context 'given array-like table', ->
+    tab = {'a', 'b', 'c'}
+
+    it 'returns true when table contains the item', ->
+      assert.is_true util.contains('b', tab)
+
+    it 'returns false when table does not contain the item', ->
+      assert.is_false util.contains('x', tab)
+
+  context 'given hash-like table', ->
+    tab = {a: 2, b: 4, c: 6}
+
+    it 'returns true when table contains the item', ->
+      assert.is_true util.contains(2, tab)
+
+    it 'returns false when table does not contain the item', ->
+      assert.is_false util.contains(66, tab)
+
+
 describe 'id', ->
 
   it 'returns given value', ->
