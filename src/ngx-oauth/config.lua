@@ -54,8 +54,8 @@ function M.load ()
   end
 
   if conf.client_secret:len() < conf.aes_bits / 8 then
-    table.insert(errors, '$oauth_client_secret is too short, it must be at least '..
-      (conf.aes_bits / 8)..' characters long for $oauth_aes_bits = '..conf.aes_bits)
+    table.insert(errors, ('$oauth_client_secret is too short, it must be at least %.0f'..
+      ' characters long for $oauth_aes_bits = %.0f'):format(conf.aes_bits / 8, conf.aes_bits))
   end
 
   for _, key in ipairs {'authorization_url', 'token_url', 'userinfo_url'} do
