@@ -3,6 +3,7 @@
 
 local util = require 'ngx-oauth.util'
 
+local contains = util.contains
 local is_blank = util.is_blank
 local map      = util.map
 local par      = util.partial
@@ -43,8 +44,18 @@ function M.load ()
   if is_blank(conf.client_id) then
     table.insert(errors, 'variable $oauth_client_id is not set')
   end
+
   if is_blank(conf.client_secret) then
     table.insert(errors, 'variable $oauth_client_secret is not set')
+  end
+
+  if not contains(conf.aes_bits, {128, 192, 256}) then
+    table.insert(errors, '$oauth_aes_bits must be 128, 192, or 256')
+  end
+
+  if conf.client_secret:len() < conf.aes_bits / 8 then
+    table.insert(errors, '$oauth_client_secret is too short, it must be at least '..
+      (conf.aes_bits / 8)..' characters long for $oauth_aes_bits = '..conf.aes_bits)
   end
 
   for _, key in ipairs {'authorization_url', 'token_url', 'userinfo_url'} do

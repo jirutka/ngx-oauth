@@ -7,7 +7,7 @@ describe 'load', ->
 
   required_vars = {
     client_id: 'abc'
-    client_secret: '123'
+    client_secret: 'thoh5eveeth7thohF7nohY7c'
     authorization_url: 'http://oaas.org/authorize'
     token_url: 'http://oaas.org/token'
     userinfo_url: 'http://oaas.org/userinfo'
@@ -47,7 +47,7 @@ describe 'load', ->
       success_path: '/'
       cookie_path: '/'
       max_age: 2592000
-      aes_bits: 256
+      aes_bits: 192
       debug: false
     }, required_vars
 
@@ -89,3 +89,22 @@ describe 'load', ->
       it 'returns error message as 2nd value', ->
         _, errs = config.load()
         assert.matches "variable $oauth_#{varname} is not set", errs
+
+
+  context 'when ngx.var.oauth_aes_bits is illegal', ->
+    before_each ->
+      _G.ngx.var.oauth_aes_bits = 666
+
+    it 'returns error message as 2nd value', ->
+      _, errs = config.load()
+      assert.matches '$oauth_aes_bits must be 128, 192, or 256', errs
+
+
+  context 'when ngx.var.oauth_client_secret is too short', ->
+    before_each ->
+      _G.ngx.var = { oauth_client_secret: '123', oauth_aes_bits: 128 }
+
+    it 'returns error message as 2nd value', ->
+      _, errs = config.load()
+      assert.matches ('$oauth_client_secret is too short, it must be at least '..
+        '16 characters long for $oauth_aes_bits = 128'), errs
