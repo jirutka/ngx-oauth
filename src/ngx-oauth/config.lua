@@ -8,9 +8,7 @@ local is_blank = util.is_blank
 local map      = util.map
 local par      = util.partial
 
-local M = {}
-
-local defaults = {
+local DEFAULTS = {
   client_id         = '',
   client_secret     = '',
   scope             = '',
@@ -26,20 +24,15 @@ local defaults = {
   debug             = false
 }
 
+local OAAS_ENDPOINT_VARS = {'authorization_url', 'token_url', 'userinfo_url'}
+
+
 local load_from_ngx = par(map, function(default_value, key)
     return util.default(ngx.var['oauth_'..key], default_value)
-  end, defaults)
+  end, DEFAULTS)
 
---- Loads settings from nginx variables and ensure that all required
--- variables are set.
---
--- @treturn {[string]=any,...} Settings
--- @treturn nil|string Validation error, or `false` if no validation
---   error was found.
-function M.load ()
+local function validate (conf)
   local errors = {}
-  local conf = load_from_ngx()
-  local server_url = not is_blank(conf.server_url) and conf.server_url
 
   if is_blank(conf.client_id) then
     table.insert(errors, '$oauth_client_id is not set')
@@ -58,14 +51,33 @@ function M.load ()
       ' characters long for $oauth_aes_bits = %.0f'):format(conf.aes_bits / 8, conf.aes_bits))
   end
 
-  for _, key in ipairs {'authorization_url', 'token_url', 'userinfo_url'} do
-    if not server_url and conf[key]:find('${server_url}', 1, true) then
+  for _, key in ipairs(OAAS_ENDPOINT_VARS) do
+    if conf[key]:find('${server_url}', 1, true) then
       table.insert(errors, 'neither $oauth_'..key..' nor $oauth_server_url is set')
-    elseif server_url then
-      conf[key] = conf[key]:gsub('${server_url}', server_url)
     end
   end
 
+  return errors
+end
+
+local M = {}
+
+--- Loads settings from nginx variables and ensure that all required
+-- variables are set.
+--
+-- @treturn {[string]=any,...} Settings
+-- @treturn nil|string Validation error, or `false` if no validation
+--   error was found.
+function M.load ()
+  local conf = load_from_ngx()
+
+  if not is_blank(conf.server_url) then
+    for _, key in ipairs(OAAS_ENDPOINT_VARS) do
+      conf[key] = conf[key]:gsub('${server_url}', conf.server_url)
+    end
+  end
+
+  local errors = validate(conf)
   return conf, #errors ~= 0 and table.concat(errors, '; ')
 end
 
