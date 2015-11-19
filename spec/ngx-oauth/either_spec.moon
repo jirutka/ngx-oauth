@@ -3,21 +3,29 @@ import mtype from require 'ngx-oauth.util'
 import Left, Right, either, encase, encase2 from require 'ngx-oauth.either'
 
 
-shared_either = (ttype) ->
-  other = ttype == Right and Left or Right
+shared_either = (type_func, type_name) ->
+  other = type_func == Right and Left or Right
 
   describe 'metatable.__eq', ->
     context 'same Either types with same value', ->
-      it 'returns true', -> assert.is_true ttype(42) == ttype(42)
+      it 'returns true', -> assert.is_true type_func(42) == type_func(42)
 
     context 'same Either types with different value', ->
-      it 'returns false', -> assert.is_false ttype(42) == ttype(66)
+      it 'returns false', -> assert.is_false type_func(42) == type_func(66)
 
     context 'different Either types with same value', ->
-      it 'returns false', -> assert.is_false ttype(42) == other(42)
+      it 'returns false', -> assert.is_false type_func(42) == other(42)
 
     context 'Either with non-Either', ->
-      it 'returns false', -> assert.is_false ttype(66) == 66
+      it 'returns false', -> assert.is_false type_func(66) == 66
+
+  describe 'metatable.__tostring', ->
+    it "returns #{type_name}(<value>)", ->
+      assert.same "#{type_name}(42)", tostring(type_func(42))
+
+  describe 'metatable.__type', ->
+    it "is #{type_name}", ->
+      assert.same type_name, getmetatable(type_func(42)).__type
 
 
 describe 'Left', ->
@@ -28,10 +36,7 @@ describe 'Left', ->
       it 'returns self', ->
         assert.equal left, left[func_name](Right(42))
 
-  describe 'metatable.__type', ->
-    it 'is Left', -> getmetatable(left).__type
-
-  shared_either Left
+  shared_either Left, 'Left'
 
 
 describe 'Right', ->
@@ -68,10 +73,7 @@ describe 'Right', ->
     it "returns result of applying given function to this Right's value", ->
       assert.same 84, right.chain((x) -> x * 2)
 
-  describe 'metatable.__type', ->
-    it 'is Right', -> getmetatable(right).__type
-
-  shared_either Right
+  shared_either Right, 'Right'
 
 
 describe 'either', ->
