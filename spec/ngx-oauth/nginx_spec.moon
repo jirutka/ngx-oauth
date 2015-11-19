@@ -70,6 +70,12 @@ describe 'fail', ->
       nginx.fail 400, 'EXTERMINATE!'
       assert.stub(_G.ngx.log).called_with _G.ngx.WARN, '[ngx-oauth] EXTERMINATE!'
 
+  context 'when some format arguments are nil', ->
+    it 'substitutes nil with "#nil"', ->
+      nginx.fail(500, 'such %s, so %s', 'string', nil)
+      assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so #nil'
+      assert.stub(_G.ngx.say).called_with '{"error":"such string, so #nil"}'
+
 
 describe 'format_cookie', ->
   setup ->
@@ -117,13 +123,20 @@ describe 'log', ->
     _G.ngx = mock { ERR: 4, WARN: 5, INFO: 7, log: -> }
 
   context 'when level <= treshold', ->
+    log_info = (...) -> nginx.log(ngx.INFO, ngx.INFO, ...)
+
     it 'calls ngx.log with given level and message prefixed by [ngx-oauth]', ->
-      nginx.log(ngx.INFO, ngx.INFO, 'allons-y!')
-      assert.stub(_G.ngx.log).called_with(ngx.INFO, '[ngx-oauth] allons-y!')
+      nginx.log(ngx.INFO, ngx.WARN, 'allons-y!')
+      assert.stub(_G.ngx.log).called_with ngx.WARN, '[ngx-oauth] allons-y!'
 
     it 'calls ngx.log with formatted message', ->
-      nginx.log(ngx.INFO, ngx.WARN, 'such %s, so %s', 'string', 'formatted')
-      assert.stub(_G.ngx.log).called_with(_, '[ngx-oauth] such string, so formatted')
+      log_info 'such %s, so %s', 'string', 'formatted'
+      assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so formatted'
+
+    context 'and some format arguments are nil', ->
+      it 'substitutes nil with "#nil"', ->
+        log_info 'such %s, so %s', 'string', nil
+        assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so #nil'
 
   context 'when level > treshold', ->
     it 'does not call ngx.log', ->

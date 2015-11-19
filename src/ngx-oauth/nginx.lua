@@ -9,12 +9,24 @@ if not ok then
   json = require 'json'
 end
 
+-- unpack is not global since Lua 5.3
+local unpack = table.unpack or unpack
+
 local concat   = util.concat
 local is_empty = util.is_empty
 local unless   = util.unless
 
-
 local LOG_PREFIX = '[ngx-oauth] '
+
+
+local function sub_vararg_nil (...)
+  local result = {}
+  for i = 1, select('#', ...) do
+    local v = select(i, ...)
+    table.insert(result, v == nil and '#nil' or v)
+  end
+  return unpack(result)
+end
 
 local M = {}
 
@@ -48,11 +60,12 @@ end
 --
 -- @tparam int status The HTTP status code to send.
 -- @tparam string message The error message to log and send.
--- @param ... Arguments for @{string.format} being applied to `message`.
+-- @param ... Arguments for @{string.format} being applied to `message`. Nil
+--   values are replaced with `#nil`.
 function M.fail (status, message, ...)
   assert(status >= 400 and status < 600, 'status must be >= 400 and < 600')
 
-  message = message:format(...)
+  message = message:format(sub_vararg_nil(...))
   local level = status >= 500 and ngx.ERR or ngx.WARN
 
   M.log(ngx.WARN, level, message)
@@ -96,12 +109,13 @@ end
 -- @tparam int threshold The logging level threshold (0-8).
 -- @tparam int level The logging level (0-8).
 -- @tparam string message
--- @param ... Arguments for @{string.format} being applied to `message`.
+-- @param ... Arguments for @{string.format} being applied to `message`. Nil
+--   values are replaced with `#nil`.
 function M.log (threshold, level, message, ...)
   assert(level >= 0 and level < 9, 'level must be >= 0 and < 9')
 
   if level <= threshold then
-    ngx.log(level, LOG_PREFIX..message:format(...))
+    ngx.log(level, LOG_PREFIX..message:format(sub_vararg_nil(...)))
   end
 end
 
