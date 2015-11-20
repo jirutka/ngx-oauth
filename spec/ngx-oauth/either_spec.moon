@@ -3,7 +3,7 @@ import mtype from require 'ngx-oauth.util'
 import Left, Right, either, encase, encase2 from require 'ngx-oauth.either'
 
 
-shared_either = (type_func, type_name) ->
+behaves_like_either = (type_func, type_name) ->
   other = type_func == Right and Left or Right
 
   describe 'metatable.__eq', ->
@@ -29,6 +29,8 @@ shared_either = (type_func, type_name) ->
 
 
 describe 'Left', ->
+  behaves_like_either Left, 'Left'
+
   left = Left(66)
 
   for func_name in *{'ap', 'map', 'chain'} do
@@ -36,10 +38,10 @@ describe 'Left', ->
       it 'returns self', ->
         assert.equal left, left[func_name](Right(42))
 
-  shared_either Left, 'Left'
-
 
 describe 'Right', ->
+  behaves_like_either Right, 'Right'
+
   right = Right(42)
 
   describe 'ap', ->
@@ -72,8 +74,6 @@ describe 'Right', ->
   describe 'chain', ->
     it "returns result of applying given function to this Right's value", ->
       assert.same 84, right.chain((x) -> x * 2)
-
-  shared_either Right, 'Right'
 
 
 describe 'either', ->
