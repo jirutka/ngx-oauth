@@ -20,12 +20,7 @@ local par      = util.partial
 local pipe     = util.pipe
 local unless   = util.unless
 
-local COOKIE_ACCESS_TOKEN  = 'oauth_access_token'
-local COOKIE_REFRESH_TOKEN = 'oauth_refresh_token'
-local COOKIE_USERNAME      = 'oauth_username'
-local COOKIE_EMAIL         = 'oauth_email'
-
-local ALL_COOKIES = { COOKIE_ACCESS_TOKEN, COOKIE_REFRESH_TOKEN, COOKIE_USERNAME, COOKIE_EMAIL }
+local ALL_COOKIES = { 'access_token', 'refresh_token', 'username', 'email' }
 
 
 --- Creates a new Cookies "object" with the given configuration.
@@ -47,7 +42,7 @@ return function (conf, crypto)
   local decrypt = par(crypto.decrypt, conf.aes_bits, conf.client_secret)
 
   local function create_cookie (name, value, max_age)
-    return nginx.format_cookie(name, value, {
+    return nginx.format_cookie(conf.cookie_prefix..name, value, {
       version = 1, secure = true, path = conf.cookie_path, max_age = max_age
     })
   end
@@ -56,17 +51,21 @@ return function (conf, crypto)
     return create_cookie(name, 'deleted', 0)
   end
 
+  local function get_cookie(name)
+    return nginx.get_cookie(conf.cookie_prefix..name)
+  end
+
   --- Writes access token and refresh token (if provided) cookies to the
   -- *response's* `Set-Cookie` header.
   --
   -- @tparam {access_token=string,expires_in=int,refresh_token=(string|nil)} token
   self.add_token = function(token)
     local cookies = {
-      create_cookie(COOKIE_ACCESS_TOKEN, token.access_token, min(token.expires_in, conf.max_age))
+      create_cookie('access_token', token.access_token, min(token.expires_in, conf.max_age))
     }
     if token.refresh_token then
       table.insert(cookies,
-        create_cookie(COOKIE_REFRESH_TOKEN, encrypt(token.refresh_token), conf.max_age))
+        create_cookie('refresh_token', encrypt(token.refresh_token), conf.max_age))
     end
     nginx.add_response_cookies(cookies)
   end
@@ -77,8 +76,8 @@ return function (conf, crypto)
   -- @tparam {username=string,email=string} userinfo
   self.add_userinfo = function(userinfo)
     nginx.add_response_cookies {
-      create_cookie(COOKIE_USERNAME, userinfo.username, conf.max_age),
-      create_cookie(COOKIE_EMAIL, userinfo.email, conf.max_age)
+      create_cookie('username', userinfo.username, conf.max_age),
+      create_cookie('email', userinfo.email, conf.max_age)
     }
   end
 
@@ -95,13 +94,13 @@ return function (conf, crypto)
   --
   -- @function get_access_token
   -- @treturn string|nil An access token, or `nil` if not set.
-  self.get_access_token = par(nginx.get_cookie, COOKIE_ACCESS_TOKEN)
+  self.get_access_token = par(get_cookie, 'access_token')
 
   --- Reads a refresh token from the *request's* cookies.
   -- @treturn string|nil A decrypted refresh token, or `nil` if not set.
   self.get_refresh_token = function()
     if not refresh_token then
-      refresh_token = unless(is_empty, decrypt, nginx.get_cookie(COOKIE_REFRESH_TOKEN))
+      refresh_token = unless(is_empty, decrypt, get_cookie('refresh_token'))
     end
     return refresh_token
   end
@@ -110,7 +109,7 @@ return function (conf, crypto)
   --
   -- @function get_username
   -- @treturn string|nil An username, or `nil` if not set.
-  self.get_username = par(nginx.get_cookie, COOKIE_USERNAME)
+  self.get_username = par(get_cookie, 'username')
 
   return self
 end

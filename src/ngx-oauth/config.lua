@@ -19,6 +19,7 @@ local DEFAULTS = {
   userinfo_url      = "${server_url}/userinfo",
   success_path      = '/',
   cookie_path       = '/',
+  cookie_prefix     = 'oauth_',
   max_age           = 2592000, -- 30 days
   aes_bits          = 256,
   debug             = false

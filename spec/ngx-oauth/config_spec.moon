@@ -24,6 +24,7 @@ describe 'load', ->
       server_url: 'not-used'
       success_path: '/app/home'
       cookie_path: '/app'
+      cookie_prefix: 'oa_'
       max_age: 600
       aes_bits: 128
       debug: true
@@ -46,6 +47,7 @@ describe 'load', ->
       redirect_path: '/_oauth/callback'
       success_path: '/'
       cookie_path: '/'
+      cookie_prefix: 'oauth_'
       max_age: 2592000
       aes_bits: 192
       debug: false

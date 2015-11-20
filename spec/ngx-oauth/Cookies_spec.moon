@@ -2,7 +2,7 @@ require 'moon.all'
 Cookies = require 'ngx-oauth.Cookies'
 import concat from require 'ngx-oauth.util'
 
-ALL_COOKIES = {'oauth_access_token', 'oauth_refresh_token', 'oauth_username', 'oauth_email'}
+ALL_COOKIES = {'access_token', 'refresh_token', 'username', 'email'}
 
 set_cookie = (name, value) ->
   ngx.var['cookie_'..name] = value
@@ -13,9 +13,11 @@ describe '__call', ->
   conf =
     client_secret: 'super-top-secret-password'
     cookie_path: '/app'
+    cookie_prefix: 'oa_'
     max_age: 600
     aes_bits: 128
 
+  prefix = conf.cookie_prefix
   cookie_attrs = "path=#{conf.cookie_path};secure;version=1"
 
   setup ->
@@ -37,7 +39,7 @@ describe '__call', ->
   describe 'add_token', ->
 
     access_token_cookie = (token, max_age = token.expires_in) ->
-      "oauth_access_token=#{token.access_token};max-age=#{max_age};#{cookie_attrs}"
+      "#{prefix}access_token=#{token.access_token};max-age=#{max_age};#{cookie_attrs}"
 
     it 'does not overwrite content of Set-Cookie', ->
       existing = 'foo=42;path=/'
@@ -67,7 +69,7 @@ describe '__call', ->
       tkn = { access_token: 'acc-token', expires_in: conf.max_age / 2, refresh_token: 'ref-token' }
       expected = {
         access_token_cookie(tkn),
-        "oauth_refresh_token=<ENC[#{tkn.refresh_token}]>;max-age=#{conf.max_age};#{cookie_attrs}"
+        "#{prefix}refresh_token=<ENC[#{tkn.refresh_token}]>;max-age=#{conf.max_age};#{cookie_attrs}"
       }
 
       it 'writes cookie with access token and encrypted refresh token', ->
@@ -78,8 +80,8 @@ describe '__call', ->
 
   describe 'add_userinfo', ->
     expected = {
-      "oauth_username=flynn;max-age=#{conf.max_age};#{cookie_attrs}",
-      "oauth_email=flynn@encom.com;max-age=#{conf.max_age};#{cookie_attrs}"
+      "#{prefix}username=flynn;max-age=#{conf.max_age};#{cookie_attrs}",
+      "#{prefix}email=flynn@encom.com;max-age=#{conf.max_age};#{cookie_attrs}"
     }
 
     it 'writes cookies with username and email from userinfo', ->
@@ -95,36 +97,36 @@ describe '__call', ->
 
 
   describe 'clear_all', ->
-    expected = [ "#{name}=deleted;max-age=0;#{cookie_attrs}" for name in *ALL_COOKIES ]
+    expected = [ "#{prefix}#{name}=deleted;max-age=0;#{cookie_attrs}" for name in *ALL_COOKIES ]
 
-    it 'sets all oauth_* cookies to "deleted" and max-age 0', ->
+    it 'sets access_token, refresh_token and username cookies to "deleted" and max-age 0', ->
       cookies.clear_all()
       assert.same expected, _G.ngx.header['Set-Cookie']
 
 
   describe 'get_access_token', ->
 
-    it 'returns value of cookie oauth_access_token', ->
-      set_cookie 'oauth_access_token', 'token-123'
+    it 'returns value of access_token cookie', ->
+      set_cookie "#{prefix}access_token", 'token-123'
       assert.same 'token-123', cookies.get_access_token()
 
 
   describe 'get_refresh_token', ->
 
-    context 'cookie oauth_refresh_token exists', ->
+    context 'refresh_token cookie exists', ->
       it 'returns decrypted value of the cookie', ->
-        set_cookie 'oauth_refresh_token', 'token-123'
+        set_cookie "#{prefix}refresh_token", 'token-123'
 
         assert.same '<DEC[token-123]>', cookies.get_refresh_token()
         assert.stub(crypto_stub.decrypt).called_with(conf.aes_bits, conf.client_secret, 'token-123')
 
-    context 'cookie oauth_refresh_token does not exist', ->
+    context 'refresh_token cookie does not exist', ->
       it 'returns nil', ->
         assert.is_nil cookies.get_refresh_token()
 
 
   describe 'get_username', ->
 
-    it 'returns value of cookie oauth_username', ->
-      set_cookie 'oauth_username', 'flynn'
+    it 'returns value of username cookie', ->
+      set_cookie "#{prefix}username", 'flynn'
       assert.same 'flynn', cookies.get_username()
