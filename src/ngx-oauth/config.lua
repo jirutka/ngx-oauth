@@ -13,6 +13,7 @@ local DEFAULTS = {
   client_secret     = '',
   scope             = '',
   redirect_path     = '/_oauth/callback',
+  redirect_uri      = '',
   server_url        = '',  -- used only as a shorthand for setting these 3 below
   authorization_url = '${server_url}/authorize',
   token_url         = '${server_url}/token',
@@ -71,6 +72,10 @@ local M = {}
 --   error was found.
 function M.load ()
   local conf = load_from_ngx()
+
+  if is_blank(conf.redirect_uri) then
+    conf.redirect_uri = ngx.var.scheme..'://'..ngx.var.server_name..conf.redirect_path
+  end
 
   if not is_blank(conf.server_url) then
     for _, key in ipairs(OAAS_ENDPOINT_VARS) do

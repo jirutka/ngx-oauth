@@ -14,13 +14,15 @@ describe 'load', ->
   }
 
   before_each ->
-    _G.ngx = { var: {} }
+    _G.ngx =
+      var: { scheme: 'https', server_name: 'example.org' }
 
 
   context 'when all variables are set', ->
     expected = merge {
       scope: 'read'
-      redirect_path: 'http://example.rg'
+      redirect_path: '/callback'
+      redirect_uri: 'https://example.cz/oauth/callback'
       server_url: 'not-used'
       success_path: '/app/home'
       cookie_path: '/app'
@@ -45,6 +47,7 @@ describe 'load', ->
       scope: ''
       server_url: ''
       redirect_path: '/_oauth/callback'
+      redirect_uri: 'https://example.org/_oauth/callback'
       success_path: '/'
       cookie_path: '/'
       cookie_prefix: 'oauth_'
@@ -61,6 +64,16 @@ describe 'load', ->
       actual, errs = config.load()
       assert.same expected, actual
       assert.is_falsy errs
+
+
+  context 'when ngx.var.oauth_redirect_uri is not set', ->
+    before_each ->
+      _G.ngx.var =
+        scheme: 'http', server_name: 'example.cz', oauth_redirect_path: '/callme'
+
+    it 'sets redirect_uri built from vars scheme, server_name and oauth_redirect_path', ->
+      actual = config.load()
+      assert.same 'http://example.cz/callme', actual.redirect_uri
 
 
   context 'when ngx.var.oauth_server_url is set', ->
@@ -104,7 +117,8 @@ describe 'load', ->
 
   context 'when ngx.var.oauth_client_secret is too short', ->
     before_each ->
-      _G.ngx.var = { oauth_client_secret: '123', oauth_aes_bits: 128 }
+      _G.ngx.var.oauth_client_secret = '123'
+      _G.ngx.var.oauth_aes_bits = 128
 
     it 'returns error message as 2nd value', ->
       _, errs = config.load()
