@@ -20,7 +20,7 @@ local par      = util.partial
 local pipe     = util.pipe
 local unless   = util.unless
 
-local ALL_COOKIES = { 'access_token', 'refresh_token', 'username', 'email' }
+local ALL_COOKIES = { 'access_token', 'refresh_token', 'username' }
 
 
 --- Creates a new Cookies "object" with the given configuration.
@@ -70,14 +70,12 @@ return function (conf, crypto)
     nginx.add_response_cookies(cookies)
   end
 
-  --- Writes userinfo cookies, i.e. username and email, to the *response's*
-  -- `Set-Cookie` header.
+  --- Writes username cookie to the *response's* `Set-Cookie` header.
   --
-  -- @tparam {username=string,email=string} userinfo
-  self.add_userinfo = function(userinfo)
+  -- @tparam string username
+  self.add_username = function(username)
     nginx.add_response_cookies {
-      create_cookie('username', userinfo.username, conf.max_age),
-      create_cookie('email', userinfo.email, conf.max_age)
+      create_cookie('username', username, conf.max_age)
     }
   end
 

@@ -2,7 +2,7 @@ require 'moon.all'
 Cookies = require 'ngx-oauth.Cookies'
 import concat from require 'ngx-oauth.util'
 
-ALL_COOKIES = {'access_token', 'refresh_token', 'username', 'email'}
+ALL_COOKIES = {'access_token', 'refresh_token', 'username'}
 
 set_cookie = (name, value) ->
   ngx.var['cookie_'..name] = value
@@ -78,21 +78,18 @@ describe '__call', ->
         assert.stub(crypto_stub.encrypt).called_with(conf.aes_bits, conf.client_secret, tkn.refresh_token)
 
 
-  describe 'add_userinfo', ->
-    expected = {
-      "#{prefix}username=flynn;max-age=#{conf.max_age};#{cookie_attrs}",
-      "#{prefix}email=flynn@encom.com;max-age=#{conf.max_age};#{cookie_attrs}"
-    }
+  describe 'add_username', ->
+    expected = { "#{prefix}username=flynn;max-age=#{conf.max_age};#{cookie_attrs}" }
 
-    it 'writes cookies with username and email from userinfo', ->
-      cookies.add_userinfo(username: 'flynn', email: 'flynn@encom.com')
+    it 'writes cookies with username and Max-Age equals to conf.max_age', ->
+      cookies.add_username('flynn')
       assert.same expected, _G.ngx.header['Set-Cookie']
 
     it 'does not overwrite existing Set-Cookie', ->
       existing = {'foo=42;path=/', 'bar=55;path=/'}
       _G.ngx.header['Set-Cookie'] = existing
 
-      cookies.add_userinfo(username: 'flynn', email: 'flynn@encom.com')
+      cookies.add_username('flynn')
       assert.same concat(existing, expected), _G.ngx.header['Set-Cookie']
 
 
