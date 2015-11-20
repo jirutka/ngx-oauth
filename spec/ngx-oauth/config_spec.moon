@@ -26,7 +26,7 @@ describe 'load', ->
       cookie_path: '/app'
       cookie_prefix: 'oa_'
       max_age: 600
-      aes_bits: 128
+      aes_bits: 192
       debug: true
     }, required_vars
 
@@ -49,7 +49,7 @@ describe 'load', ->
       cookie_path: '/'
       cookie_prefix: 'oauth_'
       max_age: 2592000
-      aes_bits: 192
+      aes_bits: 128
       debug: false
     }, required_vars
 

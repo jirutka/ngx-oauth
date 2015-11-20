@@ -21,7 +21,7 @@ local DEFAULTS = {
   cookie_path       = '/',
   cookie_prefix     = 'oauth_',
   max_age           = 2592000, -- 30 days
-  aes_bits          = 256,
+  aes_bits          = 128,
   debug             = false
 }
 
