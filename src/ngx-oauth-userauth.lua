@@ -32,7 +32,7 @@ if conf.debug then
 end
 
 -- Got response from the authorization server.
-if ngx.var.uri == conf.redirect_path then
+if ngx.var.uri == conf.redirect_location then
   log_debug('processing request from authorization server')
 
   local request_args = ngx.req.get_uri_args()

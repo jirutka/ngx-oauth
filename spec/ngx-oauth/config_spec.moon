@@ -21,9 +21,9 @@ describe 'load', ->
   context 'when all variables are set', ->
     expected = merge {
       scope: 'read'
-      redirect_path: '/callback'
       redirect_uri: 'https://example.cz/oauth/callback'
       server_url: 'not-used'
+      redirect_location: '/callback'
       success_path: '/app/home'
       cookie_path: '/app'
       cookie_prefix: 'oa_'
@@ -46,8 +46,8 @@ describe 'load', ->
     expected = merge {
       scope: ''
       server_url: ''
-      redirect_path: '/_oauth/callback'
       redirect_uri: 'https://example.org/_oauth/callback'
+      redirect_location: '/_oauth/callback'
       success_path: '/'
       cookie_path: '/'
       cookie_prefix: 'oauth_'
@@ -69,9 +69,9 @@ describe 'load', ->
   context 'when ngx.var.oauth_redirect_uri is not set', ->
     before_each ->
       _G.ngx.var =
-        scheme: 'http', server_name: 'example.cz', oauth_redirect_path: '/callme'
+        scheme: 'http', server_name: 'example.cz', oauth_redirect_location: '/callme'
 
-    it 'sets redirect_uri built from vars scheme, server_name and oauth_redirect_path', ->
+    it 'sets redirect_uri built from vars scheme, server_name and oauth_redirect_location', ->
       actual = config.load()
       assert.same 'http://example.cz/callme', actual.redirect_uri
 
