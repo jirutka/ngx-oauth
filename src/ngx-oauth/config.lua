@@ -14,9 +14,9 @@ local DEFAULTS = {
   scope             = '',
   redirect_uri      = '',
   server_url        = '',  -- used only as a shorthand for setting these 3 below
-  authorization_url = '${server_url}/authorize',
-  token_url         = '${server_url}/token',
-  userinfo_url      = "${server_url}/userinfo",
+  authorization_url = '${oauth_server_url}/authorize',
+  token_url         = '${oauth_server_url}/token',
+  userinfo_url      = "${oauth_server_url}/userinfo",
   redirect_location = '/_oauth/callback',
   success_path      = '/',
   cookie_path       = '/',
@@ -54,7 +54,7 @@ local function validate (conf)
   end
 
   for _, key in ipairs(OAAS_ENDPOINT_VARS) do
-    if conf[key]:find('${server_url}', 1, true) then
+    if conf[key]:find('${oauth_server_url}', 1, true) then
       table.insert(errors, 'neither $oauth_'..key..' nor $oauth_server_url is set')
     end
   end
@@ -79,7 +79,7 @@ function M.load ()
 
   if not is_blank(conf.server_url) then
     for _, key in ipairs(OAAS_ENDPOINT_VARS) do
-      conf[key] = conf[key]:gsub('${server_url}', conf.server_url)
+      conf[key] = conf[key]:gsub('${oauth_server_url}', conf.server_url)
     end
   end
 
