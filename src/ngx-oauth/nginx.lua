@@ -68,7 +68,7 @@ function M.fail (status, message, ...)
   message = message:format(sub_vararg_nil(...))
   local level = status >= 500 and ngx.ERR or ngx.WARN
 
-  M.log(ngx.WARN, level, message)
+  M.log(level, message)
 
   ngx.status = status
   ngx.header.content_type = 'application/json'
@@ -103,20 +103,16 @@ function M.get_cookie (name)
   return unless(is_empty, ngx.unescape_uri, ngx.var['cookie_'..name])
 end
 
---- Logs the given `message` on the specified logging `level` (e.g. `ngx.ERR`,
--- `ngx.INFO`), if the `level` is less or equal to the `threshold`.
+--- Logs the given (formatted) `message` on the specified logging `level` (e.g.
+-- `ngx.ERR`, `ngx.INFO`...).
 --
--- @tparam int threshold The logging level threshold (0-8).
 -- @tparam int level The logging level (0-8).
 -- @tparam string message
 -- @param ... Arguments for @{string.format} being applied to `message`. Nil
 --   values are replaced with `#nil`.
-function M.log (threshold, level, message, ...)
+function M.log (level, message, ...)
   assert(level >= 0 and level < 9, 'level must be >= 0 and < 9')
-
-  if level <= threshold then
-    ngx.log(level, LOG_PREFIX..message:format(sub_vararg_nil(...)))
-  end
+  ngx.log(level, LOG_PREFIX..message:format(sub_vararg_nil(...)))
 end
 
 return M

@@ -122,23 +122,16 @@ describe 'log', ->
   before_each ->
     _G.ngx = mock { ERR: 4, WARN: 5, INFO: 7, log: -> }
 
-  context 'when level <= treshold', ->
-    log_info = (...) -> nginx.log(ngx.INFO, ngx.INFO, ...)
+  it 'calls ngx.log with given level and message prefixed by [ngx-oauth]', ->
+    nginx.log(ngx.WARN, 'allons-y!')
+    assert.stub(_G.ngx.log).called_with ngx.WARN, '[ngx-oauth] allons-y!'
 
-    it 'calls ngx.log with given level and message prefixed by [ngx-oauth]', ->
-      nginx.log(ngx.INFO, ngx.WARN, 'allons-y!')
-      assert.stub(_G.ngx.log).called_with ngx.WARN, '[ngx-oauth] allons-y!'
-
+  context 'with arguments for format', ->
     it 'calls ngx.log with formatted message', ->
-      log_info 'such %s, so %s', 'string', 'formatted'
+      nginx.log(ngx.INFO, 'such %s, so %s', 'string', 'formatted')
       assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so formatted'
 
-    context 'and some format arguments are nil', ->
+    context 'where some are nil', ->
       it 'substitutes nil with "#nil"', ->
-        log_info 'such %s, so %s', 'string', nil
+        nginx.log(ngx.INFO, 'such %s, so %s', 'string', nil)
         assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so #nil'
-
-  context 'when level > treshold', ->
-    it 'does not call ngx.log', ->
-      nginx.log(ngx.ERR, ngx.WARN, 'allons-y!')
-      assert.stub(_G.ngx.log).not_called!
