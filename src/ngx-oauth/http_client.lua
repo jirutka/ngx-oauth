@@ -73,6 +73,20 @@ function M.request_json (method, headers, url, body)
     .chain(encase(json.decode))
 end
 
+--- Sends an HTTP GET request with optional Bearer token (OAuth 2.0 access
+-- token) and returns a parsed JSON body (wrapped in `Right`) if response
+-- status is 200; otherwise returns an error message (wrapped in `Left`).
+--
+-- @tparam string url The request's URL.
+-- @tparam ?string bearer_token The Bearer token to be added into
+-- `Authorization` header.
+-- @treturn Either @{either.Right|Right} with parsed JSON body in a table, or
+--   @{either.Left|Left} with an error message.
+function M.get_for_json (url, bearer_token)
+  local headers = bearer_token and { Authorization = 'Bearer '..bearer_token } or {}
+  return M.request_json('GET', headers, url)
+end
+
 --- Sends an HTTP POST request with body encoded as `x-www-form-urlencoded`
 -- and returns a parsed JSON body (wrapped in `Right`) if response status is
 -- 200; otherwise returns an error message (wrapped in `Left`).

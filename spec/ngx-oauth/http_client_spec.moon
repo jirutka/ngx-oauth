@@ -7,6 +7,7 @@ HTTP_INST = '<fake-http-instance>'
 
 http_stub = {}
 url = 'https://example.org'
+accept_json_header = { Accept: 'application/json' }
 
 -- Trick Lua to require our fake table instead of resty.http module
 -- into http_client.
@@ -36,7 +37,7 @@ describe 'request', ->
     params = {
       method: 'POST'
       body: '<body>'
-      headers: { Accept: 'application/json' }
+      headers: accept_json_header
       ssl_verify: true
     }
 
@@ -119,11 +120,38 @@ describe 'request_json', ->
     assert.spy(client.request).called_with('PUT', _, url, '<body>')
 
   it 'calls request() with given headers plus Accept header', ->
-    expected_headers = merge(headers, Accept: 'application/json')
+    expected_headers = merge(headers, accept_json_header)
     request_json!
     assert.spy(client.request).called_with(_, expected_headers, _, _)
 
   contexts_json_response -> request_json!
+
+
+describe 'get_for_json', ->
+
+  setup -> spy.on(client, 'request')
+  teardown -> client.request\revert!
+
+  it 'calls request() with GET method, given url and no body', ->
+    client.get_for_json(url)
+    assert.spy(client.request).called_with('GET', _, url, nil)
+
+  context 'without bearer_token', ->
+
+    it 'calls request() with Accept header application/json', ->
+      client.get_for_json(url)
+      assert.spy(client.request).called_with(_, accept_json_header, _, _)
+
+  context 'with bearer_token', ->
+
+    it 'calls request() with Accept header and token in Authorization header', ->
+      token = '8e7e1f47-8992-42e8-a3bb-b7b6526bca71'
+      headers = merge(accept_json_header, { Authorization: 'Bearer '..token })
+
+      client.get_for_json(url, token)
+      assert.spy(client.request).called_with(_, headers, _, _)
+
+  contexts_json_response -> client.get_for_json(url)
 
 
 describe 'post_form_for_json', ->
