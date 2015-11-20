@@ -54,7 +54,7 @@ describe 'load', ->
     }, required_vars
 
     before_each ->
-      for key, val in pairs expected do
+      for key, val in pairs required_vars do
         _G.ngx.var['oauth_'..key] = val
 
     it 'returns settings built from ngx.var.oauth_* variables and defaults, and falsy', ->
