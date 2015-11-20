@@ -42,8 +42,8 @@ local M = {}
 -- @tparam {[string]=string,...} headers The request's headers.
 -- @tparam string url The request's URL.
 -- @tparam string body The request's body as string.
--- @treturn either.Left|either.Right Either a response (`Right`),
---   or an error message (`Left`).
+-- @treturn Either @{either.Right|Right} with a response, or
+--   @{either.Left|Left} with an error message.
 function M.request (method, headers, url, body)
 
   local init_http = encase2(http.new)
@@ -64,8 +64,8 @@ end
 -- if response status is 200; otherwise returns an error message (wrapped
 -- in `Left`). This method accepts the same arguments as `request`.
 --
--- @treturn either.Left|either.Right Either a response (`Right`),
---   or an error message (`Left`).
+-- @treturn Either @{either.Right|Right} with parsed JSON body in a table, or
+--   @{either.Left|Left} with an error message.
 function M.request_json (method, headers, url, body)
   return M.request(method, merge({ Accept = 'application/json' }, headers), url, body)
     .chain(ensure_status_200)
@@ -74,14 +74,14 @@ function M.request_json (method, headers, url, body)
 end
 
 --- Sends an HTTP POST request with body encoded as `x-www-form-urlencoded`
--- and returns a parsed JSON body (wrapped in `Right`}) if response status is
+-- and returns a parsed JSON body (wrapped in `Right`) if response status is
 -- 200; otherwise returns an error message (wrapped in `Left`).
 --
 -- @tparam {[string]=string,...} headers The request's headers.
 -- @tparam string url The request's URL.
 -- @tparam {[string]=string,...} form_data The form data as a table.
--- @treturn either.Left|either.Right Either a parsed JSON as a table (`Right`),
---   or an error message (`Left`).
+-- @treturn Either @{either.Right|Right} with parsed JSON body in a table, or
+--   @{either.Left|Left} with an error message.
 function M.post_form_for_json (headers, url, form_data)
   return M.request_json('POST',
     merge(headers, { ['Content-Type'] = 'application/x-www-form-urlencoded' }),
