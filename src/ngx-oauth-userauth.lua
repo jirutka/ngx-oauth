@@ -50,8 +50,8 @@ if ngx.var.uri == conf.redirect_location then
     local user = get_or_fail(httpc.get_for_json(conf.userinfo_url, token.access_token))
     cookies.add_username(user.username)
 
-    log_info("authorized user '%s', redirecting to: %s", user.username, conf.success_path)
-    return redirect(conf.success_path)
+    log_info("authorized user '%s', redirecting to: %s", user.username, conf.success_uri)
+    return redirect(conf.success_uri)
 
   else
     return nginx.fail(400, "Missing query parameter 'code' or 'error'.")
@@ -68,7 +68,7 @@ elseif cookies.get_refresh_token() then
     cookies.add_token
   })()
 
-  return redirect(conf.success_path)
+  return redirect(conf.success_uri)
 
 -- Cookie with refresh token not found, redirecting to the authorization endpoint.
 else

@@ -24,7 +24,7 @@ describe 'load', ->
       redirect_uri: 'https://example.cz/oauth/callback'
       server_url: 'not-used'
       redirect_location: '/callback'
-      success_path: '/app/home'
+      success_uri: '/app/home'
       cookie_path: '/app'
       cookie_prefix: 'oa_'
       max_age: 600
@@ -48,7 +48,7 @@ describe 'load', ->
       server_url: ''
       redirect_uri: 'https://example.org/_oauth/callback'
       redirect_location: '/_oauth/callback'
-      success_path: '/'
+      success_uri: '/'
       cookie_path: '/'
       cookie_prefix: 'oauth_'
       max_age: 2592000
