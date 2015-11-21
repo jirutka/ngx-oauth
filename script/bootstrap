@@ -18,6 +18,7 @@ DEFAULT_VERSION='luajit-2.0'
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 VENV_DIR="$PROJECT_DIR/.env"
 HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py'
+show_path_warn=
 
 
 #======================  Functions  ======================#
@@ -80,7 +81,10 @@ if [[ "$USE_SYSTEM_LUA" == y* ]]; then
     fi
 
 else
-    export PATH="$VENV_DIR/bin:$PATH"
+    if [[ "$PATH" != "$VENV_DIR/bin":* ]]; then
+        show_path_warn='yes'
+        export PATH="$VENV_DIR/bin:$PATH"
+    fi
 
     if ! check-lua-version "$VENV_DIR/bin/lua" || [ ! -x "$VENV_DIR/bin/luarocks" ]; then
         version="${LUA_VERSION:-$DEFAULT_VERSION}"
@@ -95,3 +99,11 @@ echo '==> Installing lua modules...' >&2
 while read -r rockname; do
     install-rock "$rockname" || die "Failed to install rock $rockname."
 done < Rocksfile
+
+
+if [ "$show_path_warn" == 'yes' ]; then
+    echo ''
+    echo '! You have to add ".env/bin" to your PATH. Execute "source .envrc" in your !'
+    echo '! shell, or install direnv or similar tool that will do it for you.        !'
+    echo ''
+fi
