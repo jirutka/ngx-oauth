@@ -1,7 +1,13 @@
 = ngx-oauth
 Jakub Jirutka <https://github.com/jirutka[@jirutka]>
+:source-language: sh
 :gh-name: jirutka/ngx-oauth
 :gh-branch: master
+:gh-url: https://github.com
+:rocks-url: https://luarocks.org/modules
+:rfc6749: http://tools.ietf.org/html/rfc6749
+:rfc6265: http://tools.ietf.org/html/rfc6265
+:ngx-http-core-doc: http://nginx.org/en/docs/http/ngx_http_core_module.html
 
 ifdef::env-github[]
 image:https://travis-ci.org/{gh-name}.svg?branch={gh-branch}["Build Status", link="https://travis-ci.org/{gh-name}"]
@@ -9,3 +15,103 @@ image:https://coveralls.io/repos/{gh-name}/badge.svg?branch={gh-branch}&service=
 endif::env-github[]
 
 TBD
+
+
+== Requirements
+
+* http://nginx.org[nginx] with compiled https://github.com/openresty/lua-nginx-module[Lua module]
+* http://luajit.org[LuaJIT] 2.0+, or http://www.lua.org[Lua] 5.1+
+* lua-cjson [{gh-url}/mpx/lua-cjson[source]] [{rocks-url}/luarocks/lua-cjson[LuaRocks]], or luajson [{gh-url}/harningt/luajson[source]] [{rocks-url}/harningt/luajson[LuaRocks]]
+* luaossl [{gh-url}/wahern/luaossl[source]] [{rocks-url}/daurnimator/luaossl[LuaRocks]]
+
+
+== Configuration variables
+
+$oauth_aes_bits::
+  Selects the AES key length (in bits) for encrypting a refresh token stored in a cookie.
+  The supported values are: `128`, `192`, and `256`.
+  The default value is `128`.
+
+$oauth_authorization_url::
+  URL of the {rfc6749}#section-3.1[authorization endpoint] provided by the authorization server.
+  This variable is required if `$oauth_server_url` is not set; otherwise it defaults to `${oauth_server_url}/authorize`.
+
+$oauth_client_id::
+  The {rfc6749}#section-2.2[client identifier] registered on the authorization server.
+  This variable is *required.*
+
+$oauth_client_secret::
+  The {rfc6749}#section-2.3.1[client secret] (password).
+  First _n_-bytes of this value, where _n_ equals `$oauth_aes_bits / 8`, is also used as a key for encrypting a refresh token stored in a cookie.
+  This _n_ also defines the lower limit of the secret length.
+  However, even if you use the default key length 128 bits, the client secret should be much longer (e.g. 32 characters).
+  This variable is *required.*
+
+$oauth_cookie_path::
+  Specifies the {rfc6265}#section-4.1.2.4[Path attribute] for the cookies.
+  The default value is `/`.
+
+$oauth_cookie_prefix::
+  The string to be used as a prefix for `access_token`, `refresh_token` and `username` cookies.
+  The default value is `oauth_`.
+
+$oauth_max_age::
+  Specifies the {rfc6749}#section-4.1.2.2[Max-Age attribute] for the refresh_token cookie and the username cookie, in seconds.
+  The Max-Age of the access_token cookie is determined as a minimum of this value and token’s `expires_in` attribute.
+  The default value is `2592000` (30 days).
+
+$oauth_redirect_location::
+  TODO
+
+$oauth_redirect_uri::
+  The _client’s_ {rfc6749}#section-3.1.2[redirection endpoint] previously registered on the authorization server.
+  It must be an absolute URI that is accessible from the authorization server and routed to this module.
+  You don’t need to change this variable, unless your nginx instance is behind some other HTTP proxy.
+  The default value is `${scheme}://${server_name}${oauth_redirect_location}`, where variables {ngx-http-core-doc}#var_scheme[`$scheme`] and {ngx-http-core-doc}#var_server_name[`$server_name`] are set by nginx.
+
+$oauth_scope::
+  A space delimited set of OAuth scopes that should be requested.
+  The default value is empty, i.e. all scopes allowed for the client will be requested.
+
+$oauth_server_url::
+  Base URI of the OAuth 2.0 authorization server.
+  This variable is *required*, unless you set `$oauth_authorization_url`, `$oauth_token_url` and `$oauth_userinfo_url`.
+
+$oauth_success_uri::
+  Absolute or relative URI to which a browser should be redirected after successful authorization.
+  The default value is `/`.
+
+$oauth_token_url::
+  URL of the {rfc6749}#section-3.2[token endpoint] provided by the authorization server.
+  This variable is required if `$oauth_server_url` is not set; otherwise it defaults to `${oauth_server_url}/token`.
+
+$oauth_userinfo_url::
+  URL of the userinfo endpoint.
+  This may be any GET resource secured by OAuth 2.0 that returns JSON with username (in the attribute `username`) of the user that has authorized the access token.
+  This variable is required if `$oauth_server_url` is not set; otherwise it defaults to `${oauth_server_url}/userinfo`.
+
+
+== Setup development environment
+
+. Clone this repository:
+
+    git clone https://github.com/jirutka/ngx-oauth.git
+    cd ngx-oauth
+
+. Source file `.envrc` into your shell (or manually add `$(pwd)/.env/bin` to your `PATH`):
+
+    source .envrc
+
+. Install LuaJIT and modules for development into directory `.env`:
+
+    ./script/bootstrap
+
+. Run tests with code coverage and linter:
+
+    ./script/test
+
+
+== License
+
+This project is licensed under http://opensource.org/licenses/MIT/[MIT License].
+For the full text of the license, see the link:LICENSE[LICENSE] file.
