@@ -34,7 +34,7 @@ $oauth_aes_bits::
 
 $oauth_authorization_url::
   URL of the {rfc6749}#section-3.1[authorization endpoint] provided by the authorization server.
-  This variable is required if `$oauth_server_url` is not set; otherwise it defaults to `${oauth_server_url}/authorize`.
+  This variable is required if `$oauth_oaas_uri` is not set; otherwise it defaults to `${oauth_oaas_uri}/authorize`.
 
 $oauth_client_id::
   The {rfc6749}#section-2.2[client identifier] registered on the authorization server.
@@ -60,6 +60,10 @@ $oauth_max_age::
   The Max-Age of the access_token cookie is determined as a minimum of this value and token’s `expires_in` attribute.
   The default value is `2592000` (30 days).
 
+$oauth_oaas_uri::
+  Base URI of the OAuth 2.0 authorization server.
+  This variable is *required*, unless you set `$oauth_authorization_url`, `$oauth_token_url` and `$oauth_userinfo_url`.
+
 $oauth_redirect_location::
   TODO
 
@@ -73,22 +77,18 @@ $oauth_scope::
   A space delimited set of OAuth scopes that should be requested.
   The default value is empty, i.e. all scopes allowed for the client will be requested.
 
-$oauth_server_url::
-  Base URI of the OAuth 2.0 authorization server.
-  This variable is *required*, unless you set `$oauth_authorization_url`, `$oauth_token_url` and `$oauth_userinfo_url`.
-
 $oauth_success_uri::
   Absolute or relative URI to which a browser should be redirected after successful authorization.
   The default value is `/`.
 
 $oauth_token_url::
   URL of the {rfc6749}#section-3.2[token endpoint] provided by the authorization server.
-  This variable is required if `$oauth_server_url` is not set; otherwise it defaults to `${oauth_server_url}/token`.
+  This variable is required if `$oauth_oaas_uri` is not set; otherwise it defaults to `${oauth_oaas_uri}/token`.
 
 $oauth_userinfo_url::
   URL of the userinfo endpoint.
   This may be any GET resource secured by OAuth 2.0 that returns JSON with username (in the attribute `username`) of the user that has authorized the access token.
-  This variable is required if `$oauth_server_url` is not set; otherwise it defaults to `${oauth_server_url}/userinfo`.
+  This variable is required if `$oauth_oaas_uri` is not set; otherwise it defaults to `${oauth_oaas_uri}/userinfo`.
 
 
 == Setup development environment

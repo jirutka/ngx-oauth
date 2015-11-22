@@ -13,10 +13,10 @@ local DEFAULTS = {
   client_secret     = '',
   scope             = '',
   redirect_uri      = '',
-  server_url        = '',  -- used only as a shorthand for setting these 3 below
-  authorization_url = '${oauth_server_url}/authorize',
-  token_url         = '${oauth_server_url}/token',
-  userinfo_url      = "${oauth_server_url}/userinfo",
+  oaas_uri          = '',  -- used only as a shorthand for setting these 3 below
+  authorization_url = '${oaas_uri}/authorize',
+  token_url         = '${oaas_uri}/token',
+  userinfo_url      = "${oaas_uri}/userinfo",
   redirect_location = '/_oauth/callback',
   success_uri       = '/',
   cookie_path       = '/',
@@ -54,8 +54,8 @@ local function validate (conf)
   end
 
   for _, key in ipairs(OAAS_ENDPOINT_VARS) do
-    if conf[key]:find('${oauth_server_url}', 1, true) then
-      table.insert(errors, 'neither $oauth_'..key..' nor $oauth_server_url is set')
+    if conf[key]:find('${oaas_uri}', 1, true) then
+      table.insert(errors, 'neither $oauth_'..key..' nor $oauth_oaas_uri is set')
     end
   end
 
@@ -77,9 +77,9 @@ function M.load ()
     conf.redirect_uri = ngx.var.scheme..'://'..ngx.var.server_name..conf.redirect_location
   end
 
-  if not is_blank(conf.server_url) then
+  if not is_blank(conf.oaas_uri) then
     for _, key in ipairs(OAAS_ENDPOINT_VARS) do
-      conf[key] = conf[key]:gsub('${oauth_server_url}', conf.server_url)
+      conf[key] = conf[key]:gsub('${oaas_uri}', conf.oaas_uri)
     end
   end
 

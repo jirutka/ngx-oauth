@@ -22,7 +22,7 @@ describe 'load', ->
     expected = merge {
       scope: 'read'
       redirect_uri: 'https://example.cz/oauth/callback'
-      server_url: 'not-used'
+      oaas_uri: 'not-used'
       redirect_location: '/callback'
       success_uri: '/app/home'
       cookie_path: '/app'
@@ -45,7 +45,7 @@ describe 'load', ->
   context 'when only required variables are set', ->
     expected = merge {
       scope: ''
-      server_url: ''
+      oaas_uri: ''
       redirect_uri: 'https://example.org/_oauth/callback'
       redirect_location: '/_oauth/callback'
       success_uri: '/'
@@ -76,9 +76,9 @@ describe 'load', ->
       assert.same 'http://example.cz/callme', actual.redirect_uri
 
 
-  context 'when ngx.var.oauth_server_url is set', ->
+  context 'when ngx.var.oauth_oaas_uri is set', ->
     before_each ->
-      _G.ngx.var.oauth_server_url = 'http://example.org'
+      _G.ngx.var.oauth_oaas_uri = 'http://example.org'
 
     for key, default_value in pairs {
       token_url: 'token',
@@ -86,17 +86,17 @@ describe 'load', ->
       userinfo_url: 'userinfo'
     } do
       context "and ngx.var.#{key} is not set", ->
-        it "prefixes default #{key} with server_url", ->
+        it "prefixes default #{key} with oaas_uri", ->
           assert.same "http://example.org/#{default_value}", config.load()[key]
 
 
-  context 'when ngx.var.oauth_server_url is not set', ->
+  context 'when ngx.var.oauth_oaas_uri is not set', ->
 
     for varname in *{'authorization_url', 'token_url', 'userinfo_url'} do
       context "and ngx.var.#{varname} is not set", ->
         it 'returns error message as 2nd value', ->
           _, errs = config.load()
-          assert.matches "neither $oauth_#{varname} nor $oauth_server_url is set", errs
+          assert.matches "neither $oauth_#{varname} nor $oauth_oaas_uri is set", errs
 
 
   for varname in *{'client_id', 'client_secret'} do
