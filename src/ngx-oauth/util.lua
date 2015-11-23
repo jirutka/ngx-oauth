@@ -169,8 +169,9 @@ function M.pipe (...)
     funcs = funcs[1]
   end
 
+  local n = #funcs
   local function pipe_inner (i, ...)
-    if i == #funcs then
+    if i == n then
       return funcs[i](...)
     end
     return pipe_inner(i + 1, funcs[i](...))
