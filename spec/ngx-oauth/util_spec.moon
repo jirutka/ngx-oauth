@@ -58,33 +58,17 @@ describe 'id', ->
     assert.equal value, util.id(value)
 
 
-behaves_like_is_empty = (func) ->
+describe 'is_empty', ->
 
   it 'returns true for nil', ->
-    assert.is_true func(nil)
+    assert.is_true util.is_empty(nil)
 
   it 'returns true for empty string', ->
-    assert.is_true func('')
+    assert.is_true util.is_empty('')
 
   it 'returns false for other types than nil and string', ->
     for value in *{42, true, false, {}, print}
-      assert.is_false func(value)
-
-
-describe 'is_blank', ->
-  behaves_like_is_empty util.is_blank
-
-  it 'returns true for string with whitespaces only', ->
-    for value in *{'  ', '\t\t', '\t'} do
-      assert.is_true util.is_blank(value)
-
-  it 'returns false for string with any non-whitespace char', ->
-    for value in *{'foo', ' foo ', '\tfoo'} do
-      assert.is_false util.is_blank(value)
-
-
-describe 'is_empty', ->
-  behaves_like_is_empty util.is_empty
+      assert.is_false util.is_empty(value)
 
 
 describe 'map', ->

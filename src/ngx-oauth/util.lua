@@ -76,14 +76,6 @@ function M.id (value)
   return value
 end
 
---- Returns true if the `value` is nil, empty string or contains at least one
--- character other than space and tab. If the `value` is not nil and
--- string, then it's converted to string.
--- @treturn bool
-function M.is_blank (value)
-  return M.is_empty(value) or tostring(value):find('^%s*$') ~= nil
-end
-
 --- Returns true if the `value` is nil or empty string.
 -- @treturn bool
 function M.is_empty (value)

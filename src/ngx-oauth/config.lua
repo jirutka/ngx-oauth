@@ -4,7 +4,7 @@
 local util = require 'ngx-oauth.util'
 
 local contains    = util.contains
-local is_blank    = util.is_blank
+local is_empty    = util.is_empty
 local map         = util.map
 local par         = util.partial
 local starts_with = util.starts_with
@@ -37,11 +37,11 @@ local load_from_ngx = par(map, function(default_value, key)
 local function validate (conf)
   local errors = {}
 
-  if is_blank(conf.client_id) then
+  if is_empty(conf.client_id) then
     table.insert(errors, '$oauth_client_id is not set')
   end
 
-  if is_blank(conf.client_secret) then
+  if is_empty(conf.client_secret) then
     table.insert(errors, '$oauth_client_secret is not set')
   end
 
@@ -74,11 +74,11 @@ local M = {}
 function M.load ()
   local conf = load_from_ngx()
 
-  if is_blank(conf.redirect_uri) then
+  if is_empty(conf.redirect_uri) then
     conf.redirect_uri = ngx.var.scheme..'://'..ngx.var.server_name..conf.redirect_location
   end
 
-  if not is_blank(conf.oaas_uri) then
+  if not is_empty(conf.oaas_uri) then
     for _, key in ipairs(OAAS_ENDPOINT_VARS) do
       conf[key] = conf[key]:gsub('${oaas_uri}', conf.oaas_uri)
     end
