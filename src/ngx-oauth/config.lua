@@ -3,10 +3,11 @@
 
 local util = require 'ngx-oauth.util'
 
-local contains = util.contains
-local is_blank = util.is_blank
-local map      = util.map
-local par      = util.partial
+local contains    = util.contains
+local is_blank    = util.is_blank
+local map         = util.map
+local par         = util.partial
+local starts_with = util.starts_with
 
 local DEFAULTS = {
   client_id         = '',
@@ -54,7 +55,7 @@ local function validate (conf)
   end
 
   for _, key in ipairs(OAAS_ENDPOINT_VARS) do
-    if conf[key]:find('${oaas_uri}', 1, true) then
+    if starts_with('${oaas_uri}', conf[key]) then
       table.insert(errors, 'neither $oauth_'..key..' nor $oauth_oaas_uri is set')
     end
   end

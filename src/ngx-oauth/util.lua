@@ -200,6 +200,15 @@ function M.pipe (...)
   end
 end
 
+--- Returns true if the string `str` starts with the `prefix`.
+--
+-- @tparam prefix string
+-- @tparam str string
+-- @treturn bool
+function M.starts_with (prefix, str)
+  return string.sub(str or '', 1, prefix:len()) == prefix
+end
+
 --- Returns the result of calling `when_false` with the `value` if `pred`
 -- function returns falsy for the `value`; otherwise returns the `value` as is.
 --

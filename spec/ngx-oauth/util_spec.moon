@@ -211,6 +211,18 @@ describe 'pipe', ->
       assert.same 3, util.pipe({ math.abs, math.floor, math.sqrt })(-9.4)
 
 
+describe 'starts_with', ->
+
+  it 'returns true when str starts with the prefix', ->
+    assert.is_true util.starts_with('chunk', 'chunky bacon')
+
+  it 'returns false when str does not start with the prefix', ->
+    assert.is_false util.starts_with('bacon', 'chunky bacon')
+
+  it 'returns false when str is nil', ->
+    assert.is_false util.starts_with('xx', nil)
+
+
 describe 'unless', ->
 
   context 'when pred evaluates to false', ->
