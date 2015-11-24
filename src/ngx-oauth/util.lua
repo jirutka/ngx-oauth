@@ -4,6 +4,28 @@
 -- unpack is not global since Lua 5.3
 local unpack = table.unpack or unpack
 
+
+--- Calls the function `func` with the given arguments. This is equivalent to:
+--
+--     func(unpack(args), ...)
+--
+-- but in a form that can be highly optimized by LuaJIT (~20x faster) when
+-- called with less than 4 arguments in the `args` table. If `#args > 3`, then
+-- it fallbacks to `unpack` (that is not JIT-compiled in LuaJIT 2.0).
+local function call (func, args, ...)
+  local n = #args
+
+  if n == 1 then
+    return func(args[1], ...)
+  elseif n == 2 then
+    return func(args[1], args[2], ...)
+  elseif n == 3 then
+    return func(args[1], args[2], args[3], ...)
+  else
+    return func(unpack(args), ...)
+  end
+end
+
 local M = {}
 
 --- Returns a new table with items concatenated from the given tables.
@@ -149,11 +171,7 @@ function M.partial (func, ...)
   local args1 = {...}
 
   return function(...)
-    local args2 = {...}
-    -- concat args1 and args2
-    for i = 1, #args1 do table.insert(args2, i, args1[i]) end
-
-    return func(unpack(args2))
+    return call(func, args1, ...)
   end
 end
 
