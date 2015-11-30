@@ -1,0 +1,18 @@
+#!/bin/bash
+# vim: set ts=4:
+#
+# Runs integration tests.
+#
+set -e
+
+# Go to the project's root directory.
+cd "$(dirname "$0")/.."
+
+source script/common.sh
+setup-path
+script/bootstrap-full
+
+echo -e '\n==> Running integration tests...'
+export TEMP_DIR
+cd integration
+py.test -v

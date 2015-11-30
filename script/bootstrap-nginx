@@ -1,0 +1,123 @@
+#!/bin/bash
+# vim: set ts=4:
+#
+# This script ensures that nginx with required modules is installed.
+#
+# Environment variables:
+#   NGINX_VERSION     : Nginx version to install.
+#   NGINX_LUA_VERSION : Version of lua-nginx-module to compile nginx with.
+#   USE_SYSTEM_NGINX  : Set to 'yes' if you want to use system provided nginx. Default is to
+#                       build and install nginx locally in .env directory.
+set -e
+
+NGINX_VERSION=${NGINX_VERSION:-1.9.7}
+NGINX_URI="http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz"
+NGINX_WD="nginx-$NGINX_VERSION"
+
+NGINX_LUA_VERSION=${NGINX_LUA_VERSION:-0.9.19}
+NGINX_LUA_URI="https://github.com/openresty/lua-nginx-module/archive/v${NGINX_LUA_VERSION}.tar.gz"
+NGINX_LUA_WD="lua-nginx-module-$NGINX_LUA_VERSION"
+
+NGINX_DEVKIT_VERSION='0.2.19'
+NGINX_DEVKIT_URI="https://github.com/simpl/ngx_devel_kit/archive/v${NGINX_DEVKIT_VERSION}.tar.gz"
+NGINX_DEVKIT_WD="ngx_devel_kit-$NGINX_DEVKIT_VERSION"
+
+PCRE_VERSION='8.37'
+PCRE_URI="https://downloads.sourceforge.net/project/pcre/pcre/${PCRE_VERSION}/pcre-${PCRE_VERSION}.tar.gz"
+PCRE_WD="pcre-$PCRE_VERSION"
+
+NGINX_WITHOUT_MODULES='
+	access auth_basic autoindex browser charset empty_gif fastcgi geo gzip
+	limit_conn limit_req map memcached proxy referer scgi split_clients ssi
+	upstream_hash upstream_ip_hash upstream_keepalive upstream_least_conn
+	upstream_zone userid uwsgi'
+
+
+#======================  Functions  ======================#
+
+has-luajit() {
+	[[ "$($VENV_DIR/bin/lua -v)" == LuaJIT* ]]
+}
+
+download() {
+	local url
+
+	for url in "$NGINX_URI" "$NGINX_LUA_URI" "$NGINX_DEVKIT_URI" "$PCRE_URI"; do
+		echo -e "\nDownloading $url:"
+		curl -L "$url" | tar -xz
+	done
+}
+
+configure() {
+	local mod myconf
+
+	if has-luajit; then
+		export LUAJIT_LIB="$VENV_DIR/lib"
+		export LUAJIT_INC="$VENV_DIR/include"
+	else
+		export LUA_LIB="$VENV_DIR/lib"
+		export LUA_INC="$VENV_DIR/include"
+	fi
+
+	for mod in $NGINX_WITHOUT_MODULES; do
+		myconf+=" --without-http_${mod}_module"
+	done
+
+	./configure \
+		--prefix="$VENV_DIR" \
+		--sbin-path="$VENV_DIR/bin/nginx" \
+		--conf-path="$VENV_DIR/etc/nginx/nginx.conf" \
+		--with-ld-opt="-Wl,-rpath,$VENV_DIR/lib" \
+		--with-pcre="../$PCRE_WD" \
+		--with-http_ssl_module \
+		--add-module="../$NGINX_DEVKIT_WD" \
+		--add-module="../$NGINX_LUA_WD" \
+		$myconf
+}
+
+compile() {
+	export LANG=C
+	export LC_ALL=C
+
+	make -j2
+}
+
+install() {
+	mkdir -p "$VENV_DIR/etc/nginx"
+	make install
+}
+
+
+#========================  Main  =========================#
+
+# Go to the project's root directory.
+cd "$(dirname "$0")/.."
+
+source script/common.sh
+
+if yesno "$USE_SYSTEM_NGINX"; then
+	exists nginx || die "nginx is not installed and USE_SYSTEM_NGINX=$USE_SYSTEM_NGINX"
+
+	buildinfo=$(nginx -V 2>&1)
+	for needle in lua-nginx-module --with-http_ssl_module --with-pcre; do
+		if ! grep -q -- $needle <<< $buildinfo; then
+			die "nginx is not compiled with ${needle/--with-/} and USE_SYSTEM_NGINX=$USE_SYSTEM_NGINX"
+		fi
+	done
+
+elif [ ! -x "$VENV_DIR/bin/nginx" ]; then
+	echo '==> Installing nginx...'
+
+	[ -x "$VENV_DIR/bin/lua" ] || die "$VENV_DIR/bin/lua does not exist or not executable"
+
+	mkdir -p "$TEMP_DIR" && cd "$TEMP_DIR"
+	download
+
+	cd "$NGINX_WD"
+	configure
+	compile
+	install
+
+	cd "$TEMP_DIR"
+	rm -Rf -- "$NGINX_WD" "$NGINX_LUA_WD" "$NGINX_DEVKIT_WD" "$PCRE_WD"
+fi

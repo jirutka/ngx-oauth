@@ -1,0 +1,65 @@
+#!/bin/bash
+# vim: set ts=4:
+#
+# This script ensures that Python 3.3+ is available and installs modules
+# specified in integration/requirements.txt.
+#
+# Environment variables:
+#   PYTHON          : Python executable to use (default is python3 or python on PATH).
+#   USE_PYTHON_VENV : Set to 'no' if you don't want to initialize venv for modules.
+#
+set -e
+
+: ${USE_PYTHON_VENV:=yes}
+
+#======================  Functions  ======================#
+
+find-python-exec() {
+	local cmd; for cmd in "$PYTHON" python3 python; do
+		if exists "$cmd"; then
+			PYTHON="$cmd"; return 0
+		fi
+	done
+	return 1
+}
+
+check-python-version() {
+	$PYTHON -c 'import sys; exit(0) if sys.version_info >= (3, 3, 0) else exit(1)'
+}
+
+install-requirements() {
+	pip install $@ -r integration/requirements.txt
+}
+
+
+#========================  Main  =========================#
+
+# Go to the project's root directory.
+cd "$(dirname "$0")/.."
+
+source script/common.sh
+
+pyenv_dir="$VENV_DIR/python"
+
+find-python-exec || die 'Could not find python executable!'
+check-python-version || die "Python 3.3+ is required, but you have $($PYTHON -V 2>&1)!"
+
+if [ -d "$pyenv_dir" ]; then
+	# Just to be sure that all requirements are installed (should be already).
+	install-requirements -q
+
+elif yesno "$USE_PYTHON_VENV"; then
+	echo '==> Initializing Python virtual environment and installing modules...'
+
+	"$PYTHON" -m venv "$pyenv_dir"
+	export PATH="$pyenv_dir/bin:$PATH"
+
+	install-requirements
+
+	ln -sf "$pyenv_dir"/bin/* "$VENV_DIR"/bin/
+
+else
+	echo '==> Installing Python modules...'
+
+	install-requirements
+fi

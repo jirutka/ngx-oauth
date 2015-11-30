@@ -1,7 +1,7 @@
 #!/bin/bash
 # vim: set ts=4:
 #
-# This script runs unit tests and linter.
+# Runs unit tests and linter.
 #
 set -e
 
@@ -20,9 +20,10 @@ report-coverage() {
 cd "$(dirname "$0")/.."
 
 source script/common.sh
+setup-path
 script/bootstrap
 
-echo -e '\n==> Running tests...'
+echo -e '\n==> Running unit tests...'
 busted --shuffle --verbose --coverage
 report-coverage
 

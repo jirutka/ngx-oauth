@@ -3,7 +3,6 @@
 # sourcing this file.
 
 VENV_DIR="$(pwd)/.env"
-PYENV_DIR="$VENV_DIR/python"
 TEMP_DIR="$(pwd)/.tmp"
 
 die() {
@@ -13,6 +12,23 @@ die() {
 
 exists() {
 	command -v "$1" &>/dev/null
+}
+
+is-venv-on-path() {
+	[[ "$PATH" == "$VENV_DIR/bin":* ]]
+}
+
+setup-path() {
+	is-venv-on-path || export PATH="$VENV_DIR/bin:$PATH"
+}
+
+warn-if-venv-not-on-path() {
+	is-venv-on-path || cat <<-EOF
+
+		! You should add ".env/bin" to your PATH. Execute "source .envrc" in your !
+		! shell, or install direnv or similar tool that will do it for you.       !
+
+	EOF
 }
 
 yesno() {
