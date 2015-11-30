@@ -105,10 +105,18 @@ $oauth_userinfo_url::
 . Install LuaJIT and modules for development into directory `.env`:
 
     ./script/bootstrap
++
+or to install also nginx and Python modules for running integration tests, then use:
+
+    ./script/bootstrap-full
 
 . Run tests with code coverage and linter:
 
     ./script/test
++
+and integration tests:
+
+    ./script/test-integration
 
 
 == License
