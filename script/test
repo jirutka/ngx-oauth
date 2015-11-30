@@ -1,20 +1,28 @@
 #!/bin/bash
 # vim: set ts=4:
+#
+# This script runs unit tests and linter.
+#
 set -e
 
-# Go to the project's root directory.
-cd "$(dirname "$0")/.."
+#======================  Functions  ======================#
 
 report-coverage() {
 	echo -e '\nHits\tMiss\tRate\tFile'
 	echo -e '--------------------------------------------------'
-	cat .tmp/luacov.report.out | sed -nE '/^Summary/,$p' | tail -n+4
+	cat "$TEMP_DIR/luacov.report.out" | sed -nE '/^Summary/,$p' | tail -n+4
 }
 
+
+#========================  Main  =========================#
+
+# Go to the project's root directory.
+cd "$(dirname "$0")/.."
+
+source script/common.sh
 script/bootstrap
 
 echo -e '\n==> Running tests...'
-mkdir -p .tmp
 busted --shuffle --verbose --coverage
 report-coverage
 

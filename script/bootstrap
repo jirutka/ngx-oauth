@@ -16,22 +16,11 @@
 set -e
 
 DEFAULT_VERSION='luajit-2.0'
-PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-VENV_DIR="$PROJECT_DIR/.env"
 HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py'
 show_path_warn=
 
 
 #======================  Functions  ======================#
-
-die() {
-	echo -e "ERROR: $1" >&2
-	exit ${2:-2}
-}
-
-exists() {
-	command -v "$1" &>/dev/null
-}
 
 find-lua-exec() {
 	local cmd; for cmd in lua luajit; do
@@ -70,9 +59,14 @@ install-rock() {
 
 #========================  Main  =========================#
 
-cd "$PROJECT_DIR"
+# Go to the project's root directory.
+cd "$(dirname "$0")/.."
 
-if [[ "$USE_SYSTEM_LUA" == y* ]]; then
+source script/common.sh
+
+mkdir -p "$TEMP_DIR"
+
+if yesno "$USE_SYSTEM_LUA"; then
 
 	if ! check-lua-version "$(find-lua-exec)"; then
 		die "${LUA_VERSION:-lua 5.1-5.2 or luajit 2} is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
@@ -90,13 +84,13 @@ else
 	if ! check-lua-version "$VENV_DIR/bin/lua" || [ ! -x "$VENV_DIR/bin/luarocks" ]; then
 		version="${LUA_VERSION:-$DEFAULT_VERSION}"
 
-		echo "==> Installing $version and luarocks into $VENV_DIR..." >&2
+		echo "==> Installing $version and luarocks into $VENV_DIR..."
 		install-lua $version
 		echo ''
 	fi
 fi
 
-echo '==> Installing lua modules...' >&2
+echo '==> Installing lua modules...'
 while read -r rockname; do
 	install-rock "$rockname" || die "Failed to install rock $rockname."
 done < Rocksfile
