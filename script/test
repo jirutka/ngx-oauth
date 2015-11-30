@@ -1,13 +1,14 @@
 #!/bin/bash
+# vim: set ts=4:
 set -e
 
 # Go to the project's root directory.
 cd "$(dirname "$0")/.."
 
 report-coverage() {
-    echo -e '\nHits\tMiss\tRate\tFile'
-    echo -e '--------------------------------------------------'
-    cat .tmp/luacov.report.out | sed -nE '/^Summary/,$p' | tail -n+4
+	echo -e '\nHits\tMiss\tRate\tFile'
+	echo -e '--------------------------------------------------'
+	cat .tmp/luacov.report.out | sed -nE '/^Summary/,$p' | tail -n+4
 }
 
 script/bootstrap

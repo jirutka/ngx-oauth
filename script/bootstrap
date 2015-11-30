@@ -1,4 +1,5 @@
 #!/bin/bash
+# vim: set ts=4:
 #
 # This script ensures that lua interpreter and lua modules specified in Rocksfile are installed.
 #
@@ -24,46 +25,46 @@ show_path_warn=
 #======================  Functions  ======================#
 
 die() {
-    echo -e "ERROR: $1" >&2
-    exit ${2:-2}
+	echo -e "ERROR: $1" >&2
+	exit ${2:-2}
 }
 
 exists() {
-    command -v "$1" &>/dev/null
+	command -v "$1" &>/dev/null
 }
 
 find-lua-exec() {
-    local cmd; for cmd in lua luajit; do
-        if exists "$cmd"; then
-            command -v "$cmd"
-            return 0
-        fi
-    done
-    return 1
+	local cmd; for cmd in lua luajit; do
+		if exists "$cmd"; then
+			command -v "$cmd"
+			return 0
+		fi
+	done
+	return 1
 }
 
 check-lua-version() {
-    local luabin="$1"
-    local ver="$($luabin -v 2>&1 | cut -d' ' -f1-2 | tr '[A-Z] ' '[a-z]-' || '')"
+	local luabin="$1"
+	local ver="$($luabin -v 2>&1 | cut -d' ' -f1-2 | tr '[A-Z] ' '[a-z]-' || '')"
 
-    if [ -n "$LUA_VERSION" ]; then
-        [[ "$ver" == "$LUA_VERSION"* ]]
-    else
-        [[ "$ver" =~ ^lua-5.[12]|^luajit-2 ]]
-    fi
+	if [ -n "$LUA_VERSION" ]; then
+		[[ "$ver" == "$LUA_VERSION"* ]]
+	else
+		[[ "$ver" =~ ^lua-5.[12]|^luajit-2 ]]
+	fi
 }
 
 install-lua() {
-    local version=$1
+	local version=$1
 
-    mkdir -p "$VENV_DIR"
-    curl -o "$VENV_DIR/hererocks.py" "$HEREROCKS_URI"
-    python "$VENV_DIR/hererocks.py" "$VENV_DIR" --luarocks=^ --${version/-/=}
+	mkdir -p "$VENV_DIR"
+	curl -o "$VENV_DIR/hererocks.py" "$HEREROCKS_URI"
+	python "$VENV_DIR/hererocks.py" "$VENV_DIR" --luarocks=^ --${version/-/=}
 }
 
 install-rock() {
-    local name="$1"
-    luarocks --mversion show "$name" &>/dev/null || luarocks install "$name"
+	local name="$1"
+	luarocks --mversion show "$name" &>/dev/null || luarocks install "$name"
 }
 
 
@@ -73,37 +74,37 @@ cd "$PROJECT_DIR"
 
 if [[ "$USE_SYSTEM_LUA" == y* ]]; then
 
-    if ! check-lua-version "$(find-lua-exec)"; then
-        die "${LUA_VERSION:-lua 5.1-5.2 or luajit 2} is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
+	if ! check-lua-version "$(find-lua-exec)"; then
+		die "${LUA_VERSION:-lua 5.1-5.2 or luajit 2} is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
 
-    elif ! exists luarocks; then
-        die "luarocks is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
-    fi
+	elif ! exists luarocks; then
+		die "luarocks is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
+	fi
 
 else
-    if [[ "$PATH" != "$VENV_DIR/bin":* ]]; then
-        show_path_warn='yes'
-        export PATH="$VENV_DIR/bin:$PATH"
-    fi
+	if [[ "$PATH" != "$VENV_DIR/bin":* ]]; then
+		show_path_warn='yes'
+		export PATH="$VENV_DIR/bin:$PATH"
+	fi
 
-    if ! check-lua-version "$VENV_DIR/bin/lua" || [ ! -x "$VENV_DIR/bin/luarocks" ]; then
-        version="${LUA_VERSION:-$DEFAULT_VERSION}"
+	if ! check-lua-version "$VENV_DIR/bin/lua" || [ ! -x "$VENV_DIR/bin/luarocks" ]; then
+		version="${LUA_VERSION:-$DEFAULT_VERSION}"
 
-        echo "==> Installing $version and luarocks into $VENV_DIR..." >&2
-        install-lua $version
-        echo ''
-    fi
+		echo "==> Installing $version and luarocks into $VENV_DIR..." >&2
+		install-lua $version
+		echo ''
+	fi
 fi
 
 echo '==> Installing lua modules...' >&2
 while read -r rockname; do
-    install-rock "$rockname" || die "Failed to install rock $rockname."
+	install-rock "$rockname" || die "Failed to install rock $rockname."
 done < Rocksfile
 
 
 if [ "$show_path_warn" == 'yes' ]; then
-    echo ''
-    echo '! You have to add ".env/bin" to your PATH. Execute "source .envrc" in your !'
-    echo '! shell, or install direnv or similar tool that will do it for you.        !'
-    echo ''
+	echo ''
+	echo '! You have to add ".env/bin" to your PATH. Execute "source .envrc" in your !'
+	echo '! shell, or install direnv or similar tool that will do it for you.        !'
+	echo ''
 fi

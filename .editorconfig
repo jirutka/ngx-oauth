@@ -10,4 +10,5 @@ indent_style = space
 indent_size = 2
 
 [script/*]
+indent_style = tab
 indent_size = 4
