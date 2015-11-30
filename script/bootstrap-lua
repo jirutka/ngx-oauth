@@ -4,12 +4,12 @@
 # This script ensures that lua interpreter and lua modules specified in Rocksfile are installed.
 #
 # Environment variables:
-#   LUA_VERSION    : Required version of the lua interpreter (e.g. lua-5.2, luajit-2.1). If this
+#   LUA_VERSION    : Required version of the lua interpreter (e.g. lua-5.1, luajit-2.0). If this
 #                    version is not available on PATH and USE_SYSTEM_LUA != 'yes', then it will be
 #                    installed, otherwise it fails.
-#                    If not set, then the script checks if lua-5.1, lua-5.2, or luajit-2 is
-#                    available. If not and USE_SYSTEM_LUA != 'yes', then luajit-2.0 will be
-#                    installed, otherwise it fails.
+#                    If not set, then the script checks if lua-5.1, or luajit-2 is available.
+#                    If not and USE_SYSTEM_LUA != 'yes', then luajit-2.0 will be installed,
+#                    otherwise it fails.
 #
 #   USE_SYSTEM_LUA : Set to 'yes' if you want to use system provided lua. Default is to install
 #                    lua locally in .env directory.
@@ -39,7 +39,7 @@ check-lua-version() {
 	if [ -n "$LUA_VERSION" ]; then
 		[[ "$ver" == "$LUA_VERSION"* ]]
 	else
-		[[ "$ver" =~ ^lua-5.[12]|^luajit-2 ]]
+		[[ "$ver" =~ ^lua-5.1|^luajit-2 ]]
 	fi
 }
 
@@ -69,7 +69,7 @@ mkdir -p "$TEMP_DIR"
 if yesno "$USE_SYSTEM_LUA"; then
 
 	if ! check-lua-version "$(find-lua-exec)"; then
-		die "${LUA_VERSION:-lua 5.1-5.2 or luajit 2} is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
+		die "${LUA_VERSION:-lua 5.1 or luajit 2} is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
 
 	elif ! exists luarocks; then
 		die "luarocks is not installed and USE_SYSTEM_LUA=$USE_SYSTEM_LUA"
