@@ -1,3 +1,8 @@
 /.env/
 /.tmp/
 /doc/
+
+# Python
+__pycache__/
+.cache/
+*.py[cod]

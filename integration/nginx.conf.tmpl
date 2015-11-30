@@ -1,0 +1,36 @@
+# vim: set ft=nginx:
+
+worker_processes 1;
+error_log stderr debug;
+daemon off;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    lua_package_path '../src/?.lua;;';
+
+    server {
+        listen ${port} ssl;
+        server_name localhost;
+
+        ssl_certificate ../integration/support/nginx.crt;
+        ssl_certificate_key ../integration/support/nginx.key;
+
+        location / {
+            return 200;
+        }
+
+        set $$oauth_client_id '${client_id}';
+        set $$oauth_client_secret '${client_secret}';
+        set $$oauth_scope '${scope}';
+        set $$oauth_oaas_uri '${oaas_uri}';
+        set $$oauth_redirect_uri '${redirect_uri}';
+        set $$oauth_success_uri '${success_uri}';
+
+        location /_oauth {
+            content_by_lua_file '../src/ngx-oauth-userauth.lua';
+        }
+    }
+}

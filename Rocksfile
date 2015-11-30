@@ -2,6 +2,7 @@ basexx
 busted
 ldoc
 lua-cjson
+lua-resty-http
 luacheck
 luacov
 luacov-coveralls
