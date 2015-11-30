@@ -14,6 +14,10 @@ env:
 matrix:
   allow_failures:
     env: LUA_VERSION=luajit-2.1  # luajit-2.1 is still in beta
+cache:
+  directories:
+    - .env
+    - $HOME/.cache/pip
 install:
   - script/bootstrap-full
   - source .envrc
