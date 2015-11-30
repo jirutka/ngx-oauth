@@ -46,9 +46,8 @@ check-lua-version() {
 install-lua() {
 	local version=$1
 
-	mkdir -p "$VENV_DIR"
-	curl -o "$VENV_DIR/hererocks.py" "$HEREROCKS_URI"
-	python "$VENV_DIR/hererocks.py" "$VENV_DIR" --luarocks=^ --${version/-/=}
+	curl -o "$TEMP_DIR/hererocks.py" "$HEREROCKS_URI"
+	python "$TEMP_DIR/hererocks.py" "$VENV_DIR" --luarocks=^ --${version/-/=}
 }
 
 install-rock() {
@@ -64,7 +63,7 @@ cd "$(dirname "$0")/.."
 
 source script/common.sh
 
-mkdir -p "$TEMP_DIR"
+mkdir -p "$VENV_DIR" "$TEMP_DIR"
 
 if yesno "$USE_SYSTEM_LUA"; then
 
