@@ -1,17 +1,26 @@
 sudo: false
+# Python is needed for integration tests.
+language: python
+python: 3.5
 env:
-  - LUA_VERSION=luajit-2.0
-  - LUA_VERSION=luajit-2.1
-  - LUA_VERSION=lua-5.1
-  - LUA_VERSION=lua-5.2
-  - LUA_VERSION=lua-5.3
+  global:
+    # Travis uses virtualenv by default and venv rejects to install pip,
+    # although it should do it (maybe Ubuntu's fault).
+    - USE_PYTHON_VENV=no
+  matrix:
+    - LUA_VERSION=luajit-2.0
+    - LUA_VERSION=luajit-2.1
+    - LUA_VERSION=lua-5.1
+    - LUA_VERSION=lua-5.2
+    - LUA_VERSION=lua-5.3
 matrix:
   allow_failures:
     env: LUA_VERSION=luajit-2.1  # luajit-2.1 is still in beta
 install:
-  - script/bootstrap
+  - script/bootstrap-full
   - source .envrc
 script:
   - script/test
+  - script/test-integration
 after_success: |
   [ "$LUA_VERSION" = 'lua-5.1' ] && luacov-coveralls
