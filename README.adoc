@@ -107,7 +107,7 @@ $oauth_userinfo_url::
 
     ./script/bootstrap
 +
-or to install also nginx and Python modules for running integration tests, then use:
+or to install nginx and Python modules for running integration tests as well, use:
 
     ./script/bootstrap-full
 
@@ -118,6 +118,9 @@ or to install also nginx and Python modules for running integration tests, then 
 and integration tests:
 
     ./script/test-integration
+
+
+These scripts should work on every up-to-date Unix system (tested on OS X, Gentoo, Slackware, and Ubuntu).
 
 
 == License
