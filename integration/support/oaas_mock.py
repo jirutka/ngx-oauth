@@ -108,7 +108,7 @@ class BottleServer(Process):
 
     def __init__(self, bottle_app, port=free_tcp_port(), server='cherrypy',
                  check_url=None, bottle_opts={}):
-        opts = {'port': port, 'server': server, **bottle_opts}
+        opts = dict(port=port, server=server, **bottle_opts)
 
         super().__init__(target=bottle_app.run, kwargs=opts, daemon=True)
         self._check_url = check_url or "http://%s:%d" % (opts.get('host', 'localhost'), port)
