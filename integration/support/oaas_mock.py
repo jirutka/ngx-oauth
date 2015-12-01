@@ -1,15 +1,25 @@
+from . import free_tcp_port
+
 from base64 import b64decode
-from bottle import Bottle, ConfigDict, HTTPError, LocalRequest, redirect
 import json
 from multiprocessing import Process
 
-__all__ = ['OAuthServerMock']
+from bottle import Bottle, ConfigDict, HTTPError, LocalRequest, abort, redirect
+import requests
+from requests import ConnectionError
+from retry import retry
+
+__all__ = ['OAuthServerMock', 'BottleServer']
 
 
-def OAuthServerMock(config, **run_opts):
+def OAuthServerMock(config):
     conf = ConfigDict().load_dict(config)
     app = Bottle()
     request = LocalRequest()
+
+    @app.get('/')
+    def get_root():
+        abort(200, 'OK')
 
     @app.get('/authorize')
     def get_authorize():
@@ -91,10 +101,30 @@ def OAuthServerMock(config, **run_opts):
     def handle_error(error):
         return error.body
 
-    def _run():
-        app.run(**run_opts)
+    return app
 
-    return Process(target=_run, daemon=True)
+
+class BottleServer(Process):
+
+    def __init__(self, bottle_app, port=free_tcp_port(), server='cherrypy',
+                 check_url=None, bottle_opts={}):
+        opts = {'port': port, 'server': server, **bottle_opts}
+
+        super().__init__(target=bottle_app.run, kwargs=opts, daemon=True)
+        self._check_url = check_url or "http://%s:%d" % (opts.get('host', 'localhost'), port)
+
+    def start(self):
+        super().start()
+
+        try:  # sanity check
+            self._request_check_url()
+        except ConnectionError as e:
+            self.terminate()
+            raise e
+
+    @retry(ConnectionError, tries=20, delay=0.1)
+    def _request_check_url(self):
+        return requests.get(self._check_url)
 
 
 class OAASError(HTTPError):

@@ -59,11 +59,9 @@ def oaas(request):
     extra_conf = marker.kwargs if marker else {}
     config = merge_dicts(proxy_conf, oaas_state, extra_conf)
 
-    process = OAuthServerMock(config=config, port=oaas_port, server='cherrypy')
+    process = BottleServer(OAuthServerMock(config), port=oaas_port)
     process.start()
     request.addfinalizer(process.terminate)
-
-    sleep(0.1)
 
 
 @fixture(scope='module')
