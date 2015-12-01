@@ -106,7 +106,7 @@ if yesno "$USE_SYSTEM_NGINX"; then
 	done
 
 elif [ ! -x "$VENV_DIR/bin/nginx" ]; then
-	echo '==> Installing nginx...'
+	echo -e '\n==> Installing nginx...'
 
 	[ -x "$VENV_DIR/bin/lua" ] || die "$VENV_DIR/bin/lua does not exist or not executable"
 
