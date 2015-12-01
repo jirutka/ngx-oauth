@@ -13,7 +13,7 @@ env:
     - LUA_VERSION=lua-5.1
 matrix:
   allow_failures:
-    env: LUA_VERSION=luajit-2.1  # luajit-2.1 is still in beta
+    - env: LUA_VERSION=luajit-2.1  # luajit-2.1 is still in beta
 cache:
   directories:
     - .env
