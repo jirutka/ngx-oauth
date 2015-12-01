@@ -68,6 +68,12 @@ def oaas(request):
 def http():
     class HttpClient(requests.Session):
         def request(self, method, uri, **kwargs):
+            url = urljoin(nginx_base_uri, uri)
             defaults = {'allow_redirects': False, 'verify': False}
-            return super().request(method, urljoin(nginx_base_uri, uri), **dict(kwargs, **defaults))
+            return super().request(method, url, **merge_dicts(defaults, kwargs))
+
+        # Original get method sets allow_redirects to True, so we must override it.
+        def get(self, url, **kwargs):
+            return self.request('GET', url, **kwargs)
+
     return HttpClient()
