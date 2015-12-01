@@ -9,6 +9,7 @@ from time import sleep, time
 
 import requests
 from requests import ConnectionError
+from retry import retry
 
 
 class NginxServer:
@@ -24,22 +25,14 @@ class NginxServer:
     def start(self):
         self._ngx_process = Popen(shlex.split(self._command))
 
-        # sanity check
-        start = time()
-        resp = None
-        while time() - start < 2:
-            try:
-                resp = requests.get(self.check_url, verify=False)
-                break
-            except ConnectionError:
-                sleep(0.1)
-
-        if resp is None or resp.status_code != 200:
+        try:  # sanity check
+            resp = self._request_check_url()
+        except ConnectionError as e:
             self.stop()
-            if resp is None:
-                raise IOError('Failed to start Nginx')
-            else:
-                raise IOError("Nginx failed with: %s" % resp)
+            raise e
+
+        if resp.status_code != 200:
+            raise IOError("Nginx returned %s for GET %s" % (resp.status_code, self.check_url))
 
     def stop(self):
         if self._ngx_process is None:
@@ -49,3 +42,7 @@ class NginxServer:
             sleep(0.2)
         finally:
             os.kill(self._ngx_process.pid, 9)
+
+    @retry(ConnectionError, tries=20, delay=0.1)
+    def _request_check_url(self):
+        return requests.get(self.check_url, verify=False)
