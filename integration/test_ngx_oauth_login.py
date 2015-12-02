@@ -1,5 +1,7 @@
 from .conftest import *
 
+# Note: This tests also the ngx-oauth-redirect-handler.
+
 
 def test_login_for_the_first_time(http):
     # When I make a GET request to the proxy's login endpoint,

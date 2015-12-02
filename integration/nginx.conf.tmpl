@@ -29,8 +29,12 @@ http {
         set $$oauth_redirect_uri '${redirect_uri}';
         set $$oauth_success_uri '${success_uri}';
 
-        location /_oauth {
-            content_by_lua_file '../src/ngx-oauth-userauth.lua';
+        location /_oauth/login {
+            content_by_lua_file '../src/ngx-oauth-login.lua';
+        }
+
+        location /_oauth/callback {
+            content_by_lua_file '../src/ngx-oauth-redirect-handler.lua';
         }
 
         location /_oauth/logout {
