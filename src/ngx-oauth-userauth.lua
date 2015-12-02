@@ -9,8 +9,9 @@ local nginx   = require 'ngx-oauth.nginx'
 local oauth   = require 'ngx-oauth.oauth2'
 local util    = require 'ngx-oauth.util'
 
-local par      = util.partial
 local either   = ethr.either
+local log      = nginx.log
+local par      = util.partial
 local redirect = ngx.redirect
 
 local fail_with_oaas_error = par(nginx.fail, 503, 'Authorization server error: %s')
@@ -24,11 +25,10 @@ end
 
 local cookies = Cookies(conf)
 
-local log_info  = par(nginx.log, ngx.INFO)
 local log_debug = function() end
 
 if conf.debug then
-  log_debug = par(nginx.log, ngx.DEBUG)
+  log_debug = log.debug
 end
 
 -- Got response from the authorization server.
@@ -50,7 +50,7 @@ if ngx.var.uri == conf.redirect_location then
     local user = get_or_fail(httpc.get_for_json(conf.userinfo_url, token.access_token))
     cookies.add_username(user.username)
 
-    log_info("authorized user '%s', redirecting to: %s", user.username, conf.success_uri)
+    log.info("authorized user '%s', redirecting to: %s", user.username, conf.success_uri)
     return redirect(conf.success_uri)
 
   else
@@ -59,7 +59,7 @@ if ngx.var.uri == conf.redirect_location then
 
 -- Cookie with refresh token found, requesting a new access token.
 elseif cookies.get_refresh_token() then
-  log_info('refreshing token for user: %s', cookies.get_username())
+  log.info('refreshing token for user: %s', cookies.get_username())
 
   util.pipe({
     cookies.get_refresh_token,
@@ -72,6 +72,6 @@ elseif cookies.get_refresh_token() then
 
 -- Cookie with refresh token not found, redirecting to the authorization endpoint.
 else
-  log_info('redirecting to authorization endpoint')
+  log.info('redirecting to authorization endpoint')
   return redirect(oauth.authorization_url(conf))
 end

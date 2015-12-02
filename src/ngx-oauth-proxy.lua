@@ -8,6 +8,7 @@ local nginx   = require 'ngx-oauth.nginx'
 local oauth   = require 'ngx-oauth.oauth2'
 
 local either = ethr.either
+local log    = nginx.log
 
 local function write_auth_header (access_token)
   ngx.req.set_header('Authorization', 'Bearer '..access_token)
@@ -28,7 +29,7 @@ if access_token then
 
 -- Cookie with refresh token found; refresh token and set Authorization header.
 elseif cookies.get_refresh_token() then
-  nginx.log(ngx.INFO, 'refreshing token for user: %s', cookies.get_username())
+  log.info('refreshing token for user: %s', cookies.get_username())
 
   either (
     function(err)

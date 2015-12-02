@@ -1,6 +1,6 @@
 require 'moon.all'
 import _ from require 'luassert.match'
-import concat from require 'ngx-oauth.util'
+import concat, partial from require 'ngx-oauth.util'
 nginx = require 'ngx-oauth.nginx'
 
 
@@ -113,18 +113,25 @@ describe 'get_cookie', ->
       assert.is_nil nginx.get_cookie('noop')
 
 
-describe 'log', ->
+behaves_like_log = (level, log_func) ->
 
   it 'calls ngx.log with given level and message prefixed by [ngx-oauth]', ->
-    nginx.log(ngx.WARN, 'allons-y!')
-    assert.stub(_G.ngx.log).called_with ngx.WARN, '[ngx-oauth] allons-y!'
+    log_func('allons-y!')
+    assert.stub(_G.ngx.log).called_with ngx[level\upper!], '[ngx-oauth] allons-y!'
 
   context 'with arguments for format', ->
     it 'calls ngx.log with formatted message', ->
-      nginx.log(ngx.INFO, 'such %s, so %s', 'string', 'formatted')
+      log_func('such %s, so %s', 'string', 'formatted')
       assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so formatted'
 
     context 'where some are nil', ->
       it 'substitutes nil with "#nil"', ->
-        nginx.log(ngx.INFO, 'such %s, so %s', 'string', nil)
+        log_func('such %s, so %s', 'string', nil)
         assert.stub(_G.ngx.log).called_with _, '[ngx-oauth] such string, so #nil'
+
+describe 'log', ->
+  behaves_like_log 'crit', partial(nginx.log, ngx.CRIT)
+
+for level in *{'err', 'warn', 'info', 'debug'} do
+  describe "log.#{level}", ->
+    behaves_like_log level, nginx.log[level]

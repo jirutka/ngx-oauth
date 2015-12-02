@@ -14,6 +14,7 @@ local unpack = table.unpack or unpack
 
 local concat   = util.concat
 local is_empty = util.is_empty
+local par      = util.partial
 local unless   = util.unless
 
 local LOG_PREFIX = '[ngx-oauth] '
@@ -26,6 +27,10 @@ local function sub_vararg_nil (...)
     table.insert(result, v == nil and '#nil' or v)
   end
   return unpack(result)
+end
+
+local function log_formatted (level, message, ...)
+  ngx.log(level, LOG_PREFIX..message:format(sub_vararg_nil(...)))
 end
 
 local M = {}
@@ -103,16 +108,28 @@ function M.get_cookie (name)
   return unless(is_empty, ngx.unescape_uri, ngx.var['cookie_'..name])
 end
 
---- Logs the given (formatted) `message` on the specified logging `level` (e.g.
--- `ngx.ERR`, `ngx.INFO`...).
+--- Logs the given (formatted) `message` on the specified logging `level`.
+-- There are 8 levels defined by ngx's constants (you can find list of them
+-- [here](https://github.com/openresty/lua-nginx-module/#nginx-log-level-constants)).
 --
+-- This module also defines convenient functions for most common levels:
+-- `log.err()`, `log.warn()`, `log.info()`, and `log.debug()`.
+--
+-- @function log
 -- @tparam int level The logging level (0-8).
 -- @tparam string message
 -- @param ... Arguments for @{string.format} being applied to `message`. Nil
 --   values are replaced with `#nil`.
-function M.log (level, message, ...)
-  assert(level >= 0 and level < 9, 'level must be >= 0 and < 9')
-  ngx.log(level, LOG_PREFIX..message:format(sub_vararg_nil(...)))
-end
+M.log = setmetatable({
+  err   = par(log_formatted, ngx.ERR),
+  warn  = par(log_formatted, ngx.WARN),
+  info  = par(log_formatted, ngx.INFO),
+  debug = par(log_formatted, ngx.DEBUG),
+}, {
+  __call = function(_, level, message, ...)
+    assert(level >= 0 and level < 9, 'level must be >= 0 and < 9')
+    log_formatted(level, message, ...)
+  end
+})
 
 return M
