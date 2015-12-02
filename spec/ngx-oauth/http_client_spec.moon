@@ -157,12 +157,10 @@ describe 'get_for_json', ->
 describe 'post_form_for_json', ->
 
   headers = { Cookie: 'foo=42;path=/' }
-  body = {foo: 42}
+  body = {colour: '#004b7e'}
   post_form_for_json = -> client.post_form_for_json(headers, url, body)
 
   setup ->
-    _G.ngx = mock
-      encode_args: (tab) -> '<encoded>'
     spy.on(client, 'request')
 
   teardown ->
@@ -188,6 +186,6 @@ describe 'post_form_for_json', ->
   it 'calls request() with body encoded using ngx.encode_args', ->
     post_form_for_json!
     assert.stub(_G.ngx.encode_args).called_with body
-    assert.spy(client.request).called_with(_, _, _, '<encoded>')
+    assert.spy(client.request).called_with(_, _, _, 'colour=%23004b7e')
 
   contexts_json_response -> post_form_for_json!

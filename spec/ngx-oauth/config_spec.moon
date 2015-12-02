@@ -14,8 +14,7 @@ describe 'load', ->
   }
 
   before_each ->
-    _G.ngx =
-      var: { scheme: 'https', server_name: 'example.org' }
+    _G.ngx.var = { scheme: 'https', server_name: 'example.org' }
 
 
   context 'when all variables are set', ->

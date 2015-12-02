@@ -16,7 +16,7 @@ http_client_stub = { post_form_for_json: -> }
 
 
 setup ->
-  _G.ngx = { encode_args: spec_helper.encode_args, encode_base64: to_base64 }
+  _G.pairs = spec_helper.sorted_pairs
   -- Trick Lua to require our fake http_client instead of ngx-oauth.http_client module.
   package.loaded['ngx-oauth.http_client'] = http_client_stub
   export oauth = require 'ngx-oauth.oauth2'
@@ -28,7 +28,7 @@ teardown ->
 
 describe 'authorization_url', ->
   expected = 'https://oaas.org/authorize?client_id=client123&redirect_uri='..
-    'http%3A%2F%2Fexample%2Eorg&response_type=code&scope=email&state=xyz'
+    'http%3A%2F%2Fexample.org&response_type=code&scope=email&state=xyz'
 
   it 'returns encoded authorization url with correct query parameters', ->
     actual = oauth.authorization_url(conf, 'xyz')

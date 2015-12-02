@@ -23,17 +23,13 @@ describe '__call', ->
   setup ->
     _G.pairs = spec_helper.sorted_pairs
     export crypto_stub = mock {
-      encrypt: (bits, key, value) -> "<ENC[#{value}]>"
-      decrypt: (bits, key, value) -> "<DEC[#{value}]>"
+      encrypt: (bits, key, value) -> "~~ENC-#{value}~~"
+      decrypt: (bits, key, value) -> "~~DEC-#{value}~~"
     }
 
   before_each ->
     export cookies = Cookies(conf, crypto_stub)
-    _G.ngx =
-      var: {}
-      header: {}
-      escape_uri: (value) -> value\gsub(' ', '+')
-      unescape_uri: spec_helper.unescape_uri
+    _G.ngx = spec_helper.ngx_mock!
 
 
   describe 'add_token', ->
@@ -69,7 +65,7 @@ describe '__call', ->
       tkn = { access_token: 'acc-token', expires_in: conf.max_age / 2, refresh_token: 'ref-token' }
       expected = {
         access_token_cookie(tkn),
-        "#{prefix}refresh_token=<ENC[#{tkn.refresh_token}]>;max-age=#{conf.max_age};#{cookie_attrs}"
+        "#{prefix}refresh_token=~~ENC-#{tkn.refresh_token}~~;max-age=#{conf.max_age};#{cookie_attrs}"
       }
 
       it 'writes cookie with access token and encrypted refresh token', ->
@@ -114,7 +110,7 @@ describe '__call', ->
       it 'returns decrypted value of the cookie', ->
         set_cookie "#{prefix}refresh_token", 'token-123'
 
-        assert.same '<DEC[token-123]>', cookies.get_refresh_token()
+        assert.same '~~DEC-token-123~~', cookies.get_refresh_token()
         assert.stub(crypto_stub.decrypt).called_with(conf.aes_bits, conf.client_secret, 'token-123')
 
     context 'refresh_token cookie does not exist', ->

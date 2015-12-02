@@ -1,5 +1,8 @@
 luassert = require 'luassert'
-say = require 'say'
+ngx_mock = require 'ngx_mock'
+say      = require 'say'
+
+_G.ngx = ngx_mock!
 
 -- Assertions
 
@@ -34,21 +37,7 @@ sorted_pairs = (tab) ->
     key, tab[key] if key
 
 
-encode_args = (tab) ->
-  encode_param = (str) ->
-    tostring(str)\gsub('\n', '\r\n')\gsub('([^%w_])', (c) ->
-      string.format('%%%02X', string.byte(c)))
-
-  table.concat([ encode_param(k)..'='..encode_param(v) for k, v in sorted_pairs(tab) ], '&')
-
-
-unescape_uri = (str) ->
-  tostring(str)\gsub('+', ' ')\gsub('\r\n', '\n')\gsub('%%(%x%x)', (h) ->
-    string.char(tonumber(h, 16)))
-
-
 export spec_helper = {
-  :encode_args
   :sorted_pairs
-  :unescape_uri
+  :ngx_mock
 }

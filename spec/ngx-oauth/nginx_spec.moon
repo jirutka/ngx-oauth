@@ -6,7 +6,7 @@ nginx = require 'ngx-oauth.nginx'
 
 describe 'add_response_cookies', ->
   before_each ->
-    _G.ngx = { header: {} }
+    _G.ngx = spec_helper.ngx_mock!
 
   set_resp_cookie = (value) ->
     _G.ngx.header['Set-Cookie'] = value
@@ -37,8 +37,8 @@ describe 'add_response_cookies', ->
 
 
 describe 'fail', ->
-  setup ->
-    _G.ngx = mock { ERR: 4, WARN: 5, HTTP_OK: 200, header: {}, log: ->, say: ->, exit: -> }
+  before_each ->
+    _G.ngx = spec_helper.ngx_mock!
 
   context 'given valid status', ->
     before_each -> nginx.fail(503, 'Ay, %s!', 'caramba')
@@ -80,8 +80,6 @@ describe 'fail', ->
 describe 'format_cookie', ->
   setup ->
     _G.pairs = spec_helper.sorted_pairs
-    _G.ngx = mock
-      escape_uri: (value) -> string.gsub(value, ' ', '+')
 
   it 'returns correctly formated cookie with attributes', ->
     actual = nginx.format_cookie('foo', 'meh', version: 1, path: '/')
@@ -100,10 +98,7 @@ describe 'format_cookie', ->
 
 describe 'get_cookie', ->
   setup ->
-    _G.ngx = mock {
-      var: { cookie_plain: 'meh.', cookie_encod: '%2Fping%3F' }
-      unescape_uri: spec_helper.unescape_uri
-    }
+    _G.ngx.var = { cookie_plain: 'meh.', cookie_encod: '%2Fping%3F' }
 
   context 'existing cookie', ->
     it 'returns cookie value from ngx.var', ->
@@ -119,8 +114,6 @@ describe 'get_cookie', ->
 
 
 describe 'log', ->
-  before_each ->
-    _G.ngx = mock { ERR: 4, WARN: 5, INFO: 7, log: -> }
 
   it 'calls ngx.log with given level and message prefixed by [ngx-oauth]', ->
     nginx.log(ngx.WARN, 'allons-y!')

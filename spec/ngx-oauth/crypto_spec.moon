@@ -8,10 +8,6 @@ encrypted = 'I6u7/Lp5vS+APJJtBjVRGdteDmq0Fxt45xzrEb7Q9ag='
 
 
 describe 'encrypt/decrypt', ->
-  setup ->
-    _G.ngx = mock
-      encode_base64: (value) -> basexx.to_base64(value)
-      decode_base64: (value) -> basexx.from_base64(value)
 
   it 'encrypts and decryptes string', ->
     encrypted = crypto.encrypt(128, key, plain)
@@ -20,8 +16,6 @@ describe 'encrypt/decrypt', ->
 
 
 describe 'decrypt', ->
-  before_each ->
-    _G.ngx = decode_base64: (value) -> basexx.from_base64(value)
 
   context 'given correct key and encrypted value', ->
     it 'returns decrypted value', ->
@@ -47,5 +41,4 @@ describe 'decrypt', ->
 
   context 'given invalid base64 value', ->
     it 'returns nil', ->
-      _G.ngx.decode_base64 = -> nil
       assert.is_nil crypto.decrypt(128, key, '%invalid%')
