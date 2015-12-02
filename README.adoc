@@ -65,14 +65,10 @@ $oauth_oaas_uri::
   Base URI of the OAuth 2.0 authorization server.
   This variable is *required*, unless you set `$oauth_authorization_url`, `$oauth_token_url` and `$oauth_userinfo_url`.
 
-$oauth_redirect_location::
-  TODO
-
 $oauth_redirect_uri::
-  The _client’s_ {rfc6749}#section-3.1.2[redirection endpoint] previously registered on the authorization server.
-  It must be an absolute URI that is accessible from the authorization server and routed to this module.
-  You don’t need to change this variable, unless your nginx instance is behind some other HTTP proxy.
-  The default value is `${scheme}://${server_name}${oauth_redirect_location}`, where variables {ngx-http-core-doc}#var_scheme[`$scheme`] and {ngx-http-core-doc}#var_server_name[`$server_name`] are set by nginx.
+  URL of the _client’s_ {rfc6749}#section-3.1.2[redirection endpoint] previously registered on the authorization server.
+  It may be full (absolute) URL, or just a path (starting with `/`) relative to {ngx-http-core-doc}#var_scheme[`$scheme`]`://`{ngx-http-core-doc}#var_server_name[`$server_name`].
+  The default value is `/_oauth/callback`.
 
 $oauth_scope::
   A space delimited set of OAuth scopes that should be requested.

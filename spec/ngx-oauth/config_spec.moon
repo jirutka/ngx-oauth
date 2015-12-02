@@ -22,7 +22,6 @@ describe 'load', ->
       scope: 'read'
       redirect_uri: 'https://example.cz/oauth/callback'
       oaas_uri: 'not-used'
-      redirect_location: '/callback'
       success_uri: '/app/home'
       cookie_path: '/app'
       cookie_prefix: 'oa_'
@@ -45,7 +44,6 @@ describe 'load', ->
       scope: ''
       oaas_uri: ''
       redirect_uri: 'https://example.org/_oauth/callback'
-      redirect_location: '/_oauth/callback'
       success_uri: '/'
       cookie_path: '/'
       cookie_prefix: 'oauth_'
@@ -63,12 +61,12 @@ describe 'load', ->
       assert.is_falsy errs
 
 
-  context 'when ngx.var.oauth_redirect_uri is not set', ->
+  context 'when ngx.var.oauth_redirect_uri starts with "/"', ->
     before_each ->
       _G.ngx.var =
-        scheme: 'http', server_name: 'example.cz', oauth_redirect_location: '/callme'
+        scheme: 'http', server_name: 'example.cz', oauth_redirect_uri: '/callme'
 
-    it 'sets redirect_uri built from vars scheme, server_name and oauth_redirect_location', ->
+    it 'prepends oauth_redirect_uri with ${scheme}://${server_name}', ->
       actual = config.load()
       assert.same 'http://example.cz/callme', actual.redirect_uri
 

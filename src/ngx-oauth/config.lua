@@ -13,12 +13,11 @@ local DEFAULTS = {
   client_id         = '',
   client_secret     = '',
   scope             = '',
-  redirect_uri      = '',
+  redirect_uri      = '/_oauth/callback',
   oaas_uri          = '',  -- used only as a shorthand for setting these 3 below
   authorization_url = '${oaas_uri}/authorize',
   token_url         = '${oaas_uri}/token',
   userinfo_url      = "${oaas_uri}/userinfo",
-  redirect_location = '/_oauth/callback',
   success_uri       = '/',
   cookie_path       = '/',
   cookie_prefix     = 'oauth_',
@@ -73,8 +72,8 @@ local M = {}
 function M.load ()
   local conf = load_from_ngx()
 
-  if is_empty(conf.redirect_uri) then
-    conf.redirect_uri = ngx.var.scheme..'://'..ngx.var.server_name..conf.redirect_location
+  if starts_with('/', conf.redirect_uri) then
+    conf.redirect_uri = ngx.var.scheme..'://'..ngx.var.server_name..conf.redirect_uri
   end
 
   if not is_empty(conf.oaas_uri) then
