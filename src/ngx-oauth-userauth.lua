@@ -25,15 +25,9 @@ end
 
 local cookies = Cookies(conf)
 
-local log_debug = function() end
-
-if conf.debug then
-  log_debug = log.debug
-end
-
 -- Got response from the authorization server.
 if ngx.var.uri == conf.redirect_location then
-  log_debug('processing request from authorization server')
+  log.debug('processing request from authorization server')
 
   local request_args = ngx.req.get_uri_args()
   local auth_code = request_args.code
@@ -42,7 +36,7 @@ if ngx.var.uri == conf.redirect_location then
     return nginx.fail(403, request_args.error)
 
   elseif auth_code then
-    log_debug('requesting token for auth code: %s', auth_code)
+    log.debug('requesting token for auth code: %s', auth_code)
 
     local token = get_or_fail(oauth.request_token('authorization_code', conf, auth_code))
     cookies.add_token(token)

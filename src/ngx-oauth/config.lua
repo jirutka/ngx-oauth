@@ -23,8 +23,7 @@ local DEFAULTS = {
   cookie_path       = '/',
   cookie_prefix     = 'oauth_',
   max_age           = 2592000, -- 30 days
-  aes_bits          = 128,
-  debug             = false
+  aes_bits          = 128
 }
 
 local OAAS_ENDPOINT_VARS = {'authorization_url', 'token_url', 'userinfo_url'}

@@ -28,7 +28,6 @@ describe 'load', ->
       cookie_prefix: 'oa_'
       max_age: 600
       aes_bits: 192
-      debug: true
     }, required_vars
 
     before_each ->
@@ -52,7 +51,6 @@ describe 'load', ->
       cookie_prefix: 'oauth_'
       max_age: 2592000
       aes_bits: 128
-      debug: false
     }, required_vars
 
     before_each ->
