@@ -194,8 +194,8 @@ end
 
 --- Returns true if the string `str` starts with the `prefix`.
 --
--- @tparam prefix string
--- @tparam str string
+-- @tparam string prefix
+-- @tparam string str
 -- @treturn bool
 function M.starts_with (prefix, str)
   return string.sub(str or '', 1, prefix:len()) == prefix
