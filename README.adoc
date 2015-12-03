@@ -26,6 +26,65 @@ TBD
 * luaossl [{gh-url}/wahern/luaossl[source]] [{rocks-url}/daurnimator/luaossl[LuaRocks]]
 
 
+== Usage
+
+[source, nginx]
+.Example of nginx.conf:
+-------------------------------------------------------------------------------
+http {
+
+    # DNS servers used to resolve names of upstream servers into addresses.
+    resolver 208.67.222.222 208.67.220.220 [2620:0:ccc::2] [2620:0:ccd::2];
+
+    # Path of the file with trusted CA certificates.
+    lua_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+
+    # The verification depth in the server certificates chain.
+    lua_ssl_verify_depth 3;
+
+    # The Lua module search path.
+    lua_package_path '/path/to/ngx-oauth/?.lua;;';
+
+    ...
+
+    server {
+        listen 443 ssl;
+        server_name client.example.org;
+
+        ...
+
+        set $oauth_client_id '01234567-89ab-cdef-0123-456789abcdef';
+        set $oauth_client_secret 'very-top-secret-password';
+        set $oauth_redirect_uri '/_oauth/callback';
+        set $oauth_oaas_uri 'https://oaas.example.org/oauth';
+
+        location /_oauth/login {
+            content_by_lua_file '/path/to/ngx-oauth-login.lua';
+        }
+
+        location /_oauth/callback {
+            content_by_lua_file '/path/to/ngx-oauth-redirect-handler.lua';
+        }
+
+        location /_oauth/logout {
+            content_by_lua_file '/path/to/ngx-oauth-logout.lua';
+        }
+
+        location /_proxy {
+            access_by_lua_file '/path/to/ngx-oauth-proxy.lua';
+
+            rewrite ^/_proxy/(.*)$ /$1 break;
+            proxy_pass https://resource-provider;
+        }
+
+        location / {
+            ...
+        }
+    }
+}
+-------------------------------------------------------------------------------
+
+
 == Configuration variables
 
 $oauth_aes_bits::
