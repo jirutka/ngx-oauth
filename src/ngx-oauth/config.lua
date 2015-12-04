@@ -3,11 +3,12 @@
 
 local util = require 'ngx-oauth.util'
 
-local contains    = util.contains
-local is_empty    = util.is_empty
-local map         = util.map
-local par         = util.partial
-local starts_with = util.starts_with
+local contains        = util.contains
+local is_absolute_url = util.is_absolute_url
+local is_empty        = util.is_empty
+local map             = util.map
+local par             = util.partial
+local starts_with     = util.starts_with
 
 local DEFAULTS = {
   client_id         = '',
@@ -72,7 +73,7 @@ local M = {}
 function M.load ()
   local conf = load_from_ngx()
 
-  if starts_with('/', conf.redirect_uri) then
+  if not is_absolute_url(conf.redirect_uri) then
     conf.redirect_uri = ngx.var.scheme..'://'..ngx.var.server_name..conf.redirect_uri
   end
 

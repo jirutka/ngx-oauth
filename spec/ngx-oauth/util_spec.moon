@@ -58,6 +58,20 @@ describe 'id', ->
     assert.equal value, util.id(value)
 
 
+describe 'is_absolute_url', ->
+
+  for prefix in *{'https://', 'http://'} do
+    it "returns true for string that starts with #{prefix}", ->
+      assert.is_true util.is_absolute_url("#{prefix}example.org")
+
+  it "returns false for strings that don't start with https:// or http://", ->
+    for value in *{'foo', '//hello', '/http://', ' https://'} do
+      assert.is_false util.is_absolute_url(value)
+
+  it 'returns false for nil', ->
+    assert.is_false util.is_absolute_url(nil)
+
+
 describe 'is_empty', ->
 
   it 'returns true for nil', ->

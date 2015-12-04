@@ -82,6 +82,12 @@ function M.is_empty (value)
   return value == nil or value == ''
 end
 
+--- Returns true if the `value` starts with `https://` or `http://`. This is
+-- very simplified test, but it's good enough and efficient for our needs.
+function M.is_absolute_url (value)
+  return M.starts_with('https://', value) or M.starts_with('http://', value)
+end
+
 --- Returns a new table with the results of running `func(value, key)` once
 -- for every key-value pair in the `tab`. Tables are iterated using @{pairs},
 -- so this function is intended for tables that represent *associative arrays*.
