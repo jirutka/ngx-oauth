@@ -15,8 +15,6 @@ local either  = ethr.either
 
 local fail_with_oaas_error = par(nginx.fail, 503, "Authorization server error: %s")
 local get_or_fail = par(either, fail_with_oaas_error, util.id)
-local request_args = ngx.req.get_uri_args()
-local auth_code = request_args.code
 
 
 local conf, err = config.load()
@@ -25,11 +23,13 @@ if err then
 end
 
 local cookies = Cookies(conf)
+local err_code = nginx.get_uri_arg('error')
+local auth_code = nginx.get_uri_arg('code')
 
 log.debug('processing request from authorization server')
 
-if request_args.error then
-  return nginx.fail(403, request_args.error)
+if err_code then
+  return nginx.fail(403, err_code)
 
 elseif auth_code then
   log.debug("requesting token for auth code: %s", auth_code)

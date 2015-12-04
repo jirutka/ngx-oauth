@@ -108,6 +108,15 @@ function M.get_cookie (name)
   return unless(is_empty, ngx.unescape_uri, ngx.var['cookie_'..name])
 end
 
+--- Returns URI-decoded value of the specified request's URI argument
+-- (query parameter).
+--
+-- @tparam string name The name of the argument to get.
+-- @treturn string|nil The argument's value, or nil if doesn't exist.
+function M.get_uri_arg (name)
+  return unless(is_empty, ngx.unescape_uri, ngx.var['arg_'..name])
+end
+
 --- Logs the given (formatted) `message` on the specified logging `level`.
 -- There are 8 levels defined by ngx's constants (you can find list of them
 -- [here](https://github.com/openresty/lua-nginx-module/#nginx-log-level-constants)).

@@ -113,6 +113,23 @@ describe 'get_cookie', ->
       assert.is_nil nginx.get_cookie('noop')
 
 
+describe 'get_uri_arg', ->
+  setup ->
+    _G.ngx.var = { arg_plain: 'meh.', arg_encod: '%2Fping%3F' }
+
+  context 'existing argument', ->
+    it 'returns value from ngx.var.arg_*', ->
+      assert.same 'meh.', nginx.get_uri_arg('plain')
+
+    it 'decodes uri-encoded argument using ngx.unescape_uri', ->
+      assert.same '/ping?', nginx.get_uri_arg('encod')
+      assert.spy(_G.ngx.unescape_uri).called_with '%2Fping%3F'
+
+  context 'non-existing argument', ->
+    it 'returns nil', ->
+      assert.is_nil nginx.get_uri_arg('noop')
+
+
 behaves_like_log = (level, log_func) ->
 
   it 'calls ngx.log with given level and message prefixed by [ngx-oauth]', ->
