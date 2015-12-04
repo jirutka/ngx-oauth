@@ -3,6 +3,7 @@ from . import free_tcp_port
 from base64 import b64decode
 import json
 from multiprocessing import Process
+from urllib.parse import urlencode
 
 from bottle import Bottle, ConfigDict, HTTPError, LocalRequest, abort, redirect
 import requests
@@ -37,9 +38,13 @@ def OAuthServerMock(config):
                             query.redirect_uri, conf.redirect_uri)
 
         if conf.get('approve_request', True) and query.scope in conf.scope.split(' '):
-            redirect("%s?code=%s" % (query.redirect_uri, conf.auth_code))
+            params = {'code': conf.auth_code}
         else:
-            redirect("%s?error=%s" % (query.redirect_uri, 'invalid_scope'))
+            params = {'error': 'invalid_scope'}
+        if query.state:
+            params['state'] = query.state
+
+        redirect(query.redirect_uri + '?' + urlencode(params))
 
     @app.post('/token')
     def post_token():
