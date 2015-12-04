@@ -26,12 +26,12 @@ local cookies = Cookies(conf)
 if cookies.get_refresh_token() then
   log.info("refreshing token for user: %s", cookies.get_username())
 
-  util.pipe({
+  util.pipe(
     cookies.get_refresh_token,
     par(oauth.request_token, 'refresh_token', conf),
     par(either, fail_with_oaas_error, util.id),
     cookies.add_token
-  })()
+  )()
 
   return ngx.redirect(conf.success_uri)
 
