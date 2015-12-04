@@ -15,6 +15,11 @@ local either  = ethr.either
 local fail_with_oaas_error = par(nginx.fail, 503, "Authorization server error: %s")
 
 
+local method  = ngx.var.request_method
+if method ~= 'POST' then
+  return nginx.fail(405, "This resource supports only POST, but you've sent %s.", method)
+end
+
 local conf, err = config.load()
 if err then
   return nginx.fail(500, "OAuth proxy error: %s", err)

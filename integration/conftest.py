@@ -81,7 +81,7 @@ def http():
 
 @fixture
 def logged_in_fixture(http):
-    http.get('/_oauth/login', allow_redirects=True)
+    http.post('/_oauth/login', allow_redirects=True)
     assert len(http.cookies) == 3
 
 logged_in = mark.usefixtures('logged_in_fixture')
