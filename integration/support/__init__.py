@@ -13,6 +13,17 @@ class OAuthError(HTTPError):
         })
 
 
+def assert_access_token(request, access_token):
+    header = get_authorization_header(request)
+    method, token = header.split(' ')
+
+    if method != 'Bearer':
+        raise OAuthError(400, 'invalid_request', "Invalid authorization method: %s" % method)
+
+    if token != access_token:
+        raise OAuthError(401, 'invalid_token', "Invalid access token: %s" % token)
+
+
 def free_tcp_port():
     sock = socket()
     try:
@@ -20,6 +31,14 @@ def free_tcp_port():
         return sock.getsockname()[1]
     finally:
         sock.close()
+
+
+def get_authorization_header(request):
+    auth = request.headers.get('Authorization')
+    if auth:
+        return auth
+    raise OAuthError(401, 'unauthorized',
+                     'Full authentication is required to access this resource')
 
 
 def merge_dicts(*dicts):

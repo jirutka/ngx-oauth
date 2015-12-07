@@ -1,8 +1,8 @@
 from base64 import b64decode
 from urllib.parse import urlencode
 
-from . import OAuthError
-from bottle import Bottle, ConfigDict, HTTPError, LocalRequest, abort, redirect
+from . import OAuthError, assert_access_token, get_authorization_header
+from bottle import Bottle, ConfigDict, LocalRequest, abort, redirect
 
 __all__ = ['OAuthServerMock']
 
@@ -85,11 +85,7 @@ def OAuthServerMock(config):
 
     @app.get('/userinfo')
     def get_userinfo():
-        auth = get_authorization_header(request)
-        token = parse_token_auth(auth)
-
-        if token != conf.access_token:
-            raise OAuthError(401, 'invalid_token', "Invalid access token: %s" % token)
+        assert_access_token(request, conf.access_token)
 
         return {
             'username': conf.username
@@ -107,17 +103,3 @@ def parse_client_auth(header):
     method, credentials = header.split(' ')
     assert method == 'Basic', 'Expected method Basic'
     return tuple(b64decode(credentials).decode().split(':'))
-
-
-def parse_token_auth(header):
-    method, token = header.split(' ')
-    assert method == 'Bearer'
-    return token
-
-
-def get_authorization_header(request):
-    auth = request.headers.get('Authorization')
-    if auth:
-        return auth
-    raise OAuthError(401, 'unauthorized',
-                     'Full authentication is required to access this resource')
