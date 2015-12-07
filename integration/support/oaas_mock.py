@@ -1,7 +1,7 @@
 from base64 import b64decode
 from urllib.parse import urlencode
 
-from . import OAuthError, assert_access_token, get_authorization_header
+from .util import OAuthError, assert_access_token, get_authorization_header
 from bottle import Bottle, ConfigDict, LocalRequest, abort, redirect
 
 __all__ = ['OAuthServerMock']

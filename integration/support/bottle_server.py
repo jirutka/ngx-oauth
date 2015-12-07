@@ -1,6 +1,6 @@
 from multiprocessing import Process
 
-from . import free_tcp_port
+from .util import free_tcp_port
 import requests
 from requests import ConnectionError
 from retry import retry

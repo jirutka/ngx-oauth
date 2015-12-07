@@ -1,21 +1,21 @@
-from . import *
-
 import os
-from os.path import join as pathjoin
+from os import path
 import shlex
 from subprocess import Popen
-import sys
-from time import sleep, time
+from time import sleep
 
+from .util import write_file
 import requests
 from requests import ConnectionError
 from retry import retry
+
+__all__ = ['NginxServer']
 
 
 class NginxServer:
 
     def __init__(self, nginx_conf, check_url, temp_dir='.'):
-        conf_path = pathjoin(temp_dir, 'nginx.conf')
+        conf_path = path.join(temp_dir, 'nginx.conf')
         write_file(conf_path, nginx_conf)
 
         self._command = "nginx -c %s" % conf_path
