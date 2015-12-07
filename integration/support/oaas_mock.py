@@ -1,6 +1,7 @@
 from base64 import b64decode
 from urllib.parse import urlencode
 
+from . import OAuthError
 from bottle import Bottle, ConfigDict, HTTPError, LocalRequest, abort, redirect
 
 __all__ = ['OAuthServerMock']
@@ -20,15 +21,15 @@ def OAuthServerMock(config):
         query = request.query
 
         if query.client_id != conf.client_id:
-            raise OAASError(401, 'invalid_client', "Invalid client_id: %s" % query.client_id)
+            raise OAuthError(401, 'invalid_client', "Invalid client_id: %s" % query.client_id)
 
         if query.response_type != 'code':
-            raise OAASError(400, 'unsupported_response_type', "Unsupported response type: %s",
-                            query.response_type)
+            raise OAuthError(400, 'unsupported_response_type', "Unsupported response type: %s",
+                             query.response_type)
 
         if query.redirect_uri != conf.redirect_uri:
-            raise OAASError(400, 'invalid_grant', "Invalid redirect %s does not match %s",
-                            query.redirect_uri, conf.redirect_uri)
+            raise OAuthError(400, 'invalid_grant', "Invalid redirect %s does not match %s",
+                             query.redirect_uri, conf.redirect_uri)
 
         if conf.get('approve_request', True) and query.scope in conf.scope.split(' '):
             params = {'code': conf.auth_code}
@@ -45,21 +46,21 @@ def OAuthServerMock(config):
         grant_type = request.forms.grant_type
 
         if parse_client_auth(auth) != (conf.client_id, conf.client_secret):
-            raise OAASError(401, 'unauthorized', 'Bad credentials')
+            raise OAuthError(401, 'unauthorized', 'Bad credentials')
 
         if grant_type == 'authorization_code':
             return handle_authorization_code()
         elif grant_type == 'refresh_token':
             return handle_refresh_token()
         else:
-            raise OAASError(400, 'invalid_request', 'Missing or invalid grant type')
+            raise OAuthError(400, 'invalid_request', 'Missing or invalid grant type')
 
     def handle_authorization_code():
         code = request.forms.code
         redirect_uri = request.forms.redirect_uri
 
         if code != conf.auth_code:
-            raise OAASError(400, 'invalid_grant', "Invalid authorization code: %s" % code)
+            raise OAuthError(400, 'invalid_grant', "Invalid authorization code: %s" % code)
 
         return {
             'access_token': conf.access_token,
@@ -73,7 +74,7 @@ def OAuthServerMock(config):
         refresh_token = request.forms.refresh_token
 
         if refresh_token != conf.refresh_token:
-            raise OAASError(400, 'invalid_grant', "Invalid refresh token: %s" % refresh_token)
+            raise OAuthError(400, 'invalid_grant', "Invalid refresh token: %s" % refresh_token)
 
         return {
             'access_token': conf.access_token,
@@ -88,7 +89,7 @@ def OAuthServerMock(config):
         token = parse_token_auth(auth)
 
         if token != conf.access_token:
-            raise OAASError(401, 'invalid_token', "Invalid access token: %s" % token)
+            raise OAuthError(401, 'invalid_token', "Invalid access token: %s" % token)
 
         return {
             'username': conf.username
@@ -100,15 +101,6 @@ def OAuthServerMock(config):
         return error.body
 
     return app
-
-
-class OAASError(HTTPError):
-
-    def __init__(self, status, error_code, error_desc):
-        super().__init__(status=status, body={
-            'error': error_code,
-            'error_description': error_desc
-        })
 
 
 def parse_client_auth(header):
@@ -127,5 +119,5 @@ def get_authorization_header(request):
     auth = request.headers.get('Authorization')
     if auth:
         return auth
-    raise OAASError(401, 'unauthorized',
-                    'Full authentication is required to access this resource')
+    raise OAuthError(401, 'unauthorized',
+                     'Full authentication is required to access this resource')

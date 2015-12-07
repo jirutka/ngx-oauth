@@ -1,6 +1,17 @@
 from socket import socket
 from string import Template
 
+from bottle import HTTPError
+
+
+class OAuthError(HTTPError):
+
+    def __init__(self, status, error_code, error_desc):
+        super().__init__(status=status, body={
+            'error': error_code,
+            'error_description': error_desc
+        })
+
 
 def free_tcp_port():
     sock = socket()
