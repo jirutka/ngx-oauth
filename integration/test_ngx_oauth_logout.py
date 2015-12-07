@@ -9,7 +9,7 @@ def test_logout(http):
     resp = http.post('/_oauth/logout')
 
     # then the response status should be 204,
-    resp.status_code == 204
+    assert resp.status_code == 204
 
     # and all OAuth cookies should be gone.
     assert len(http.cookies) == 0
@@ -23,7 +23,7 @@ def test_logout_using_get_method(http):
     resp = http.get('/_oauth/logout')
 
     # then the response status should be 405,
-    resp.status_code == 405
+    assert resp.status_code == 405
 
     # and cookies should be still here.
     assert len(http.cookies) == 3
