@@ -36,8 +36,10 @@ build = {
   },
   install = {
     lua = {
+      'src/ngx-oauth-login.lua',
+      'src/ngx-oauth-logout.lua',
       'src/ngx-oauth-proxy.lua',
-      'src/ngx-oauth-userauth.lua'
+      'src/ngx-oauth-redirect-handler.lua'
     }
   },
   copy_directories = { 'spec' }
