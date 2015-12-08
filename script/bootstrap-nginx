@@ -28,7 +28,7 @@ PCRE_WD="pcre-$PCRE_VERSION"
 
 NGINX_WITHOUT_MODULES='
 	access auth_basic autoindex browser charset empty_gif fastcgi geo gzip
-	limit_conn limit_req map memcached proxy referer scgi split_clients ssi
+	limit_conn limit_req map memcached referer scgi split_clients ssi
 	upstream_hash upstream_ip_hash upstream_keepalive upstream_least_conn
 	upstream_zone userid uwsgi'
 

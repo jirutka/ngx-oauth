@@ -14,8 +14,10 @@ TEMP_DIR = os.environ.get('TEMP_DIR') or pathjoin(DIR, '../.tmp')
 
 nginx_port = free_tcp_port()
 oaas_port = free_tcp_port()
+rp_port = free_tcp_port()
 nginx_base_uri = "https://127.0.0.1:%d" % nginx_port
 oaas_base_uri = "http://127.0.0.1:%d" % oaas_port
+rp_base_uri = "http://127.0.0.1:%d" % rp_port
 
 access_tokens = [
     '00f8aadb-78d8-4f6b-aa20-1212dc656b7c',
@@ -31,6 +33,7 @@ proxy_conf = {
     'oaas_uri': oaas_base_uri,
     'authorization_url': "%s/authorize" % oaas_base_uri,
     'success_uri': '/success',
+    'rp_base_uri': rp_base_uri
 }
 
 oaas_state = {
@@ -58,6 +61,13 @@ def oaas(request):
     config = merge_dicts(proxy_conf, oaas_state, extra_conf)
 
     process = BottleServer(OAuthServerMock(config), port=oaas_port)
+    process.start()
+    request.addfinalizer(process.terminate)
+
+
+@fixture(scope='function')
+def rp(request):
+    process = BottleServer(ResourceProviderMock(access_tokens[0]), port=rp_port)
     process.start()
     request.addfinalizer(process.terminate)
 

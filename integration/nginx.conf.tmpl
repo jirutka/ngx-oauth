@@ -40,5 +40,12 @@ http {
         location /_oauth/logout {
             content_by_lua_file '../src/ngx-oauth-logout.lua';
         }
+
+        location /_proxy/ {
+            access_by_lua_file '../src/ngx-oauth-proxy.lua';
+
+            rewrite ^/_proxy/(.*)$$ /$$1 break;
+            proxy_pass ${rp_base_uri};
+        }
     }
 }
