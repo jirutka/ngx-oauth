@@ -147,6 +147,194 @@ $oauth_userinfo_url::
   This variable is required if `$oauth_oaas_uri` is not set; otherwise it defaults to `${oauth_oaas_uri}/userinfo`.
 
 
+== Usage scenarios
+
+This section describes various usage scenarios.
+
+.*List of participants:*
+user-agent::
+  This is typically user’s web browser.
+
+proxy/nginx::
+  Nginx with ngx-oauth module that serves our client-side application.
+  It has URI https://nginx in the diagrams.
+
+Authorization Server (OAAS)::
+  OAuth 2.0 authorization server.
+  It may be standalone, or coupled with an resource provider.
+  It has URI https://oaas in the diagrams.
+
+Resource provider (RP)::
+  An resource provider, i.e. our backend application with RESTful API.
+  It has URI https://rp in the diagrams.
+
+.*Error handling:*
+* If there’s some problem in ngx-oauth configuration, then the proxy responds with HTTP 500.
+* If the user-agent use an incorrect HTTP method (i.e. GET instead of POST), then the proxy responds with HTTP 405.
+* If some error occur in communication with the OAAS, then the proxy responds with HTTP 503.
+
+
+=== User log-in
+
+_Modules: ngx-oauth-login and ngx-oauth-redirect-handler_
+
+This scenario is intended for authorization grant {rfc6749}#section-1.3.1[client credentials].
+
+.*Log-in for the first time*
+-----------------------------------------------------------------------------------------------------------------
++-------------+                               +-------------+                                    +-------------+
+| user-agent  |                               | proxy/nginx |                                    |    OAAS     |
++------+------+                               +------+------+                                    +------+------+
+       |       POST https://nginx/_oauth/login       |                                                  |
+      (1)------------------------------------------->|                                                  |
+       |                                             |                                                  |
+       |  302 | Location: https://oaas/authorize?... |                                                  |
+       |<- - - - - - - - - - - - - - - - - - - - - (2a)                                                 |
+       |                                             |                                                  |
+       |                                         GET <Location>                                         |
+     (2b)---------------------------------------------------------------------------------------------->|
+       :                                             :                                                  :
+       :                                             :                               /~~~~~~~~~~~~~~~~~~~~~~~~~~~+
+       :                                             :                               | User logs in and approves |
+       :                                             :                               |    authorization request. |
+       :                                             :                               +~~~~~~~~~~~~~~~~~~~~~~~~~~~/
+       :                     302 | Location: https://nginx/_oauth/callback?code=xyz                     :
+       |<- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -(3a)
+       |                                             |                                                  |
+       |               GET <Location>                |                                                  |
+      (3b)------------------------------------------>|                                                  |
+       |                                             | POST https://oaas/token | code= & redirect_uri=  |
+       |                                             | Authorization: Basic <client_id>:<client_secret> |
+       |                                            (4)------------------------------------------------>|
+       |                                             |                                                  |
+       |                                             |    200 | {access_token:, refresh_token:, ...}    |
+       |                                             |<- - - - - - - - - - - - - - - - - - - - - - - - (5)
+       |                                             |                                                  |
+       |                                             |            GET https://oaas/userinfo             |
+       |                                             |       Authorization: Bearer <access_token>       |
+       |                                            (6)------------------------------------------------>|
+       |                                             |                                                  |
+       |                                             |              200 | {username, ...}               |
+       |                                             |<- - - - - - - - - - - - - - - - - - - - - - - - (7)
+       |      302 | Location: /, Set-Cookie: ...     |                                                  |
+       |<- - - - - - - - - - - - - - - - - - - - - -(8)                                                 |
+       |                                             |                                                  |
+-----------------------------------------------------------------------------------------------------------------
+<1> The user-agent makes a POST request to the proxy’s login endpoint (i.e. user clicks on the login button).
+<2> The proxy initiates the OAuth flow by directing the user-agent to the authorization endpoint (specified by `$oauth_authorization_url`).
+    The URI includes the client identifier (`$oauth_client_id`), requested scope (`$oauth_scope`), and a _redirection URI_ (`$oauth_redirect_uri`) to which the OAAS will send the user-agent back once access is granted (or denied).
+<3> Assuming the user logs-in and grants access, the OAAS redirects the user-agent back to the proxy using the redirection URI with an authorization code.
+<4> The proxy requests an access token from the OAAS’ token endpoint (`$oauth_token_url`) by including the authorization code and the redirection URI.
+    When making the request, the proxy authenticates with the OAAS using the client identifier and the client secret (`$oauth_client_secret`).
+<5> The OAAS validates the token request and if valid, it responds back with an access token and a refresh token.
+<6> The proxy requests an userinfo from the OAAS’ userinfo endpoint (`$oauth_userinfo_url`) using the access token.
+<7> The OAAS validates the access token and if valid, it responds back with an username and possibly other fields.
+<8> Assuming that all previous steps were successful, the proxy redirects the user-agent to the `$oauth_success_uri` and sets access_token, refresh_token and username cookies.
+    The refresh_token cookie is encrypted, so it’s not readable by the user-agent.
+
+
+.*Log-in with an existing refresh token*
+-----------------------------------------------------------------------------------------------------------------
++-------------+                               +-------------+                                    +-------------+
+| user-agent  |                               | proxy/nginx |                                    |    OAAS     |
++------+------+                               +------+------+                                    +------+------+
+       |       POST https://nginx/_oauth/login       |                                                  |
+       |         Cookie: refresh_token, ...          |                                                  |
+      (1)------------------------------------------->|                                                  |
+       |                                             |     POST https://oaas/token | refresh_token=     |
+       |                                             | Authorization: Basic <client_id>:<client_secret> |
+       |                                            (2)------------------------------------------------>|
+       |                                             |                                                  |
+       |                                             |            200 | {access_token:, ...}            |
+       |                                             |<- - - - - - - - - - - - - - - - - - - - - - - - (3)
+       | 302 | Location: /, Set-Cookie: access_token |                                                  |
+       |<- - - - - - - - - - - - - - - - - - - - - -(4)                                                 |
+       |                                             |                                                  |
+-----------------------------------------------------------------------------------------------------------------
+<1> The user-agent makes a POST request to the proxy’s login endpoint and includes a valid refresh_token cookie.
+<2> The proxy requests an access token from the OAAS’ token endpoint (`$oauth_token_url`) using the refresh_token obtained from the cookie.
+    When making the request, the proxy authenticates with the OAAS using the client identifier (`$oauth_client_id`) and the client secret (`$oauth_client_secret`).
+<3> The OAAS validates the refresh token and if valid, it responds back with a new access token.
+<4> Assuming that the previous step was successful, the proxy redirects the user-agent to the `$oauth_success_uri` and sets cookie with the new access token.
+
+
+=== User log-out
+
+_Modules: ngx-oauth-logout_
+
+-----------------------------------------------------------------------------------------------------------------
++-------------+                               +-------------+                                   +-------------+
+| user-agent  |                               | proxy/nginx |                                   |    OAAS     |
++------+------+                               +------+------+                                   +------+------+
+       |      POST https://nginx/_oauth/logout       |                                                 |
+       |   Cookie: access_token, refresh_token, ...  |                                                 |
+      (1)------------------------------------------->|                                                 |
+       |                                             |                                                 |
+       |                     204                     |                                                 |
+       | Set-Cookie: oauth_*=deleted; Max-Age=0; ... |                                                 |
+       |<- - - - - - - - - - - - - - - - - - - - - -(2)                                                |
+       |                                             |                                                 |
+-----------------------------------------------------------------------------------------------------------------
+<1> The user-agent makes a POST request to the proxy’s logout endpoint.
+<2> The proxy responds back with HTTP status 204 and sets access_token, refresh_token and username cookies to expired (i.e. the user-agent will erase them).
+
+
+=== Proxy for resource provider
+
+_Module: ngx-oauth-proxy_
+
+-----------------------------------------------------------------------------------------------------------------
++-------------+                       +-------------+                        +-------------+    +-------------+
+| user-agent  |                       | proxy/nginx |                        |  RP (API)   |    |    OAAS     |
++------+------+                       +------+------+                        +------+------+    +------+------+
+       |                                     |                                      |                  |
+       |    GET https://nginx/_proxy/ping    |                                      |                  |
+       | Cookie: access_token, refresh_token |                                      |                  |
+      (1)----------------------------------->|         GET https://rp/ping          |                  |
+       |                                     | Authorization: Bearer <access_token> |                  |
+       |                                    (2)------------------------------------>|                  |
+       |                                     |                                      |                  |
+       |                                     |                 200                  |                  |
+       |                 200                 |<- - - - - - - - - - - - - - - - - - (3)                 |
+       |<- - - - - - - - - - - - - - - - - -(4)                                     |                  |
+       :                                     :                                      :                  :
+  /~~~~~~~~~~~~~~~~~~~~~~+                   :                                      :                  :
+  | access_token expired |                   :                                      :                  :
+  +~~~~~~~~~~~~~~~~~~~~~~/                   :                                      :                  :
+       :                                     :                                      :                  :
+       |    GET https://nginx/_proxy/ping    |                                      |                  |
+       |        Cookie: refresh_token        |                                      |                  |
+      (5)----------------------------------->|                                      |                  |
+       |                                     |        POST https://oaas/token | refresh_token=         |
+       |                                     |     Authorization: Basic <client_id>:<client_secret>    |
+       |                                    (6)------------------------------------------------------->|
+       |                                     |                                      |                  |
+       |                                     |                200 | {access_token:, ...}               |
+       |                                     |<- - - - - - - - - - - - - - - - - - - - - - - - - - - -(7)
+       |                                     |                                      |                  |
+       |                                     |         GET https://rp/ping          |                  |
+       |                                     | Authorization: Bearer <access_token> |                  |
+       |                                    (8)------------------------------------>|                  |
+       |                                     |                                      |                  |
+       |                                     |                 200                  |                  |
+       |   200 | Set-Cookie: access_token    |<- - - - - - - - - - - - - - - - - - (9)                 |
+       |<- - - - - - - - - - - - - - - - - (10)                                     |                  |
+       |                                     |                                      |                  |
+-----------------------------------------------------------------------------------------------------------------
+<1> The user-agent requests data on the resource provider (RP) through the proxy.
+<2> The proxy adds an Authorization header with the access token obtained from the cookie (that has been set in the login flow) and passes it to the RP.
+<3> The RP validates the access token on the OAAS and responds back to the user-agent through the proxy.
+<4> The proxy just passes the RP’s response to the user-agent without any modification.
+<5> Some time later, the access token expire and the user-agent requests another data through the proxy.
+    The access token cookie has the same or shorter expiration time than the access token itself, i.e. when the token expire, the user-agent erases the cookie.
+<6> The proxy requests an access token from the OAAS’ token endpoint (`$oauth_token_url`) using the refresh_token obtained from the cookie.
+    When making the request, the proxy authenticates with the OAAS using the client identifier (`$oauth_client_id`) and the client secret (`$oauth_client_secret`).
+<7> The OAAS validates the refresh token and if valid, it responds back with a new access token.
+<8> The proxy adds the Authorization header with the new access token to the request (5) and passes it to the RP.
+<9> The RP validates the access token on the OAAS and responds back to the proxy.
+<10> The proxy passes the RP’s response to the user-agent and sets cookie with the new access token.
+
+
 == Setup development environment
 
 . Clone this repository:
@@ -182,3 +370,5 @@ These scripts should work on every up-to-date Unix system (tested on OS X, Gento
 
 This project is licensed under http://opensource.org/licenses/MIT/[MIT License].
 For the full text of the license, see the link:LICENSE[LICENSE] file.
+
+This README file is licensed under http://creativecommons.org/licenses/by/4.0[Creative Commons Attribution 4.0 International License].
