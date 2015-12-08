@@ -16,7 +16,7 @@
 set -e
 
 DEFAULT_VERSION='luajit-2.0'
-HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/master/hererocks.py'
+HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/0.2.0/hererocks.py'
 show_path_warn=
 
 
