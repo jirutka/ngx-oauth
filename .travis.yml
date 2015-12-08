@@ -1,7 +1,7 @@
 sudo: false
 # Python is needed for integration tests.
 language: python
-python: 3.5
+python: 3.4
 env:
   global:
     # Travis uses virtualenv by default and venv rejects to install pip,
