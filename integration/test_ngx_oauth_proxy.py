@@ -7,8 +7,11 @@ def test_without_access_and_refresh_tokens(http, rp):
     # When I make a request to the resource provider through the proxy,
     resp = http.get('/_proxy/ping')
 
-    # then the response status should be 401.
+    # then the response status should be 401,
     assert resp.status_code == 401
+
+    # and the response should contain the WWW-Authenticate header.
+    assert resp.headers['WWW-Authenticate'] == 'Bearer error="unauthorized"'
 
 
 @logged_in
@@ -30,7 +33,7 @@ def test_refresh_token(http, rp):
     # When I make a request to the resource provider through the proxy,
     resp = http.get('/_proxy/ping')
 
-    # then I should get response from the resource provider.
+    # then I should get response from the resource provider,
     assert resp.status_code == 200
     assert resp.json()['pong'] == 'ok'
 
