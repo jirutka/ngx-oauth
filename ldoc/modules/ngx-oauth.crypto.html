@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ngx-oauth docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ngx-oauth</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="$(kind=='Topics' and '' or 'nowrap'">
+  <li><a href="../modules/ngx-oauth-login.html">ngx-oauth-login</a></li>
+  <li><a href="../modules/ngx-oauth-logout.html">ngx-oauth-logout</a></li>
+  <li><a href="../modules/ngx-oauth-proxy.html">ngx-oauth-proxy</a></li>
+  <li><a href="../modules/ngx-oauth-redirect-handler.html">ngx-oauth-redirect-handler</a></li>
+  <li><a href="../modules/ngx-oauth.Cookies.html">ngx-oauth.Cookies</a></li>
+  <li><a href="../modules/ngx-oauth.config.html">ngx-oauth.config</a></li>
+  <li><strong>ngx-oauth.crypto</strong></li>
+  <li><a href="../modules/ngx-oauth.either.html">ngx-oauth.either</a></li>
+  <li><a href="../modules/ngx-oauth.http_client.html">ngx-oauth.http_client</a></li>
+  <li><a href="../modules/ngx-oauth.nginx.html">ngx-oauth.nginx</a></li>
+  <li><a href="../modules/ngx-oauth.oauth2.html">ngx-oauth.oauth2</a></li>
+  <li><a href="../modules/ngx-oauth.util.html">ngx-oauth.util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ngx-oauth.crypto</code></h1>
+<p>Cryptographic utilities.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#encrypt">encrypt (bits, key, value)</a></td>
+	<td class="summary">Encrypts the given string using AES.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#decrypt">decrypt (bits, key, value)</a></td>
+	<td class="summary">Decrypts the given value using AES.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "encrypt"></a>
+    <strong>encrypt (bits, key, value)</strong>
+    </dt>
+    <dd>
+    Encrypts the given string using AES.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">bits</span>
+            <span class="types"><span class="type">int</span></span>
+         The AES block size in bits: 128, 192, or 256.
+        </li>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The secret key to use for encryption. It must be greater
+   or equal than <code>bits / 8</code>.
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The string to encrypt.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        A pair of IV and encrypted string encoded in Base64.
+    </ol>
+
+    <h3>Raises:</h3>
+    If the specified key length (<code>bits</code>) is not supported or the <code>key</code>
+   is too short.
+
+
+
+</dd>
+    <dt>
+    <a name = "decrypt"></a>
+    <strong>decrypt (bits, key, value)</strong>
+    </dt>
+    <dd>
+    Decrypts the given value using AES.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">bits</span>
+            <span class="types"><span class="type">int</span></span>
+         The AES block size in bits: 128, 192, or 256.
+        </li>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The secret key to use for decryption. It must be greater
+   or equal than <code>bits / 8</code>.
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The pair of IV and encrypted string encoded in Base64.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">nil</span></span>
+        A decrypted string, or nil if the <code>value</code> is malformed
+   or cannot be decrypted with the given key.
+    </ol>
+
+    <h3>Raises:</h3>
+    If the specified key length (<code>bits</code>) is not supported or the <code>key</code>
+   is too short.
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
+
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

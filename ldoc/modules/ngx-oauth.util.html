@@ -1,0 +1,590 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ngx-oauth docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ngx-oauth</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="$(kind=='Topics' and '' or 'nowrap'">
+  <li><a href="../modules/ngx-oauth-login.html">ngx-oauth-login</a></li>
+  <li><a href="../modules/ngx-oauth-logout.html">ngx-oauth-logout</a></li>
+  <li><a href="../modules/ngx-oauth-proxy.html">ngx-oauth-proxy</a></li>
+  <li><a href="../modules/ngx-oauth-redirect-handler.html">ngx-oauth-redirect-handler</a></li>
+  <li><a href="../modules/ngx-oauth.Cookies.html">ngx-oauth.Cookies</a></li>
+  <li><a href="../modules/ngx-oauth.config.html">ngx-oauth.config</a></li>
+  <li><a href="../modules/ngx-oauth.crypto.html">ngx-oauth.crypto</a></li>
+  <li><a href="../modules/ngx-oauth.either.html">ngx-oauth.either</a></li>
+  <li><a href="../modules/ngx-oauth.http_client.html">ngx-oauth.http_client</a></li>
+  <li><a href="../modules/ngx-oauth.nginx.html">ngx-oauth.nginx</a></li>
+  <li><a href="../modules/ngx-oauth.oauth2.html">ngx-oauth.oauth2</a></li>
+  <li><strong>ngx-oauth.util</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ngx-oauth.util</code></h1>
+<p>General utility functions.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#concat">concat (...)</a></td>
+	<td class="summary">Returns a new table with items concatenated from the given tables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#contains">contains (item, tab)</a></td>
+	<td class="summary">Returns true if the table <code>tab</code> contains the specified <code>item</code>; otherwise
+ returns false.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#default">default (value, default_value)</a></td>
+	<td class="summary">Returns the <code>value</code> if not nil or empty, otherwise returns the
+ <code>default_value</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#id">id (value)</a></td>
+	<td class="summary">Returns the given value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_empty">is_empty (value)</a></td>
+	<td class="summary">Returns true if the <code>value</code> is nil or empty string.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_absolute_url">is_absolute_url (value)</a></td>
+	<td class="summary">Returns true if the <code>value</code> starts with <code>https://</code> or <code>http://</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#map">map (func, tab)</a></td>
+	<td class="summary">Returns a new table with the results of running <code>func(value, key)</code> once
+ for every key-value pair in the <code>tab</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#imap">imap (func, tab)</a></td>
+	<td class="summary">Returns a new table with the results of running <code>func(value, index)</code> once
+ for every item in the <code>tab</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#merge">merge (...)</a></td>
+	<td class="summary">Returns a new table containing the contents of all the given tables.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mtype">mtype (value)</a></td>
+	<td class="summary">Returns type of the given value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#partial">partial (func, ...)</a></td>
+	<td class="summary">Partial application.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pipe">pipe (...)</a></td>
+	<td class="summary">Performs left-to-right function composition.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#starts_with">starts_with (prefix, str)</a></td>
+	<td class="summary">Returns true if the string <code>str</code> starts with the <code>prefix</code>.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unless">unless (pred, when_false, value)</a></td>
+	<td class="summary">Returns the result of calling <code>when_false</code> with the <code>value</code> if <code>pred</code>
+ function returns falsy for the <code>value</code>; otherwise returns the <code>value</code> as is.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "concat"></a>
+    <strong>concat (...)</strong>
+    </dt>
+    <dd>
+    Returns a new table with items concatenated from the given tables.
+ Tables are iterated using <a href="http://www.lua.org/manual/5.1/manual.html#pdf-ipairs">ipairs</a>, so this function is intended for tables
+ that represent <em>indexed arrays</em>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">{table,...}</a></span>
+         The tables to concatenate.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        A new table.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/ngx-oauth.util.html#merge">merge</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "contains"></a>
+    <strong>contains (item, tab)</strong>
+    </dt>
+    <dd>
+    Returns true if the table <code>tab</code> contains the specified <code>item</code>; otherwise
+ returns false.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">item</span>
+         The item to search.
+        </li>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         The table to test.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Whether the <code>tab</code> contains the <code>item</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "default"></a>
+    <strong>default (value, default_value)</strong>
+    </dt>
+    <dd>
+    Returns the <code>value</code> if not nil or empty, otherwise returns the
+ <code>default_value</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+
+
+
+        </li>
+        <li><span class="parameter">default_value</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "id"></a>
+    <strong>id (value)</strong>
+    </dt>
+    <dd>
+    Returns the given value.  That's it, this is an identity function.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_empty"></a>
+    <strong>is_empty (value)</strong>
+    </dt>
+    <dd>
+    Returns true if the <code>value</code> is nil or empty string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_absolute_url"></a>
+    <strong>is_absolute_url (value)</strong>
+    </dt>
+    <dd>
+    Returns true if the <code>value</code> starts with <code>https://</code> or <code>http://</code>.  This is
+ very simplified test, but it's good enough and efficient for our needs.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "map"></a>
+    <strong>map (func, tab)</strong>
+    </dt>
+    <dd>
+    Returns a new table with the results of running <code>func(value, key)</code> once
+ for every key-value pair in the <code>tab</code>.  Tables are iterated using <a href="http://www.lua.org/manual/5.1/manual.html#pdf-pairs">pairs</a>,
+ so this function is intended for tables that represent <em>associative arrays</em>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         The function that accepts at least one argument and
+   returns a value.
+        </li>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         The table to map over.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        A new table.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/ngx-oauth.util.html#imap">imap</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "imap"></a>
+    <strong>imap (func, tab)</strong>
+    </dt>
+    <dd>
+    Returns a new table with the results of running <code>func(value, index)</code> once
+ for every item in the <code>tab</code>.  Tables are iterated using <a href="http://www.lua.org/manual/5.1/manual.html#pdf-ipairs">ipairs</a>, so this
+ function is intended for tables that represent <em>indexed arrays</em>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         The function that accepts at least one argument and
+   returns a value.
+        </li>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         The table to map over.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        A new table.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/ngx-oauth.util.html#map">map</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "merge"></a>
+    <strong>merge (...)</strong>
+    </dt>
+    <dd>
+    Returns a new table containing the contents of all the given tables.
+ Tables are iterated using <a href="http://www.lua.org/manual/5.1/manual.html#pdf-pairs">pairs</a>, so this function is intended for tables
+ that represent <em>associative arrays</em>. Entries with duplicate keys are
+ overwritten with the values from a later table.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">{table,...}</a></span>
+         The tables to merge.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+        A new table.
+    </ol>
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/ngx-oauth.util.html#concat">concat</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "mtype"></a>
+    <strong>mtype (value)</strong>
+    </dt>
+    <dd>
+    Returns type of the given value.  If <code>value</code> has a metatable with key
+ <code>__type</code>, then returns its value; otherwise returns Lua's raw type.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        A type of the <code>value</code>.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "partial"></a>
+    <strong>partial (func, ...)</strong>
+    </dt>
+    <dd>
+    Partial application.
+ Takes a function <code>func</code> and arguments, and returns a function <em>func2</em>.
+ When applied, <em>func2</em> returns the result of applying <code>func</code> to the arguments
+ provided initially followed by the arguments provided to <em>func2</em>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+         Arguments to pass to the <code>func</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">func</span></span>
+        A partially applied function.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pipe"></a>
+    <strong>pipe (...)</strong>
+    </dt>
+    <dd>
+    Performs left-to-right function composition.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">...</span>
+            <span class="types"><span class="type">{function,...}</span></span>
+         The functions to compose; as multiple arguments,
+   or in a single table.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">function</span></span>
+        A composition of the given functions.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "starts_with"></a>
+    <strong>starts_with (prefix, str)</strong>
+    </dt>
+    <dd>
+    Returns true if the string <code>str</code> starts with the <code>prefix</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">str</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+
+
+
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unless"></a>
+    <strong>unless (pred, when_false, value)</strong>
+    </dt>
+    <dd>
+    Returns the result of calling <code>when_false</code> with the <code>value</code> if <code>pred</code>
+ function returns falsy for the <code>value</code>; otherwise returns the <code>value</code> as is.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pred</span>
+            <span class="types"><span class="type">function</span></span>
+         The predicate function.
+        </li>
+        <li><span class="parameter">when_false</span>
+            <span class="types"><span class="type">function</span></span>
+         The function to invoke when the <code>pred</code> evaluates
+   to a falsy value.
+        </li>
+        <li><span class="parameter">value</span>
+         The value to test with the <code>pred</code> function and pass to the
+   <code>when_false</code> if necessary.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        The <code>value</code>, or the result of applying <code>value</code> to <code>when_false</code>.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
+
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

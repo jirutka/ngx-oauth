@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ngx-oauth docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ngx-oauth</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="$(kind=='Topics' and '' or 'nowrap'">
+  <li><a href="../modules/ngx-oauth-login.html">ngx-oauth-login</a></li>
+  <li><a href="../modules/ngx-oauth-logout.html">ngx-oauth-logout</a></li>
+  <li><a href="../modules/ngx-oauth-proxy.html">ngx-oauth-proxy</a></li>
+  <li><a href="../modules/ngx-oauth-redirect-handler.html">ngx-oauth-redirect-handler</a></li>
+  <li><a href="../modules/ngx-oauth.Cookies.html">ngx-oauth.Cookies</a></li>
+  <li><a href="../modules/ngx-oauth.config.html">ngx-oauth.config</a></li>
+  <li><a href="../modules/ngx-oauth.crypto.html">ngx-oauth.crypto</a></li>
+  <li><a href="../modules/ngx-oauth.either.html">ngx-oauth.either</a></li>
+  <li><strong>ngx-oauth.http_client</strong></li>
+  <li><a href="../modules/ngx-oauth.nginx.html">ngx-oauth.nginx</a></li>
+  <li><a href="../modules/ngx-oauth.oauth2.html">ngx-oauth.oauth2</a></li>
+  <li><a href="../modules/ngx-oauth.util.html">ngx-oauth.util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ngx-oauth.http_client</code></h1>
+<p>Adapter for HTTP client.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#request">request (method, headers, url, body)</a></td>
+	<td class="summary">Sends an HTTP request and returns a response.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#request_json">request_json (method, headers, url, body)</a></td>
+	<td class="summary">Sends an HTTP request and returns a parsed JSON body (wrapped in <code>Right</code>)
+ if response status is 200; otherwise returns an error message (wrapped
+ in <code>Left</code>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_for_json">get_for_json (url, bearer_token)</a></td>
+	<td class="summary">Sends an HTTP GET request with optional Bearer token (OAuth 2.0 access
+ token) and returns a parsed JSON body (wrapped in <code>Right</code>) if response
+ status is 200; otherwise returns an error message (wrapped in <code>Left</code>).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#post_form_for_json">post_form_for_json (headers, url, form_data)</a></td>
+	<td class="summary">Sends an HTTP POST request with body encoded as <code>x-www-form-urlencoded</code>
+ and returns a parsed JSON body (wrapped in <code>Right</code>) if response status is
+ 200; otherwise returns an error message (wrapped in <code>Left</code>).</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "request"></a>
+    <strong>request (method, headers, url, body)</strong>
+    </dt>
+    <dd>
+
+<p>Sends an HTTP request and returns a response. </p>
+
+<p> If the request is successful, response wrapped in <code>Right</code> will contain the
+ following fields:</p>
+
+<ul>
+    <li>status: The status code.</li>
+    <li>headers: A table of headers.</li>
+    <li>body: The response body as a string.</li>
+</ul>
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">method</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The HTTP method (e.g. GET, POST, HEAD, ...).
+        </li>
+        <li><span class="parameter">headers</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">{[string]=string,...}</a></span>
+         The request's headers.
+        </li>
+        <li><span class="parameter">url</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The request's URL.
+        </li>
+        <li><span class="parameter">body</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The request's body as string.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Either</span></span>
+        <a href="../modules/ngx-oauth.either.html#Right">Right</a> with a response, or
+   <a href="../modules/ngx-oauth.either.html#Left">Left</a> with an error message.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "request_json"></a>
+    <strong>request_json (method, headers, url, body)</strong>
+    </dt>
+    <dd>
+    Sends an HTTP request and returns a parsed JSON body (wrapped in <code>Right</code>)
+ if response status is 200; otherwise returns an error message (wrapped
+ in <code>Left</code>).  This method accepts the same arguments as <a href="../modules/ngx-oauth.http_client.html#request">request</a>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">method</span>
+
+
+
+        </li>
+        <li><span class="parameter">headers</span>
+
+
+
+        </li>
+        <li><span class="parameter">url</span>
+
+
+
+        </li>
+        <li><span class="parameter">body</span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Either</span></span>
+        <a href="../modules/ngx-oauth.either.html#Right">Right</a> with parsed JSON body in a table, or
+   <a href="../modules/ngx-oauth.either.html#Left">Left</a> with an error message.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_for_json"></a>
+    <strong>get_for_json (url, bearer_token)</strong>
+    </dt>
+    <dd>
+    Sends an HTTP GET request with optional Bearer token (OAuth 2.0 access
+ token) and returns a parsed JSON body (wrapped in <code>Right</code>) if response
+ status is 200; otherwise returns an error message (wrapped in <code>Left</code>).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">url</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The request's URL.
+        </li>
+        <li><span class="parameter">bearer_token</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The Bearer token to be added into
+ <code>Authorization</code> header.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Either</span></span>
+        <a href="../modules/ngx-oauth.either.html#Right">Right</a> with parsed JSON body in a table, or
+   <a href="../modules/ngx-oauth.either.html#Left">Left</a> with an error message.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "post_form_for_json"></a>
+    <strong>post_form_for_json (headers, url, form_data)</strong>
+    </dt>
+    <dd>
+    Sends an HTTP POST request with body encoded as <code>x-www-form-urlencoded</code>
+ and returns a parsed JSON body (wrapped in <code>Right</code>) if response status is
+ 200; otherwise returns an error message (wrapped in <code>Left</code>).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">headers</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">{[string]=string,...}</a></span>
+         The request's headers.
+        </li>
+        <li><span class="parameter">url</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The request's URL.
+        </li>
+        <li><span class="parameter">form_data</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">{[string]=string,...}</a></span>
+         The form data as a table.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Either</span></span>
+        <a href="../modules/ngx-oauth.either.html#Right">Right</a> with parsed JSON body in a table, or
+   <a href="../modules/ngx-oauth.either.html#Left">Left</a> with an error message.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
+
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

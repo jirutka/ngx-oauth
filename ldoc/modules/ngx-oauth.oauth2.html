@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ngx-oauth docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ngx-oauth</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="$(kind=='Topics' and '' or 'nowrap'">
+  <li><a href="../modules/ngx-oauth-login.html">ngx-oauth-login</a></li>
+  <li><a href="../modules/ngx-oauth-logout.html">ngx-oauth-logout</a></li>
+  <li><a href="../modules/ngx-oauth-proxy.html">ngx-oauth-proxy</a></li>
+  <li><a href="../modules/ngx-oauth-redirect-handler.html">ngx-oauth-redirect-handler</a></li>
+  <li><a href="../modules/ngx-oauth.Cookies.html">ngx-oauth.Cookies</a></li>
+  <li><a href="../modules/ngx-oauth.config.html">ngx-oauth.config</a></li>
+  <li><a href="../modules/ngx-oauth.crypto.html">ngx-oauth.crypto</a></li>
+  <li><a href="../modules/ngx-oauth.either.html">ngx-oauth.either</a></li>
+  <li><a href="../modules/ngx-oauth.http_client.html">ngx-oauth.http_client</a></li>
+  <li><a href="../modules/ngx-oauth.nginx.html">ngx-oauth.nginx</a></li>
+  <li><strong>ngx-oauth.oauth2</strong></li>
+  <li><a href="../modules/ngx-oauth.util.html">ngx-oauth.util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ngx-oauth.oauth2</code></h1>
+<p>Module for OAuth 2.0 authorization.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#authorization_url">authorization_url (conf, state)</a></td>
+	<td class="summary">Builds an authorization URL for initiation of the authorization code flow.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#request_token">request_token (grant_type, conf, value)</a></td>
+	<td class="summary">Requests an access token from the authorization server.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "authorization_url"></a>
+    <strong>authorization_url (conf, state)</strong>
+    </dt>
+    <dd>
+    Builds an authorization URL for initiation of the authorization code flow.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">conf</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         The configuration (see <a href="../modules/ngx-oauth.config.html#">ngx-oauth.config</a>).
+        </li>
+        <li><span class="parameter">state</span>
+            <span class="types">optional <a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The state parameter.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        An URL.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "request_token"></a>
+    <strong>request_token (grant_type, conf, value)</strong>
+    </dt>
+    <dd>
+    Requests an access token from the authorization server.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">grant_type</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The authorization grant to use;
+   <code>authorization_code</code>, <code>refresh_token</code>, or <code>client_credentials</code>.
+        </li>
+        <li><span class="parameter">conf</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         The configuration (see <a href="../modules/ngx-oauth.config.html#">ngx-oauth.config</a>).
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The authorization code, refresh token, or nil; depends
+   on the <code>grant_type</code>.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Either</span></span>
+        <a href="../modules/ngx-oauth.either.html#Right">Right</a> with parsed token response as a table,
+   or <a href="../modules/ngx-oauth.either.html#Left">Left</a> with an error message.
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
+
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

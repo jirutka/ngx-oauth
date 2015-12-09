@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>ngx-oauth docs</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ngx-oauth</h1>
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="$(kind=='Topics' and '' or 'nowrap'">
+  <li><a href="../modules/ngx-oauth-login.html">ngx-oauth-login</a></li>
+  <li><a href="../modules/ngx-oauth-logout.html">ngx-oauth-logout</a></li>
+  <li><a href="../modules/ngx-oauth-proxy.html">ngx-oauth-proxy</a></li>
+  <li><a href="../modules/ngx-oauth-redirect-handler.html">ngx-oauth-redirect-handler</a></li>
+  <li><a href="../modules/ngx-oauth.Cookies.html">ngx-oauth.Cookies</a></li>
+  <li><a href="../modules/ngx-oauth.config.html">ngx-oauth.config</a></li>
+  <li><a href="../modules/ngx-oauth.crypto.html">ngx-oauth.crypto</a></li>
+  <li><a href="../modules/ngx-oauth.either.html">ngx-oauth.either</a></li>
+  <li><a href="../modules/ngx-oauth.http_client.html">ngx-oauth.http_client</a></li>
+  <li><strong>ngx-oauth.nginx</strong></li>
+  <li><a href="../modules/ngx-oauth.oauth2.html">ngx-oauth.oauth2</a></li>
+  <li><a href="../modules/ngx-oauth.util.html">ngx-oauth.util</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ngx-oauth.nginx</code></h1>
+<p>Utilities for nginx.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#add_response_cookies">add_response_cookies (cookies)</a></td>
+	<td class="summary">Adds table of cookies to the response's <code>Set-Cookie</code> header.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#fail">fail (status, message, ...)</a></td>
+	<td class="summary">Interrupts execution of the current request for a failure.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#format_cookie">format_cookie (name, value, attrs)</a></td>
+	<td class="summary">Formats HTTP cookie from the given arguments.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_cookie">get_cookie (name)</a></td>
+	<td class="summary">Returns URI-decoded value of the specified request's cookie.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#get_uri_arg">get_uri_arg (name)</a></td>
+	<td class="summary">Returns URI-decoded value of the specified request's URI argument
+ (query parameter).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#log">log (level, message, ...)</a></td>
+	<td class="summary">Logs the given (formatted) <code>message</code> on the specified logging <code>level</code>.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "add_response_cookies"></a>
+    <strong>add_response_cookies (cookies)</strong>
+    </dt>
+    <dd>
+    Adds table of cookies to the response's <code>Set-Cookie</code> header.  If the header
+ is already set, then the new cookies are appended to the existing ones.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cookies</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">{string,...}</a></span>
+         The cookies to append.
+        </li>
+    </ul>
+
+
+
+    <h3>See also:</h3>
+    <ul>
+         <a href="../modules/ngx-oauth.nginx.html#format_cookie">format_cookie</a>
+    </ul>
+
+
+</dd>
+    <dt>
+    <a name = "fail"></a>
+    <strong>fail (status, message, ...)</strong>
+    </dt>
+    <dd>
+
+<p>Interrupts execution of the current request for a failure. </p>
+
+<ol>
+    <li><p>Logs the given error message with level <code>ngx.WARN</code>, if the <code>status</code> is
+    less than 500, or <code>ngx.ERR</code> otherwise.</p></li>
+    <li><p>Sends response with the specified HTTP status and JSON body:</p>
+<pre><code>{ "message": "The error message" }
+</code></pre></li>
+</ol>
+
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">status</span>
+            <span class="types"><span class="type">int</span></span>
+         The HTTP status code to send.
+        </li>
+        <li><span class="parameter">message</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The error message to log and send.
+        </li>
+        <li><span class="parameter">...</span>
+         Arguments for <a href="http://www.lua.org/manual/5.1/manual.html#pdf-string.format">string.format</a> being applied to <code>message</code>. Nil
+   values are replaced with <code>#nil</code>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "format_cookie"></a>
+    <strong>format_cookie (name, value, attrs)</strong>
+    </dt>
+    <dd>
+    Formats HTTP cookie from the given arguments.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">value</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">attrs</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">{[string]=string,...}</a></span>
+         The cookie's attributes. Underscores in
+   the attribute name are implicitly replaced with dashes.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        A cookie string.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_cookie"></a>
+    <strong>get_cookie (name)</strong>
+    </dt>
+    <dd>
+    Returns URI-decoded value of the specified request's cookie.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The name of the cookie to get.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">nil</span></span>
+        The cookie's value, or nil if doesn't exist.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "get_uri_arg"></a>
+    <strong>get_uri_arg (name)</strong>
+    </dt>
+    <dd>
+    Returns URI-decoded value of the specified request's URI argument
+ (query parameter).
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The name of the argument to get.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a> or <span class="type">nil</span></span>
+        The argument's value, or nil if doesn't exist.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "log"></a>
+    <strong>log (level, message, ...)</strong>
+    </dt>
+    <dd>
+    Logs the given (formatted) <code>message</code> on the specified logging <code>level</code>.
+ There are 8 levels defined by ngx's constants (you can find list of them
+ <a href="https://github.com/openresty/lua-nginx-module/#nginx-log-level-constants">here</a>).</p>
+
+<p> This module also defines convenient functions for most common levels:
+ <code>log.err()</code>, <code>log.warn()</code>, <code>log.info()</code>, and <code>log.debug()</code>.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">level</span>
+            <span class="types"><span class="type">int</span></span>
+         The logging level (0-8).
+        </li>
+        <li><span class="parameter">message</span>
+            <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+
+
+
+        </li>
+        <li><span class="parameter">...</span>
+         Arguments for <a href="http://www.lua.org/manual/5.1/manual.html#pdf-string.format">string.format</a> being applied to <code>message</code>. Nil
+   values are replaced with <code>#nil</code>.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
+
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
