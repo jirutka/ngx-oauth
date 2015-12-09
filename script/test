@@ -23,9 +23,9 @@ source script/common.sh
 setup-path
 script/bootstrap
 
-echo -e '\n==> Running unit tests...'
+einfo '==> Running unit tests...'
 busted --shuffle --verbose --coverage
 report-coverage
 
-echo -e '\n==> Running linter...'
+einfo '==> Running linter...'
 luacheck src/*

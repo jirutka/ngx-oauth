@@ -12,7 +12,7 @@ source script/common.sh
 setup-path
 script/bootstrap-full
 
-echo -e '\n==> Running integration tests...'
+einfo '==> Running integration tests...'
 export TEMP_DIR
 cd integration
 py.test -v

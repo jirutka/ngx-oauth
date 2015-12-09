@@ -49,7 +49,7 @@ if [ -d "$pyenv_dir" ]; then
 	install-requirements -q
 
 elif yesno "$USE_PYTHON_VENV"; then
-	echo -e '\n==> Initializing Python virtual environment and installing modules...'
+	einfo '==> Initializing Python virtual environment and installing modules...'
 
 	"$PYTHON" -m venv "$pyenv_dir"
 	export PATH="$pyenv_dir/bin:$PATH"
@@ -59,7 +59,7 @@ elif yesno "$USE_PYTHON_VENV"; then
 	ln -sf "$pyenv_dir"/bin/* "$VENV_DIR"/bin/
 
 else
-	echo -e '\n==> Installing Python modules...'
+	einfo '==> Installing Python modules...'
 
 	install-requirements
 fi

@@ -43,7 +43,7 @@ download() {
 	local url
 
 	for url in "$NGINX_URI" "$NGINX_LUA_URI" "$NGINX_DEVKIT_URI" "$PCRE_URI"; do
-		echo -e "\nDownloading $url:"
+		einfo "Downloading $url:"
 		curl -L "$url" | tar -xz
 	done
 }
@@ -106,7 +106,7 @@ if yesno "$USE_SYSTEM_NGINX"; then
 	done
 
 elif [ ! -x "$VENV_DIR/bin/nginx" ]; then
-	echo -e '\n==> Installing nginx...'
+	einfo '==> Installing nginx...'
 
 	[ -x "$VENV_DIR/bin/lua" ] || die "$VENV_DIR/bin/lua does not exist or not executable"
 
