@@ -8,7 +8,7 @@
 #   NGINX_LUA_VERSION : Version of lua-nginx-module to compile nginx with.
 #   USE_SYSTEM_NGINX  : Set to 'yes' if you want to use system provided nginx. Default is to
 #                       build and install nginx locally in .env directory.
-set -e
+set -e -o pipefail
 
 NGINX_VERSION=${NGINX_VERSION:-1.9.7}
 NGINX_URI="http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz"

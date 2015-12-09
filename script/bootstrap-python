@@ -8,7 +8,7 @@
 #   PYTHON          : Python executable to use (default is python3 or python on PATH).
 #   USE_PYTHON_VENV : Set to 'no' if you don't want to initialize venv for modules.
 #
-set -e
+set -e -o pipefail
 
 : ${USE_PYTHON_VENV:=yes}
 

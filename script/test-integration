@@ -3,7 +3,7 @@
 #
 # Runs integration tests.
 #
-set -e
+set -e -o pipefail
 
 # Go to the project's root directory.
 cd "$(dirname "$0")/.."

@@ -13,7 +13,7 @@
 #
 #   USE_SYSTEM_LUA : Set to 'yes' if you want to use system provided lua. Default is to install
 #                    lua locally in .env directory.
-set -e
+set -e -o pipefail
 
 DEFAULT_VERSION='luajit-2.0'
 HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/0.2.0/hererocks.py'

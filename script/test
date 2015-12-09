@@ -3,7 +3,7 @@
 #
 # Runs unit tests and linter.
 #
-set -e
+set -e -o pipefail
 
 #======================  Functions  ======================#
 
