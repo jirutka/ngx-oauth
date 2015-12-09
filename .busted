@@ -3,6 +3,6 @@
 return {
   _all = {
     helper = 'spec/spec_helper',
-    lpath = './src/?.lua;./spec/support/?.lua;'
+    lpath = './lib/?.lua;./spec/support/?.lua;'
   }
 }

@@ -9,7 +9,7 @@ events {
 }
 
 http {
-    lua_package_path '../src/?.lua;;';
+    lua_package_path '../lib/?.lua;;';
 
     server {
         listen ${port} ssl;
@@ -30,19 +30,19 @@ http {
         set $$oauth_success_uri '${success_uri}';
 
         location /_oauth/login {
-            content_by_lua_file '../src/ngx-oauth-login.lua';
+            content_by_lua_file '../lib/ngx-oauth-login.lua';
         }
 
         location /_oauth/callback {
-            content_by_lua_file '../src/ngx-oauth-redirect-handler.lua';
+            content_by_lua_file '../lib/ngx-oauth-redirect-handler.lua';
         }
 
         location /_oauth/logout {
-            content_by_lua_file '../src/ngx-oauth-logout.lua';
+            content_by_lua_file '../lib/ngx-oauth-logout.lua';
         }
 
         location /_proxy/ {
-            access_by_lua_file '../src/ngx-oauth-proxy.lua';
+            access_by_lua_file '../lib/ngx-oauth-proxy.lua';
 
             rewrite ^/_proxy/(.*)$$ /$$1 break;
             proxy_pass ${rp_base_uri};

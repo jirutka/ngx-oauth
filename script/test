@@ -28,4 +28,4 @@ busted --shuffle --verbose --coverage
 report-coverage
 
 einfo '==> Running linter...'
-luacheck src/*
+luacheck lib/*

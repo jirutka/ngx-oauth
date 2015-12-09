@@ -3,6 +3,6 @@
 project = 'ngx-oauth'
 title   = 'ngx-oauth docs'
 package = 'ngx-oauth'
-file    = 'src'
+file    = 'lib'
 dir     = 'doc'
 format  = 'markdown'

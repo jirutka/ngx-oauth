@@ -25,21 +25,21 @@ dependencies = {
 build = {
   type = 'builtin',
   modules = {
-    ['ngx-oauth.config']      = 'src/ngx-oauth/config.lua',
-    ['ngx-oauth.Cookies']     = 'src/ngx-oauth/Cookies.lua',
-    ['ngx-oauth.crypto']      = 'src/ngx-oauth/crypto.lua',
-    ['ngx-oauth.either']      = 'src/ngx-oauth/either.lua',
-    ['ngx-oauth.http_client'] = 'src/ngx-oauth/http_client.lua',
-    ['ngx-oauth.nginx']       = 'src/ngx-oauth/nginx.lua',
-    ['ngx-oauth.oauth2']      = 'src/ngx-oauth/oauth2.lua',
-    ['ngx-oauth.util']        = 'src/ngx-oauth/util.lua'
+    ['ngx-oauth.config']      = 'lib/ngx-oauth/config.lua',
+    ['ngx-oauth.Cookies']     = 'lib/ngx-oauth/Cookies.lua',
+    ['ngx-oauth.crypto']      = 'lib/ngx-oauth/crypto.lua',
+    ['ngx-oauth.either']      = 'lib/ngx-oauth/either.lua',
+    ['ngx-oauth.http_client'] = 'lib/ngx-oauth/http_client.lua',
+    ['ngx-oauth.nginx']       = 'lib/ngx-oauth/nginx.lua',
+    ['ngx-oauth.oauth2']      = 'lib/ngx-oauth/oauth2.lua',
+    ['ngx-oauth.util']        = 'lib/ngx-oauth/util.lua'
   },
   install = {
     lua = {
-      'src/ngx-oauth-login.lua',
-      'src/ngx-oauth-logout.lua',
-      'src/ngx-oauth-proxy.lua',
-      'src/ngx-oauth-redirect-handler.lua'
+      'lib/ngx-oauth-login.lua',
+      'lib/ngx-oauth-logout.lua',
+      'lib/ngx-oauth-proxy.lua',
+      'lib/ngx-oauth-redirect-handler.lua'
     }
   },
   copy_directories = { 'spec' }
