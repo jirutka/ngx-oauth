@@ -4,6 +4,7 @@ Jakub Jirutka <https://github.com/jirutka[@jirutka]>
 :gh-name: jirutka/ngx-oauth
 :gh-branch: master
 :gh-url: https://github.com
+:ldoc-url: http://jirutka.github.io/ngx-oauth/ldoc/
 :rocks-url: https://luarocks.org/modules
 :rfc6749: http://tools.ietf.org/html/rfc6749
 :rfc6265: http://tools.ietf.org/html/rfc6265
@@ -12,6 +13,7 @@ Jakub Jirutka <https://github.com/jirutka[@jirutka]>
 ifdef::env-github[]
 image:https://travis-ci.org/{gh-name}.svg?branch={gh-branch}["Build Status", link="https://travis-ci.org/{gh-name}"]
 image:https://coveralls.io/repos/{gh-name}/badge.svg?branch={gh-branch}&service=github["Coverage Status", link="https://coveralls.io/github/{gh-name}?branch={gh-branch}"]
+image:https://img.shields.io/badge/ldoc-docs-blue.svg["LDoc", link="{ldoc-url}"]
 endif::env-github[]
 
 TBD
