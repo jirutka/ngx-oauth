@@ -4,7 +4,7 @@ Jakub Jirutka <https://github.com/jirutka[@jirutka]>
 :gh-name: jirutka/ngx-oauth
 :gh-branch: master
 :gh-url: https://github.com
-:ldoc-url: http://jirutka.github.io/ngx-oauth/ldoc/
+:ldoc-url: https://jirutka.github.io/ngx-oauth/ldoc/
 :rocks-url: https://luarocks.org/modules
 :rfc6749: http://tools.ietf.org/html/rfc6749
 :rfc6265: http://tools.ietf.org/html/rfc6265
