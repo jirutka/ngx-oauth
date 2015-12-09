@@ -1,0 +1,94 @@
+#!/bin/bash
+# vim: set ts=4:
+#
+# Generate docs using ldoc and deploy them to gh-pages branch in the repository.
+#
+set -e -o pipefail
+
+DEPLOY_BRANCH='gh-pages'
+SOURCE_BRANCH='master'
+
+if [ -n "$TRAVIS" ]; then
+	export GIT_COMMITTER_NAME='Travis CI'
+fi
+
+
+#======================  Functions  ======================#
+
+shield() {
+	if [ -n "$GH_TOKEN" ]; then
+		eval $@ 2>&1 | sed "s/${GH_TOKEN}/*****/g"
+	else
+		eval $@
+	fi
+}
+
+has_changes() {
+	[ -n "$(git status --porcelain)" ]
+}
+
+postprocess_docs() {
+	# Remove Last updated timestamp.
+	LANG=C find "$1" -name '*.html' \
+		-exec sed -i.BAK 's/<i style="float:right;">Last updated.*//' {} \; \
+		-exec rm {}.BAK \;  # sed -i behaves differently on BSD and GNU...
+}
+
+remote_origin_url() {
+	if [ -n "$GH_TOKEN" ]; then
+		git config remote.origin.url \
+			| sed 's|^git:|https:|' \
+			| sed "s|^https://|https://${GH_TOKEN}@|"
+	else
+		git config remote.origin.url
+	fi
+}
+
+skip_push() {
+	[ -n "$TRAVIS" ] && [[ "$TRAVIS_PULL_REQUEST" != 'false' \
+		|| "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" \
+		|| "$TRAVIS_BUILD_NUMBER.1" != "$TRAVIS_JOB_NUMBER" ]]
+}
+
+
+#========================  Main  =========================#
+
+# Go to the project's root directory.
+cd "$(dirname "$0")/.."
+
+source script/common.sh
+setup-path
+script/bootstrap
+
+einfo '==> Updating ldoc documentation...'
+
+commit_rev="$(git rev-parse --short HEAD)"
+commit_author="$(git log -n 1 --format='%aN <%aE>')"
+commit_date="$(git log -n 1 --format='%aD')"
+remote_url=$(remote_origin_url)
+temp_dir="$(mktemp -q -d "$TEMP_DIR/doc.XXXX")"
+
+shield git clone --progress --branch="$DEPLOY_BRANCH" "$remote_url" "$temp_dir"
+
+# This is needed for cleaning stale files; all docs will be regenerated.
+rm -Rf -- "$temp_dir"/ldoc/*
+
+einfo 'Running ldoc...'
+ldoc --dir "$temp_dir/ldoc" --verbose .
+postprocess_docs "$temp_dir/ldoc"
+
+cd "$temp_dir"
+
+has_changes || { einfo 'No changes'; exit 0; }
+skip_push && { einfo 'Skipping push'; exit 0; }
+
+einfo 'Commiting changes...'
+git add --all
+git commit \
+	--message="Built from $commit_rev" \
+	--author="$commit_author" --date="$commit_date"
+
+einfo 'Pushing changes to repository...'
+shield git push --progress "$remote_url" "${DEPLOY_BRANCH}:${DEPLOY_BRANCH}"
+
+rm -Rf -- "$temp_dir"

@@ -10,6 +10,10 @@ die() {
 	exit ${2:-2}
 }
 
+einfo() {
+	echo -e "\n$@"
+}
+
 exists() {
 	command -v "$1" &>/dev/null
 }

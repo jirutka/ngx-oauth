@@ -7,6 +7,8 @@ env:
     # Travis uses virtualenv by default and venv rejects to install pip,
     # although it should do it (maybe Ubuntu's fault).
     - USE_PYTHON_VENV=no
+    # GH_TOKEN=xxx
+    - secure: hvNcsGjw+KE8boWEZyfMzW81kIl9k7GJPQqL7YhQqD8uNPNJByOScJwQvCI7WsBJfT7nLWqAgBewIXKgSizOoSwTsNG4oRXpgMo+whbQ9rS9nYrhajKlZSRFWJ6cJl+dlHEC5uJB4O789LOpMHfXzdivxKDNeoie9UbGnbW6okgfNwxqDteZTph9DOobt4Nik+5RlBVbiqXQ1cCqzTIJLvO8sTB8ah3kmRYF0mgYuzasxngCslmFOnLzu/e1UDePC427+w93Dkn0L+xxMtxAlv0O3k2Gytcd8Z5aaH2rXhjbqN/hfP+ZC70pK8H9E1n+xWexItEKIc9mYJVknUO46FYua8De1wf3oEiAac8No8IHz16k56y014pFiaWVIIX11qlQtTFGrqmbOxPIroYSfpj3odYEe7Rt1TOWUmN4sk3R0qEpUoIJwAmAIOGpo7eWp0GJjG9R0JbByneXQJI/eLYL+r5aadq7YQwyRcd66BZSwMqzVexfy22l/fpPw7lKQ+7VN9iEBLm/Ueu//cEUJyarFexgOHgz1wIPC0SnVOun3q9E35YpWUiszRoGNZF5ynikkuSObtARwk2YmwHdzb8Q1kEVujtUYVhA83rbS1YwqciPJv37wz9J/dIVtIL4e2VDNZBI318EG9xehQkFi/0/YFruqKjHew0gIvrdHR4=
   matrix:
     - LUA_VERSION=luajit-2.0
     - LUA_VERSION=luajit-2.1
@@ -24,5 +26,6 @@ install:
 script:
   - script/test
   - script/test-integration
-after_success: |
-  [ "$LUA_VERSION" = 'lua-5.1' ] && luacov-coveralls
+after_success:
+  - '[ "$LUA_VERSION" = "lua-5.1" ] && luacov-coveralls'
+  - script/deploy-docs
