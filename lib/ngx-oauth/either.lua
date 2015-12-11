@@ -67,7 +67,7 @@ local function Right (value)
   --- Returns a `Right` whose value is the result of applying self's value to
   -- the given Right's value, if it's `Right`; otherwise returns the given `Left`.
   --
-  -- @function Right.map
+  -- @function Right.ap
   -- @tparam Left|Right either
   -- @treturn any
   -- @raise Error if self's value is not a function or if _either_ is not
