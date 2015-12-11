@@ -151,4 +151,10 @@ function M.encase2 (func)
   end
 end
 
-return M
+--- An alias for `either`.
+-- @function __call
+return setmetatable(M, {
+  __call = function(_, ...)
+    return M.either(...)
+  end
+})

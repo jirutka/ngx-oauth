@@ -3,11 +3,10 @@
 
 local config  = require 'ngx-oauth.config'
 local Cookies = require 'ngx-oauth.Cookies'
-local ethr    = require 'ngx-oauth.either'
+local either  = require 'ngx-oauth.either'
 local nginx   = require 'ngx-oauth.nginx'
 local oauth   = require 'ngx-oauth.oauth2'
 
-local either = ethr.either
 local log    = nginx.log
 
 local function write_auth_header (access_token)

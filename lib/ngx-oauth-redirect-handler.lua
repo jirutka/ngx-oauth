@@ -3,7 +3,7 @@
 
 local config  = require 'ngx-oauth.config'
 local Cookies = require 'ngx-oauth.Cookies'
-local ethr    = require 'ngx-oauth.either'
+local either  = require 'ngx-oauth.either'
 local httpc   = require 'ngx-oauth.http_client'
 local nginx   = require 'ngx-oauth.nginx'
 local oauth   = require 'ngx-oauth.oauth2'
@@ -11,7 +11,6 @@ local util    = require 'ngx-oauth.util'
 
 local log     = nginx.log
 local par     = util.partial
-local either  = ethr.either
 
 local fail_with_oaas_error = par(nginx.fail, 503, "Authorization server error: %s")
 local get_or_fail = par(either, fail_with_oaas_error, util.id)

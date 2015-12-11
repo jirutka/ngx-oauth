@@ -1,6 +1,7 @@
 require 'moon.all'
+either_mod = require'ngx-oauth.either'
+import Left, Right, either, encase, encase2 from either_mod
 import mtype from require 'ngx-oauth.util'
-import Left, Right, either, encase, encase2 from require 'ngx-oauth.either'
 
 
 behaves_like_either = (type_func, type_name) ->
@@ -26,6 +27,15 @@ behaves_like_either = (type_func, type_name) ->
   describe 'metatable.__type', ->
     it "is #{type_name}", ->
       assert.same type_name, getmetatable(type_func(42)).__type
+
+
+describe '__call', ->
+  it 'is alias for either', ->
+    onleft, onright, right = ->, ->, Right(42)
+    spy.on(either_mod, 'either')
+
+    either_mod(onleft, onright, right)
+    assert.stub(either_mod.either).called_with(onleft, onright, right)
 
 
 describe 'Left', ->
