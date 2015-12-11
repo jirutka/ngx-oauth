@@ -96,19 +96,19 @@ describe 'either', ->
     it "calls onleft handler with Left's value", ->
       either(onleft, onright, Left(66))
       assert.stub(onleft).called_with(66)
-      assert.stub(onright).not_called()
+      assert.stub(onright).not_called!
 
   context 'given Right', ->
     it "calls onright handler with Right's value", ->
       either(onleft, onright, Right(42))
-      assert.stub(onleft).not_called()
+      assert.stub(onleft).not_called!
       assert.stub(onright).called_with(42)
 
   context 'given neither Left, nor Right', ->
     it 'throws error and does not call any handler', ->
       assert.has_error -> either(->, ->, {})
-      assert.stub(onleft).not_called()
-      assert.stub(onright).not_called()
+      assert.stub(onleft).not_called!
+      assert.stub(onright).not_called!
 
 
 shared_encase = (encase_func) ->
