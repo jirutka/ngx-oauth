@@ -23,8 +23,8 @@ describe '__call', ->
   setup ->
     _G.pairs = spec_helper.sorted_pairs
     export crypto_stub = mock {
-      encrypt: (bits, key, value) -> "~~ENC-#{value}~~"
-      decrypt: (bits, key, value) -> "~~DEC-#{value}~~"
+      encrypt: (bits, key, value) -> string.reverse(value)
+      decrypt: (bits, key, value) -> string.reverse(value)
     }
 
   before_each ->
@@ -45,7 +45,7 @@ describe '__call', ->
       cookies.add_token(tkn)
       assert.same {existing, access_token_cookie(tkn)}, _G.ngx.header['Set-Cookie']
 
-    context 'token with expires_in less than conf.max_age', ->
+    context 'with expires_in less than conf.max_age', ->
       tkn = { access_token: 'acc-token', expires_in: conf.max_age / 2 }
       expected = { access_token_cookie(tkn) }
 
@@ -53,7 +53,7 @@ describe '__call', ->
         cookies.add_token(tkn)
         assert.same expected, _G.ngx.header['Set-Cookie']
 
-    context 'token with expires_in greater than conf.max_age', ->
+    context 'with expires_in greater than conf.max_age', ->
       tkn = { access_token: 'acc-token', expires_in: conf.max_age * 2 }
       expected = { access_token_cookie(tkn, conf.max_age) }
 
@@ -61,11 +61,11 @@ describe '__call', ->
         cookies.add_token(tkn)
         assert.same expected, _G.ngx.header['Set-Cookie']
 
-    context 'token with both access and refresh token', ->
-      tkn = { access_token: 'acc-token', expires_in: conf.max_age / 2, refresh_token: 'ref-token' }
+    context 'with both access and refresh token', ->
+      tkn = { access_token: 'acc-token', expires_in: conf.max_age / 2, refresh_token: 'reftok-123' }
       expected = {
         access_token_cookie(tkn),
-        "#{prefix}refresh_token=~~ENC-#{tkn.refresh_token}~~;max-age=#{conf.max_age};#{cookie_attrs}"
+        "#{prefix}refresh_token=321-kotfer;max-age=#{conf.max_age};#{cookie_attrs}"
       }
 
       it 'writes cookie with access token and encrypted refresh token', ->
@@ -108,10 +108,10 @@ describe '__call', ->
 
     context 'refresh_token cookie exists', ->
       it 'returns decrypted value of the cookie', ->
-        set_cookie "#{prefix}refresh_token", 'token-123'
+        set_cookie "#{prefix}refresh_token", '321-kotfer'
 
-        assert.same '~~DEC-token-123~~', cookies.get_refresh_token()
-        assert.stub(crypto_stub.decrypt).called_with(conf.aes_bits, conf.client_secret, 'token-123')
+        assert.same 'reftok-123', cookies.get_refresh_token()
+        assert.stub(crypto_stub.decrypt).called_with(conf.aes_bits, conf.client_secret, '321-kotfer')
 
     context 'refresh_token cookie does not exist', ->
       it 'returns nil', ->
