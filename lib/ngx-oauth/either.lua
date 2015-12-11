@@ -34,10 +34,13 @@ local function Either (ttype, value)
   })
 end
 
+
+local M = {}
+
 --- Returns a `Left` with the given `value`.
 -- @param value The value of any type to wrap.
 -- @treturn Left
-local function Left (value)
+function M.Left (value)
   local self = Either('Left', value)
 
   --- Returns self.
@@ -61,7 +64,7 @@ end
 --- Returns a `Right` with the given `value`.
 -- @param value The value of any type to wrap.
 -- @treturn Right
-local function Right (value)
+function M.Right (value)
   local self = Either('Right', value)
 
   --- Returns a `Right` whose value is the result of applying self's value to
@@ -87,7 +90,7 @@ local function Right (value)
   -- @tparam function func
   -- @treturn Right
   self.map = function(func)
-    return Right(func(value))
+    return M.Right(func(value))
   end
 
   --- Returns the result of applying the given function to self's value.
@@ -110,7 +113,7 @@ end
 -- @tparam function on_right The Right's handler.
 -- @tparam Left|Right teither
 -- @raise Error when `teither` is not `Left`, nor `Right`.
-local function either (on_left, on_right, teither)
+function M.either (on_left, on_right, teither)
   if mtype(teither) == 'Left' then
     return on_left(teither.value)
 
@@ -128,10 +131,10 @@ end
 -- @tparam function func The function to adapt.
 -- @treturn function An adapted `func` that accepts the same arguments as
 --   `func`, but returns `Left` on an error and `Right` on a success.
-local function encase (func)
+function M.encase (func)
   return function(...)
     local ok, val = pcall(func, ...)
-    return ok and Right(val) or Left(val)
+    return ok and M.Right(val) or M.Left(val)
   end
 end
 
@@ -141,18 +144,11 @@ end
 -- @tparam function func The function to adapt.
 -- @treturn function An adapted `func` that accepts the same arguments as
 --   `func`, but returns `Left` on an error and `Right` on a success.
-local function encase2 (func)
+function M.encase2 (func)
   return function(...)
     local res, err = func(...)
-    return err and Left(err) or Right(res)
+    return err and M.Left(err) or M.Right(res)
   end
 end
 
---- @export
-return {
-  Left = Left,
-  Right = Right,
-  either = either,
-  encase = encase,
-  encase2 = encase2
-}
+return M
