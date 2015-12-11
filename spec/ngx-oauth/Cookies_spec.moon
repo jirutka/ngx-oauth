@@ -73,6 +73,12 @@ describe '__call', ->
         assert.same expected, _G.ngx.header['Set-Cookie']
         assert.stub(crypto_stub.encrypt).called_with(conf.aes_bits, conf.client_secret, tkn.refresh_token)
 
+      context 'when cookie with same refresh token exists', ->
+        it 'does not write new refresh token cookie', ->
+          set_cookie "#{prefix}refresh_token", '321-kotfer'
+          cookies.add_token(tkn)
+          assert.same { access_token_cookie(tkn) }, _G.ngx.header['Set-Cookie']
+
 
   describe 'add_username', ->
     expected = { "#{prefix}username=flynn;max-age=#{conf.max_age};#{cookie_attrs}" }

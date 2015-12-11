@@ -63,7 +63,7 @@ return function (conf, crypto)
     local cookies = {
       create_cookie('access_token', token.access_token, min(token.expires_in, conf.max_age))
     }
-    if token.refresh_token then
+    if token.refresh_token and token.refresh_token ~= self.get_refresh_token() then
       table.insert(cookies,
         create_cookie('refresh_token', encrypt(token.refresh_token), conf.max_age))
     end
