@@ -12,6 +12,14 @@ def OAuthServerMock(config):
     app = Bottle()
     request = LocalRequest()
 
+    token = {
+        'access_token': conf.access_token,
+        'token_type': 'bearer',
+        'refresh_token': conf.refresh_token,
+        'expires_in': 3600,
+        'scope': conf.scope
+    }
+
     @app.get('/')
     def get_root():
         abort(200, 'OK')
@@ -62,13 +70,7 @@ def OAuthServerMock(config):
         if code != conf.auth_code:
             raise OAuthError(400, 'invalid_grant', "Invalid authorization code: %s" % code)
 
-        return {
-            'access_token': conf.access_token,
-            'token_type': 'bearer',
-            'refresh_token': conf.refresh_token,
-            'expires_in': 3600,
-            'scope': conf.scope
-        }
+        return token
 
     def handle_refresh_token():
         refresh_token = request.forms.refresh_token
@@ -76,12 +78,7 @@ def OAuthServerMock(config):
         if refresh_token != conf.refresh_token:
             raise OAuthError(400, 'invalid_grant', "Invalid refresh token: %s" % refresh_token)
 
-        return {
-            'access_token': conf.access_token,
-            'token_type': 'bearer',
-            'expires_in': 3600,
-            'scope': conf.scope
-        }
+        return token
 
     @app.get('/userinfo')
     def get_userinfo():
