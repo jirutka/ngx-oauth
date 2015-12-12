@@ -21,7 +21,7 @@ TBD
 
 == Requirements
 
-* http://nginx.org[nginx] with compiled https://github.com/openresty/lua-nginx-module[Lua module]
+* http://nginx.org[nginx] with compiled https://github.com/openresty/lua-nginx-module[Lua module], or http://openresty.org/#Installation[OpenResty]
 * http://luajit.org[LuaJIT] 2.0+, or http://www.lua.org[Lua] 5.1 (newer versions are not supported by lua-nginx yet)
 * lua-resty-http [{gh-url}/pintsized/lua-resty-http[source]] [{rocks-url}/pintsized/lua-resty-http[LuaRocks]]
 * lua-cjson [{gh-url}/mpx/lua-cjson[source]] [{rocks-url}/luarocks/lua-cjson[LuaRocks]], or luajson [{gh-url}/harningt/luajson[source]] [{rocks-url}/harningt/luajson[LuaRocks]]
