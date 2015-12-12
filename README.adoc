@@ -28,6 +28,50 @@ TBD
 * luaossl [{gh-url}/wahern/luaossl[source]] [{rocks-url}/daurnimator/luaossl[LuaRocks]]
 
 
+== Installation
+
+You can install ngx-oauth and its Lua dependencies (called rocks) using https://luarocks.org[LuaRocks] (the Lua package manager):
+
+    luarocks install ngx-oauth
+
+or to get the latest development version:
+
+    luarocks install --server=http://luarocks.org/dev ngx-oauth
+
+Note: If you want to bootstrap development environment or just try ngx-oauth without any hassle, read section <<Setup development environment>>.
+
+
+=== Gentoo
+
+On Gentoo Linux you can simply use https://github.com/cvut/gentoo-overlay/tree/master/dev-lua/ngx-oauth[dev-lua/ngx-oauth] ebuild from the https://github.com/cvut/gentoo-overlay[CVUT Overlay].
+
+. Add CVUT overlay, read instructions https://github.com/cvut/gentoo-overlay#usage[here].
+
+. Allow to install “unstable” packages `dev-lua/lua-cjson`, `dev-lua/luaossl`, and `dev-lua/ngx-oauth` (all three are available in the overlay):
+
+    echo -e 'dev-lua/lua-cjson\ndev-lua/luaossl\ndev-lua/ngx-oauth' >> /etc/portage/package.accept_keywords/ngx-oauth
+
+. Install `dev-lua/ngx-oauth`:
+
+    emerge -av ngx-oauth
+
+
+=== Debian/Ubuntu
+
+. Install nginx-extras (consider installing from some PPA to get not-so-old version…):
+
+    apt-get install nginx-extras
+
+. Install luarocks, libssl-dev, and git:
+
+    apt-get install luarocks libssl-dev git
+
+. Install ngx-oauth:
+
+    luarocks install luaossl CRYPTO_LIBDIR=/usr/lib/x86_64-linux-gnu OPENSSL_LIBDIR=/usr/lib/x86_64-linux-gnu
+    luarocks install --server=http://luarocks.org/dev ngx-oauth
+
+
 == Usage
 
 [source, nginx]
