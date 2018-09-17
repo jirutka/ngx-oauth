@@ -10,7 +10,7 @@ __all__ = ['BottleServer']
 
 class BottleServer(Process):
 
-    def __init__(self, bottle_app, port=free_tcp_port(), server='cherrypy',
+    def __init__(self, bottle_app, port=free_tcp_port(), server='waitress',
                  check_url=None, bottle_opts={}):
         opts = dict(port=port, server=server, **bottle_opts)
 
