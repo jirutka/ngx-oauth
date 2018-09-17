@@ -41,21 +41,6 @@ or to get the latest development version:
 Note: If you want to bootstrap development environment or just try ngx-oauth without any hassle, read section <<Setup development environment>>.
 
 
-=== Gentoo
-
-On Gentoo Linux you can simply use https://github.com/cvut/gentoo-overlay/tree/master/dev-lua/ngx-oauth[dev-lua/ngx-oauth] ebuild from the https://github.com/cvut/gentoo-overlay[CVUT Overlay].
-
-. Add CVUT overlay, read instructions https://github.com/cvut/gentoo-overlay#usage[here].
-
-. Allow to install “unstable” packages `dev-lua/lua-cjson`, `dev-lua/luaossl`, and `dev-lua/ngx-oauth` (all three are available in the overlay):
-
-    echo -e 'dev-lua/lua-cjson\ndev-lua/luaossl\ndev-lua/ngx-oauth' >> /etc/portage/package.accept_keywords/ngx-oauth
-
-. Install `dev-lua/ngx-oauth`:
-
-    emerge -av ngx-oauth
-
-
 === Debian/Ubuntu
 
 . Install nginx-extras (consider installing from some PPA to get not-so-old version…):
