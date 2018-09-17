@@ -12,7 +12,9 @@ env:
   matrix:
     - LUA_VERSION=luajit-2.0
     - LUA_VERSION=luajit-2.1
-    - LUA_VERSION=lua-5.1
+    # FIXME: Currently does not work, probably because hererocks does not build
+    # shared library for PUC Lua.
+    #- LUA_VERSION=lua-5.1
 matrix:
   allow_failures:
     - env: LUA_VERSION=luajit-2.1  # luajit-2.1 is still in beta
