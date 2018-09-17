@@ -13,11 +13,11 @@ def OAuthServerMock(config):
     request = LocalRequest()
 
     token = {
-        'access_token': conf.access_token,
+        'access_token': conf['access_token'],
         'token_type': 'bearer',
-        'refresh_token': conf.refresh_token,
+        'refresh_token': conf['refresh_token'],
         'expires_in': 3600,
-        'scope': conf.scope
+        'scope': conf['scope']
     }
 
     @app.get('/')
