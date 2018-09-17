@@ -41,6 +41,25 @@ or to get the latest development version:
 Note: If you want to bootstrap development environment or just try ngx-oauth without any hassle, read section <<Setup development environment>>.
 
 
+=== Alpine Linux
+
+. Install nginx with the Lua module:
+
+    apk add nginx nginx-mod-http-lua
+
+. Install Lua dependencies:
+
+    apk add lua5.1-cjson lua5.1-ossl lua5.1-resty-http
+
+. Install LuaRocks and git (for installing development version of the ngx-oauth from LuaRocks):
+
+    apk add git luarocks-5.1
+
+. Install ngx-oauth from LuaRocks:
+
+    luarocks-5.1 install --server=http://luarocks.org/dev ngx-oauth
+
+
 === Debian/Ubuntu
 
 . Install nginx-extras (consider installing from some PPA to get not-so-old version…):
