@@ -10,7 +10,7 @@ if not ok then
 end
 
 -- unpack is not global since Lua 5.3
-local unpack = table.unpack or unpack
+local unpack = table.unpack or unpack  --luacheck: ignore
 
 local concat   = util.concat
 local is_empty = util.is_empty

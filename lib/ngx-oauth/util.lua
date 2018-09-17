@@ -2,7 +2,7 @@
 -- General utility functions.
 
 -- unpack is not global since Lua 5.3
-local unpack = table.unpack or unpack
+local unpack = table.unpack or unpack  --luacheck: ignore
 
 
 --- Calls the function `func` with the given arguments. This is equivalent to:
