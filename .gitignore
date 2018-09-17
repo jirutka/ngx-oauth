@@ -5,4 +5,5 @@
 # Python
 __pycache__/
 .cache/
+.pytest_cache/
 *.py[cod]
