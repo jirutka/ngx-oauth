@@ -4,19 +4,19 @@
 # This script ensures that lua interpreter and lua modules specified in Rocksfile are installed.
 #
 # Environment variables:
-#   LUA_VERSION    : Required version of the lua interpreter (e.g. lua-5.1, luajit-2.0). If this
+#   LUA_VERSION    : Required version of the lua interpreter (e.g. lua-5.1, luajit-2.1). If this
 #                    version is not available on PATH and USE_SYSTEM_LUA != 'yes', then it will be
 #                    installed, otherwise it fails.
 #                    If not set, then the script checks if lua-5.1, or luajit-2 is available.
-#                    If not and USE_SYSTEM_LUA != 'yes', then luajit-2.0 will be installed,
+#                    If not and USE_SYSTEM_LUA != 'yes', then luajit-2.1 will be installed,
 #                    otherwise it fails.
 #
 #   USE_SYSTEM_LUA : Set to 'yes' if you want to use system provided lua. Default is to install
 #                    lua locally in .env directory.
 set -e -o pipefail
 
-DEFAULT_VERSION='luajit-2.0'
-HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/0.2.0/hererocks.py'
+DEFAULT_VERSION='luajit-2.1'
+HEREROCKS_URI='https://raw.githubusercontent.com/mpeterv/hererocks/0.20.0/hererocks.py'
 show_path_warn=
 
 

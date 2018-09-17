@@ -10,19 +10,19 @@
 #                       build and install nginx locally in .env directory.
 set -e -o pipefail
 
-NGINX_VERSION=${NGINX_VERSION:-1.9.7}
+NGINX_VERSION=${NGINX_VERSION:-1.14.0}
 NGINX_URI="http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz"
 NGINX_WD="nginx-$NGINX_VERSION"
 
-NGINX_LUA_VERSION=${NGINX_LUA_VERSION:-0.9.19}
+NGINX_LUA_VERSION=${NGINX_LUA_VERSION:-0.10.13}
 NGINX_LUA_URI="https://github.com/openresty/lua-nginx-module/archive/v${NGINX_LUA_VERSION}.tar.gz"
 NGINX_LUA_WD="lua-nginx-module-$NGINX_LUA_VERSION"
 
-NGINX_DEVKIT_VERSION='0.2.19'
+NGINX_DEVKIT_VERSION='0.3.0'
 NGINX_DEVKIT_URI="https://github.com/simpl/ngx_devel_kit/archive/v${NGINX_DEVKIT_VERSION}.tar.gz"
 NGINX_DEVKIT_WD="ngx_devel_kit-$NGINX_DEVKIT_VERSION"
 
-PCRE_VERSION='8.37'
+PCRE_VERSION='8.42'
 PCRE_URI="https://downloads.sourceforge.net/project/pcre/pcre/${PCRE_VERSION}/pcre-${PCRE_VERSION}.tar.gz"
 PCRE_WD="pcre-$PCRE_VERSION"
 
