@@ -1,15 +1,14 @@
-#!/bin/bash
+#!/bin/sh
 # vim: set ts=4:
 #
 # Runs unit tests and linter.
 #
-set -e -o pipefail
+set -e
 
 #======================  Functions  ======================#
 
-report-coverage() {
-	echo -e '\nHits\tMiss\tRate\tFile'
-	echo -e '--------------------------------------------------'
+report_coverage() {
+	echo ''
 	cat "$TEMP_DIR/luacov.report.out" | sed -nE '/^Summary/,$p' | tail -n+4
 }
 
@@ -19,13 +18,13 @@ report-coverage() {
 # Go to the project's root directory.
 cd "$(dirname "$0")/.."
 
-source script/common.sh
-setup-path
+. script/common.sh
+setup_path
 script/bootstrap
 
 einfo '==> Running unit tests...'
 busted --shuffle --verbose --coverage
-report-coverage
+report_coverage
 
 einfo '==> Running linter...'
 luacheck lib/*

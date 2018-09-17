@@ -5,36 +5,47 @@
 VENV_DIR="$(pwd)/.env"
 TEMP_DIR="$(pwd)/.tmp"
 
+# Set pipefail if supported.
+if ( set -o pipefail 2>/dev/null ); then
+	set -o pipefail
+fi
+
 die() {
-	echo -e "ERROR: $1" >&2
+	printf 'ERROR: %s\n' "$1" >&2
 	exit ${2:-2}
 }
 
 einfo() {
-	echo -e "\n$@"
+	printf '\n%s\n' "$@"
 }
 
 exists() {
-	command -v "$1" &>/dev/null
+	command -v "$1" >/dev/null 2>&1
 }
 
-is-venv-on-path() {
-	[[ "$PATH" == "$VENV_DIR/bin":* ]]
+is_venv_on_path() {
+	case "$PATH" in
+		"$VENV_DIR/bin":*) return 0;;
+		*) return 1;;
+	esac
 }
 
-setup-path() {
-	is-venv-on-path || export PATH="$VENV_DIR/bin:$PATH"
+setup_path() {
+	is_venv_on_path || export PATH="$VENV_DIR/bin:$PATH"
 }
 
-warn-if-venv-not-on-path() {
-	is-venv-on-path || cat <<-EOF
+warn_if_venv_not_on_path() {
+	is_venv_on_path || cat <<-EOF
 
-		! You should add ".env/bin" to your PATH. Execute "source .envrc" in your !
-		! shell, or install direnv or similar tool that will do it for you.       !
+		! You should add ".env/bin" to your PATH. Execute ". ./.envrc" in your !
+		! shell, or install direnv or similar tool that will do it for you.    !
 
 	EOF
 }
 
 yesno() {
-	[[ "$1" =~ ^(y|yes|Y|YES)$ ]]
+	case "$1" in
+		y | yes | Y | YES) return 0;;
+		*) return 1;;
+	esac
 }

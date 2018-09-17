@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # vim: set ts=4:
 #
 # This script ensures that nginx with required modules is installed.
@@ -8,7 +8,7 @@
 #   NGINX_LUA_VERSION : Version of lua-nginx-module to compile nginx with.
 #   USE_SYSTEM_NGINX  : Set to 'yes' if you want to use system provided nginx. Default is to
 #                       build and install nginx locally in .env directory.
-set -e -o pipefail
+set -e
 
 NGINX_VERSION=${NGINX_VERSION:-1.14.0}
 NGINX_URI="http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz"
@@ -35,8 +35,11 @@ NGINX_WITHOUT_MODULES='
 
 #======================  Functions  ======================#
 
-has-luajit() {
-	[[ "$($VENV_DIR/bin/lua -v)" == LuaJIT* ]]
+has_luajit() {
+	case "$("$VENV_DIR"/bin/lua -v)" in
+		LuaJIT*) return 0;;
+		*) return 1;;
+	esac
 }
 
 download() {
@@ -51,7 +54,7 @@ download() {
 configure() {
 	local mod myconf
 
-	if has-luajit; then
+	if has_luajit; then
 		export LUAJIT_LIB="$VENV_DIR/lib"
 		export LUAJIT_INC="$VENV_DIR/include"
 	else
@@ -60,7 +63,7 @@ configure() {
 	fi
 
 	for mod in $NGINX_WITHOUT_MODULES; do
-		myconf+=" --without-http_${mod}_module"
+		myconf="$myconf --without-http_${mod}_module"
 	done
 
 	./configure \
@@ -93,15 +96,15 @@ install() {
 # Go to the project's root directory.
 cd "$(dirname "$0")/.."
 
-source script/common.sh
+. script/common.sh
 
 if yesno "$USE_SYSTEM_NGINX"; then
 	exists nginx || die "nginx is not installed and USE_SYSTEM_NGINX=$USE_SYSTEM_NGINX"
 
 	buildinfo=$(nginx -V 2>&1)
 	for needle in lua-nginx-module --with-http_ssl_module --with-pcre; do
-		if ! grep -q -- $needle <<< $buildinfo; then
-			die "nginx is not compiled with ${needle/--with-/} and USE_SYSTEM_NGINX=$USE_SYSTEM_NGINX"
+		if ! echo "$buildinfo" | grep -q -- $needle; then
+			die "nginx is not compiled with ${needle#--with-} and USE_SYSTEM_NGINX=$USE_SYSTEM_NGINX"
 		fi
 	done
 

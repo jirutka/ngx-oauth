@@ -1,15 +1,15 @@
-#!/bin/bash
+#!/bin/sh
 # vim: set ts=4:
 #
 # Runs integration tests.
 #
-set -e -o pipefail
+set -e
 
 # Go to the project's root directory.
 cd "$(dirname "$0")/.."
 
-source script/common.sh
-setup-path
+. script/common.sh
+setup_path
 script/bootstrap-full
 
 einfo '==> Running integration tests...'

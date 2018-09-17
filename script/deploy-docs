@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 # vim: set ts=4:
 #
 # Generate docs using ldoc and deploy them to gh-pages branch in the repository.
 #
-set -e -o pipefail
+set -e
 
 DEPLOY_BRANCH='gh-pages'
 SOURCE_BRANCH='master'
@@ -17,9 +17,9 @@ fi
 
 shield() {
 	if [ -n "$GH_TOKEN" ]; then
-		eval $@ 2>&1 | sed "s/${GH_TOKEN}/*****/g"
+		eval "$@" 2>&1 | sed "s/${GH_TOKEN}/*****/g"
 	else
-		eval $@
+		eval "$@"
 	fi
 }
 
@@ -45,9 +45,9 @@ remote_origin_url() {
 }
 
 skip_push() {
-	[ -n "$TRAVIS" ] && [[ "$TRAVIS_PULL_REQUEST" != 'false' \
-		|| "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" \
-		|| "$TRAVIS_BUILD_NUMBER.1" != "$TRAVIS_JOB_NUMBER" ]]
+	[ -n "$TRAVIS" ] && [ "$TRAVIS_PULL_REQUEST" != 'false' ] \
+		|| [ "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ] \
+		|| [ "$TRAVIS_BUILD_NUMBER.1" != "$TRAVIS_JOB_NUMBER" ]
 }
 
 
@@ -56,8 +56,8 @@ skip_push() {
 # Go to the project's root directory.
 cd "$(dirname "$0")/.."
 
-source script/common.sh
-setup-path
+. script/common.sh
+setup_path
 script/bootstrap
 
 einfo '==> Updating ldoc documentation...'

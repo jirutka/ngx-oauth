@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 # vim: set ts=4:
-set -e -o pipefail
+set -e
 
-source "$(dirname "$0")/common.sh"
+. "$(dirname "$0")/common.sh"
 
 script/bootstrap-lua
 script/bootstrap-nginx
 script/bootstrap-python
 
-warn-if-venv-not-on-path
+warn_if_venv_not_on_path
