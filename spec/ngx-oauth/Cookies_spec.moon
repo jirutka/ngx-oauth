@@ -2,7 +2,7 @@ require 'moon.all'
 Cookies = require 'ngx-oauth.Cookies'
 import concat from require 'ngx-oauth.util'
 
-ALL_COOKIES = {'access_token', 'refresh_token', 'username'}
+ALL_COOKIES = {'access_token', 'original_uri', 'refresh_token', 'username'}
 
 set_cookie = (name, value) ->
   ngx.var['cookie_'..name] = value
@@ -80,6 +80,21 @@ describe '__call', ->
           assert.same { access_token_cookie(tkn) }, _G.ngx.header['Set-Cookie']
 
 
+  describe 'add_original_uri', ->
+    expected = { "#{prefix}original_uri=https%3A%2F%2Fexample.org%2Ffoobar%2F;max-age=600;#{cookie_attrs}" }
+
+    it 'writes cookies with original_uri', ->
+      cookies.add_original_uri('https://example.org/foobar/')
+      assert.same expected, _G.ngx.header['Set-Cookie']
+
+    it 'does not overwrite existing Set-Cookie', ->
+      existing = {'foo=42;path=/', 'bar=55;path=/'}
+      _G.ngx.header['Set-Cookie'] = existing
+
+      cookies.add_original_uri('https://example.org/foobar/')
+      assert.same concat(existing, expected), _G.ngx.header['Set-Cookie']
+
+
   describe 'add_username', ->
     expected = { "#{prefix}username=flynn;max-age=#{conf.max_age};#{cookie_attrs}" }
 
@@ -108,6 +123,18 @@ describe '__call', ->
     it 'returns value of access_token cookie', ->
       set_cookie "#{prefix}access_token", 'token-123'
       assert.same 'token-123', cookies.get_access_token()
+
+
+  describe 'get_original_uri', ->
+
+    context 'original_uri cookie exists', ->
+      it 'returns value of original_uri cookie', ->
+        set_cookie "#{prefix}original_uri", 'https://example.org/foobar/'
+        assert.same 'https://example.org/foobar/', cookies.get_original_uri()
+
+    context 'original_uri cookie does not exist', ->
+      it 'returns nil', ->
+        assert.is_nil cookies.get_original_uri()
 
 
   describe 'get_refresh_token', ->

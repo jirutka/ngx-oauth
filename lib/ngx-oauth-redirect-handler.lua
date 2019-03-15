@@ -33,14 +33,16 @@ if err_code then
 elseif auth_code then
   log.debug("requesting token for auth code: %s", auth_code)
 
+  local next_uri = cookies.get_original_uri() or conf.success_uri
+
   local token = get_or_fail(oauth.request_token('authorization_code', conf, auth_code))
   cookies.add_token(token)
 
   local user = get_or_fail(httpc.get_for_json(conf.userinfo_url, token.access_token))
   cookies.add_username(user.username)
 
-  log.info("authorized user '%s', redirecting to: %s", user.username, conf.success_uri)
-  return ngx.redirect(conf.success_uri, 303)
+  log.info("authorized user '%s', redirecting to: %s", user.username, next_uri)
+  return ngx.redirect(next_uri, 303)
 
 else
   return nginx.fail(400, "Missing query parameter 'code' or 'error'.")

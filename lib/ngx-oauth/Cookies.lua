@@ -20,7 +20,7 @@ local par      = util.partial
 local pipe     = util.pipe
 local unless   = util.unless
 
-local ALL_COOKIES = { 'access_token', 'refresh_token', 'username' }
+local ALL_COOKIES = { 'access_token', 'original_uri', 'refresh_token', 'username' }
 
 
 --- Creates a new Cookies "object" with the given configuration.
@@ -53,6 +53,15 @@ return function (conf, crypto)
 
   local function get_cookie(name)
     return nginx.get_cookie(conf.cookie_prefix..name)
+  end
+
+  --- Writes original URI cookie to the *response's* `Set-Cookie` header.
+  --
+  -- @tparam string URI
+  self.add_original_uri = function(uri)
+    nginx.add_response_cookies {
+      create_cookie('original_uri', uri, 600)
+    }
   end
 
   --- Writes access token and refresh token (if provided) cookies to the
@@ -93,6 +102,12 @@ return function (conf, crypto)
   -- @function get_access_token
   -- @treturn string|nil An access token, or `nil` if not set.
   self.get_access_token = par(get_cookie, 'access_token')
+
+  --- Reads an original URI from the *request's* cookies.
+  --
+  -- @function get_original_uri
+  -- @treturn string|nil An original URI, or `nil` if not set.
+  self.get_original_uri = par(get_cookie, 'original_uri')
 
   --- Reads a refresh token from the *request's* cookies.
   -- @treturn string|nil A decrypted refresh token, or `nil` if not set.
