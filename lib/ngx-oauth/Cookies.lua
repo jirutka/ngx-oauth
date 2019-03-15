@@ -88,6 +88,17 @@ return function (conf, crypto)
     }
   end
 
+  --- Clears the specified cookie, i.e. adds it to the *response's*
+  -- `Set-Cookie` header with value `deleted` and `Max-Age=0`.
+  --
+  -- @function clear
+  -- @tparam string name The cookie name without the prefix.
+  self.clear = function(name)
+    nginx.add_response_cookies {
+      clear_cookie(name)
+    }
+  end
+
   --- Clears all cookies managed by this module, i.e. adds them to the
   -- *response's* `Set-Cookie` header with value `deleted` and `Max-Age=0`.
   --

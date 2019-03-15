@@ -110,6 +110,14 @@ describe '__call', ->
       assert.same concat(existing, expected), _G.ngx.header['Set-Cookie']
 
 
+  describe 'clear', ->
+    name = 'foo'
+
+    it 'sets the specified cookie to "deleted" and max-age 0', ->
+      cookies.clear(name)
+      assert.same { "#{prefix}#{name}=deleted;max-age=0;#{cookie_attrs}" }, _G.ngx.header['Set-Cookie']
+
+
   describe 'clear_all', ->
     expected = [ "#{prefix}#{name}=deleted;max-age=0;#{cookie_attrs}" for name in *ALL_COOKIES ]
 

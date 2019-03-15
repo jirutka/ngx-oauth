@@ -33,7 +33,12 @@ if err_code then
 elseif auth_code then
   log.debug("requesting token for auth code: %s", auth_code)
 
-  local next_uri = cookies.get_original_uri() or conf.success_uri
+  local next_uri = cookies.get_original_uri()
+  if next_uri then
+    cookies.clear('original_uri')
+  else
+    next_uri = conf.success_uri
+  end
 
   local token = get_or_fail(oauth.request_token('authorization_code', conf, auth_code))
   cookies.add_token(token)
