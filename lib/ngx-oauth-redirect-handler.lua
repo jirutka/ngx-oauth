@@ -21,6 +21,7 @@ if err then
   return nginx.fail(500, "OAuth proxy error: %s", err)
 end
 
+local tokens = ngx.shared.oauth_tokens
 local cookies = Cookies(conf)
 local err_code = nginx.get_uri_arg('error')
 local auth_code = nginx.get_uri_arg('code')
@@ -42,6 +43,7 @@ elseif auth_code then
 
   local token = get_or_fail(oauth.request_token('authorization_code', conf, auth_code))
   cookies.add_token(token)
+  tokens:set(token.access_token, true, token.expires_in)
 
   local user = get_or_fail(httpc.get_for_json(conf.userinfo_url, token.access_token))
   cookies.add_username(user.username)

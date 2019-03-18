@@ -11,6 +11,8 @@ events {
 http {
     lua_package_path '../lib/?.lua;;';
 
+    lua_shared_dict oauth_tokens 16m;
+
     server {
         listen ${port} ssl;
         server_name localhost;
@@ -46,6 +48,12 @@ http {
 
             rewrite ^/_proxy/(.*)$$ /$$1 break;
             proxy_pass ${rp_base_uri};
+        }
+
+        location /secured/ {
+            access_by_lua_file '../lib/ngx-oauth-access.lua';
+
+            alias ../integration/support/;
         }
     }
 }
