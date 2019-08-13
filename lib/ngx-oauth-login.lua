@@ -37,10 +37,10 @@ if cookies.get_refresh_token() then
     cookies.add_token
   )()
 
-  return ngx.redirect(conf.success_uri)
+  return ngx.redirect(conf.success_uri, 303)
 
 -- Cookie with refresh token not found, redirecting to the authorization endpoint.
 else
   log.info('redirecting to authorization endpoint')
-  return ngx.redirect(oauth.authorization_url(conf))
+  return ngx.redirect(oauth.authorization_url(conf), 303)
 end

@@ -40,7 +40,7 @@ elseif auth_code then
   cookies.add_username(user.username)
 
   log.info("authorized user '%s', redirecting to: %s", user.username, conf.success_uri)
-  return ngx.redirect(conf.success_uri)
+  return ngx.redirect(conf.success_uri, 303)
 
 else
   return nginx.fail(400, "Missing query parameter 'code' or 'error'.")
