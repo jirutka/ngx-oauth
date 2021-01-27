@@ -10,6 +10,7 @@ local map             = util.map
 local par             = util.partial
 local starts_with     = util.starts_with
 
+local oauth_config_prefix = ngx.var['oauth_config_prefix'] or 'oauth_'
 local DEFAULTS = {
   client_id         = '',
   client_secret     = '',
@@ -30,7 +31,7 @@ local OAAS_ENDPOINT_VARS = {'authorization_url', 'token_url', 'userinfo_url'}
 
 
 local load_from_ngx = par(map, function(default_value, key)
-    return util.default(ngx.var['oauth_'..key], default_value)
+    return util.default(ngx.var[oauth_config_prefix..key], default_value)
   end, DEFAULTS)
 
 local function validate (conf)
