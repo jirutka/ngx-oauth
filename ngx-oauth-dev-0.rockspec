@@ -4,7 +4,7 @@ package = 'ngx-oauth'
 version = 'dev-0'
 
 source = {
-  url = 'git://github.com/jirutka/ngx-oauth.git',
+  url = 'git://github.com/subzerocloud/ngx-oauth.git',
   branch = 'master'
 }
 
