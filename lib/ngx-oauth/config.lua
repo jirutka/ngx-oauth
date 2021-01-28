@@ -10,7 +10,7 @@ local map             = util.map
 local par             = util.partial
 local starts_with     = util.starts_with
 
-local oauth_config_prefix = ngx.var['oauth_config_prefix'] or 'oauth_'
+local oauth_config_prefix = nil
 local DEFAULTS = {
   client_id         = '',
   client_secret     = '',
@@ -72,6 +72,7 @@ local M = {}
 -- @treturn nil|string Validation error, or `false` if no validation
 --   error was found.
 function M.load ()
+  oauth_config_prefix = ngx.var['oauth_config_prefix'] or 'oauth_'
   local conf = load_from_ngx()
 
   if not is_absolute_url(conf.redirect_uri) then
