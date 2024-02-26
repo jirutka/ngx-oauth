@@ -16,7 +16,7 @@ image:https://coveralls.io/repos/{gh-name}/badge.svg?branch={gh-branch}&service=
 image:https://img.shields.io/badge/ldoc-docs-blue.svg["LDoc", link="{ldoc-url}"]
 endif::env-github[]
 
-TBD
+*IMPORTANT: This project has been deprecated in favour of https://github.com/jirutka/nginx-oidc-njs[nginx-oidc-njs].*
 
 
 == Requirements
